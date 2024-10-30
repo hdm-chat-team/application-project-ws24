@@ -1,0 +1,12 @@
+{
+	"name": "@application-project-ws24/backend",
+	"scripts": {
+		"dev": "bun run --hot src/index.ts"
+	},
+	"dependencies": {
+		"hono": "^4.6.8"
+	},
+	"devDependencies": {
+		"@types/bun": "latest"
+	}
+}

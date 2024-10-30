@@ -1,0 +1,19 @@
+{
+	"recommendations": [
+		"biomejs.biome",
+		"oven.bun-vscode",
+		"catppuccin.catppuccin-vsc-pack",
+		"vivaxy.vscode-conventional-commits",
+		"usernamehw.errorlens",
+		"github.vscode-github-actions",
+		"eamodio.gitlens",
+		"oderwat.indent-rainbow",
+		"christian-kohler.npm-intellisense",
+		"yoavbls.pretty-ts-errors",
+		"stivo.tailwind-fold",
+		"bradlc.vscode-tailwindcss",
+		"alfredbirk.tailwind-documentation",
+		"aaron-bond.better-comments",
+		"fill-labs.dependi"
+	]
+}

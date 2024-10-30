@@ -2,22 +2,30 @@
   "name": "application-project-ws24",
   "private": true,
   "scripts": {
+    "check": "turbo biome",
+    "check:fix": "turbo biome:fix",
     "build": "turbo build",
     "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "biome": "biome check",
+    "biome:fix": "biome check --write",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
+    "@biomejs/biome": "1.9.4",
     "turbo": "^2.2.3",
     "typescript": "5.5.4"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20",
+    "bun": ">=1.1.33"
   },
   "packageManager": "bun@1.1.33",
   "workspaces": [
     "apps/*",
     "packages/*"
+  ],
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "core-js-pure"
   ]
 }
