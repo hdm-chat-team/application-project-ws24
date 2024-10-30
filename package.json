@@ -7,8 +7,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "biome": "biome check",
-    "biome:fix": "biome check --write",
-    "prepare": "husky"
+    "biome:fix": "biome check --write"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
