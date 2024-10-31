@@ -1,0 +1,31 @@
+# Ignore node_modules directory
+node_modules
+
+# Ignore Docker-related files
+Dockerfile*
+docker-compose*
+
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore documentation files
+README.md
+LICENSE
+
+# Ignore editor and IDE configurations
+.vscode
+.editorconfig
+.idea
+
+# Ignore build and coverage directories
+coverage*
+dist/
+build/
+
+# Ignore environment files
+.env
+
+# Ignore Makefile and Helm charts
+Makefile
+helm-charts
