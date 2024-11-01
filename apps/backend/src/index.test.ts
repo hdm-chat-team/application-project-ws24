@@ -3,9 +3,9 @@ import { testClient } from "hono/testing";
 import app from ".";
 import type { ClientType } from ".";
 
-const client = testClient(app) as ClientType;
+const { api } = testClient(app) as ClientType;
 
 test("GET /", async () => {
-	const res = await client.api.$get();
+	const res = await api.$get();
 	expect(res.ok).toBe(true);
 });
