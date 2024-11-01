@@ -13,7 +13,7 @@
 					"level": "info",
 					"fix": "safe",
 					"options": {
-						"attributes": ["class"]
+						"attributes": ["class", "className"]
 					}
 				}
 			}
