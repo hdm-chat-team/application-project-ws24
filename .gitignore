@@ -27,11 +27,10 @@ coverage
 .vercel
 
 # Build Outputs
-.next/
 out/
 build
 dist
-
+dist-ssr
 
 # Debug
 npm-debug.log*
