@@ -8,6 +8,7 @@
 		"hono": "^4.6.8"
 	},
 	"devDependencies": {
+		"@application-project-ws24/tsconfig": "workspace:*",
 		"@types/bun": "latest"
 	}
 }
