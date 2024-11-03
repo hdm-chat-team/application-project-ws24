@@ -1,38 +1,37 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
-FROM oven/bun:alpine AS base
-WORKDIR /usr/src/app
-ENV HUSKY=0
+ARG BUN_VERSION=1.1.34
 
-# install dependencies into temp directory
-# this will cache them and speed up future builds
-FROM base AS install
-RUN mkdir -p /temp/dev
-COPY package.json /temp/dev/
-RUN cd /temp/dev && bun install --frozen-lockfile
+ARG YARN_PKG_MANAGER="this.packageManager=\"yarn@1.22.22\""
+ARG BUN_PKG_MANAGER="this.packageManager=\"bun@${BUN_VERSION}\""
 
-# install with --production (exclude devDependencies)
-RUN mkdir -p /temp/prod
-COPY package.json /temp/prod/
-RUN cd /temp/prod && bun install --frozen-lockfile --production
+FROM oven/bun:${BUN_VERSION} as bun
+WORKDIR /app
 
-# copy node_modules from temp directory
-# then copy all (non-ignored) project files into the image
-FROM base AS prerelease
-COPY --from=install /temp/dev/node_modules node_modules
+FROM oven/bun:${BUN_VERSION}-alpine as bun-alpine
+WORKDIR /app
+
+# ================= TURBO PRUNE ===================
+
+FROM bun as pruned
+ARG YARN_PKG_MANAGER
 COPY . .
+RUN bunx json -I -f package.json -e ${YARN_PKG_MANAGER}
+RUN bunx turbo prune --scope="@application-project-ws24/backend" --docker
 
-# [optional] tests & build
-ENV NODE_ENV=production
-RUN bun test
-RUN bun run build
+# =============== INSTALL & BUILD =================
 
-# copy production dependencies and source code into final image
-FROM base AS release
-COPY --from=prerelease /usr/src/app/apps/backend/dist ./dist
-COPY --from=prerelease /usr/src/app/package.json .
+FROM bun as builder
+ARG BUN_PKG_MANAGER
+COPY --from=pruned /app/out/full/ .
+RUN bunx json -I -f package.json -e ${BUN_PKG_MANAGER}
+RUN bun install --production
+RUN bunx clean-modules -y "**/*.ts" "**/@types/**"
+RUN bunx turbo build --filter="@application-project-ws24/backend"
 
-# run the app
+# ================== RELEASE ======================
+
+FROM bun-alpine AS release
 USER bun
+COPY --from=builder /app .
 EXPOSE 3000/tcp
-ENTRYPOINT [ "bun", "./dist/index.js" ]
+WORKDIR /app/apps/backend
+ENTRYPOINT [ "bun", "dist/index.js" ]
