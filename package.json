@@ -6,7 +6,7 @@
     "check:fix": "turbo biome:fix",
     "build": "turbo build",
     "dev": "turbo dev",
-    "start": "turbo start", 
+    "start": "turbo start",
     "biome": "biome check",
     "biome:fix": "biome check --write"
   },
@@ -26,6 +26,7 @@
   ],
   "trustedDependencies": [
     "@biomejs/biome",
+    "@swc/core",
     "core-js-pure"
   ]
 }

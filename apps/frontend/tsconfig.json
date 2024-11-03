@@ -1,0 +1,10 @@
+{
+	"extends": "@application-project-ws24/tsconfig/tsconfig.json",
+	"compilerOptions": {
+		"lib": ["DOM"],
+		"jsx": "react-jsx",
+		"isolatedModules": true,
+		"useDefineForClassFields": true,
+		"noUncheckedSideEffectImports": true
+	}
+}
