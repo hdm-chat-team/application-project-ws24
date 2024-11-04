@@ -32,7 +32,7 @@ readline
 	});
 
 function gracefulShutdown() {
-	console.log(`Shutting down in ${SHUTDOWN_DELAY_MS / 1000}ms...`);
+	console.log(`Shutting down in ${SHUTDOWN_DELAY_MS / 1000}s...`);
 	isShuttingDown = true;
 	setTimeout(() => {
 		console.log("Server closed.");
