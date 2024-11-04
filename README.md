@@ -2,7 +2,7 @@
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 
-A messanger for students at [Stuttgart Media University](https://www.hdm-stuttgart.de/)
+A realtime web messanger for students at [Stuttgart Media University](https://www.hdm-stuttgart.de/)
 
 ## Requirements
 
@@ -18,7 +18,10 @@ We use [Turborepo](https://turbo.build) for managing our apps/packages
 ### Apps
 
 - `backend`: a [Hono](https://hono.dev) app
-- `frontend`: a [Vite](https://vite.dev) app using [React](https://react.dev)
+- `frontend`: a [Vite](https://vite.dev) app using
+  - [React](https://react.dev) for reactivity
+  - [Tanstack Router](https://tanstack.com/router/) for managing SPA routes
+  - [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
 
 ### Packages
 
@@ -39,11 +42,19 @@ We use [conventional commits](https://www.conventionalcommits.org) to format com
 
 ## Commands
 
+### Test
+
+So far we are simply using Bun's integrated test runner:
+
+```zsh
+bun test
+```
+
 ### Build
 
 To build all apps and packages, run the following command in the root of the project:
 
-```sh
+```zsh
 bun run build
 ```
 
@@ -51,6 +62,6 @@ bun run build
 
 To start all development servers, run the following command:
 
-```sh
+```zsh
 bun dev
 ```
