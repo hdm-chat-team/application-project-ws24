@@ -4,6 +4,9 @@
 		"dev": "bun run --hot src/index.ts",
 		"build": "bun build src/index.ts --outdir dist --target bun --minify"
 	},
+	"exports": {
+		"./client": "./src/app.ts"
+	},
 	"dependencies": {
 		"hono": "^4.6.8"
 	},

@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@application-project-ws24/backend": "workspace:*",
+    "hono": "^4.6.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
