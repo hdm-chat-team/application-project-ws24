@@ -20,6 +20,6 @@
 		}
 	},
 	"files": {
-		"ignore": ["**/package.json"]
+		"ignore": ["**/package.json", "routeTree.gen.ts"]
 	}
 }

@@ -1,7 +1,12 @@
 import api from "@/lib/api";
+import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export default function App() {
+export const Route = createLazyFileRoute("/")({
+	component: Index,
+});
+
+function Index() {
 	const [data, setData] = useState<string>("");
 
 	useEffect(() => {
