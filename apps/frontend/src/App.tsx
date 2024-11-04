@@ -1,8 +1,5 @@
-import type { AppType } from "@application-project-ws24/backend/client";
-import { hc } from "hono/client";
+import api from "./lib/api";
 import { useEffect, useState } from "react";
-
-const { api } = hc<AppType>("/");
 
 export default function App() {
 	const [data, setData] = useState<string>("");
