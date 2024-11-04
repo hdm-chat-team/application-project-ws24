@@ -1,33 +1,41 @@
-import { Hono } from "hono";
-import type { hc } from "hono/client";
-import { HTTPException } from "hono/http-exception";
-import { logger } from "hono/logger";
-import { prettyJSON } from "hono/pretty-json";
+import readline from "node:readline";
+import app from "./app";
 
-// * App
-const app = new Hono();
+const SHUTDOWN_DELAY_MS = 10000;
+let isShuttingDown = false;
 
-// * Middleware
-app
-	.use(logger())
-	.use(prettyJSON({ space: 2 }))
-	.onError(async (error) => {
-		if (!(error instanceof HTTPException))
-			return new Response(error.message, {
-				status: 500,
-				statusText: `Internal error: ${error.cause}`,
-			});
-		return error.getResponse();
-	});
-
-// * Routes
-const routes = app.basePath("/api").get("/", (c) => {
-	return c.text("Hello Hono!");
+// * server start up
+const server = Bun.serve({
+	port: 3000,
+	fetch: (req) =>
+		isShuttingDown
+			? new Response("Server is shutting down", { status: 503 })
+			: app.fetch(req),
 });
 
-// * Startup
-export default app;
+console.log(`Server is running at ${server.url}`);
 
-// * Types
-export type AppType = typeof routes;
-export type ClientType = ReturnType<typeof hc<AppType>>;
+// * shutdown handling
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
+
+readline
+	.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	})
+	.on("line", (input) => {
+		// listen for "q" to shutdown
+		if (input.trim().toLowerCase() === "q") {
+			gracefulShutdown();
+		}
+	});
+
+function gracefulShutdown() {
+	console.log(`Shutting down in ${SHUTDOWN_DELAY_MS/1000}ms...`);
+	isShuttingDown = true;
+	setTimeout(() => {
+		console.log("Server closed.");
+		process.exit(0);
+	}, SHUTDOWN_DELAY_MS);
+}
