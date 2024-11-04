@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
@@ -13,6 +14,9 @@ declare module "@tanstack/react-router" {
 	}
 }
 
+// * Create a new query client instance
+const queryClient = new QueryClient();
+
 // * Render the app
 // biome-ignore lint/style/noNonNullAssertion: default
 const rootElement = document.getElementById("root")!;
@@ -20,7 +24,9 @@ if (!rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<RouterProvider router={router} />
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
 		</StrictMode>,
 	);
 }
