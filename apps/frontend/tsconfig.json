@@ -5,6 +5,11 @@
 		"jsx": "react-jsx",
 		"isolatedModules": true,
 		"useDefineForClassFields": true,
-		"noUncheckedSideEffectImports": true
+		"noUncheckedSideEffectImports": true,
+
+		"baseUrl": "./",
+		"paths": {
+			"@/*": ["./src/*"]
+		}
 	}
 }
