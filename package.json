@@ -6,7 +6,7 @@
     "check:fix": "turbo biome:fix",
     "build": "turbo build",
     "dev": "turbo dev",
-    "start": "turbo start",
+    "preview": "turbo preview",
     "biome": "biome check",
     "biome:fix": "biome check --write"
   },

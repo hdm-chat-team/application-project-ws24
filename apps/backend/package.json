@@ -2,7 +2,8 @@
 	"name": "@application-project-ws24/backend",
 	"scripts": {
 		"dev": "bun run --hot src/index.ts",
-		"build": "bun build src/index.ts --outdir dist --target bun --minify"
+		"build": "bun build src/index.ts --outdir dist --target bun --minify",
+		"preview": "bun run dist/index.js"
 	},
 	"exports": {
 		"./client": "./src/app.ts"

@@ -7,13 +7,19 @@
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": ["dist"]
 		},
-		"//#biome": {},
-		"//#biome:fix": {
-			"cache": false
-		},
 		"dev": {
 			"cache": false,
 			"persistent": true
+		},
+		"preview": {
+			"dependsOn": ["^build", "build"],
+			"inputs": ["dist", ".env*"],
+			"cache": false,
+			"persistent": true
+		},
+		"//#biome": {},
+		"//#biome:fix": {
+			"cache": false
 		}
 	}
 }
