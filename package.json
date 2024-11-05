@@ -28,6 +28,7 @@
     "@biomejs/biome",
     "@swc/core",
     "core-js-pure",
-    "esbuild"
+    "esbuild",
+    "sharp"
   ]
 }
