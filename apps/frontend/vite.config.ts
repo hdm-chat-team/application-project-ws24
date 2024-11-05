@@ -15,9 +15,10 @@ export default defineConfig({
 			},
 			includeAssets: ["favicon.ico", "apple-touch-icon.png"],
 			manifest: {
-				name: "My Awesome App",
-				short_name: "MyApp",
-				description: "My Awesome App description",
+				name: "StudyConnect",
+				short_name: "SC",
+				description: "The best way to connect at HdM",
+				// TODO: Set App Color
 				theme_color: "#ffffff",
 				icons: [
 					{
