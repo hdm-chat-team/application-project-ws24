@@ -9,9 +9,8 @@ on:
 
 jobs:
     test:
+        name: Test
         runs-on: ubuntu-latest
-        container:
-            image: alpine:latest
         steps:
             - uses: actions/checkout@v4
             - name: Setup Bun
