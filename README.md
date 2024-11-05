@@ -2,6 +2,8 @@
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 
+[![Test](https://github.com/DenizGazitepe/application-project-ws24/actions/workflows/test.yml/badge.svg)](https://github.com/DenizGazitepe/application-project-ws24/actions/workflows/test.yml)
+
 A realtime web messanger for students at [Stuttgart Media University](https://www.hdm-stuttgart.de/)
 
 ## Requirements
