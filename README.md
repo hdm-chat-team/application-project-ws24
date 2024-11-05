@@ -2,18 +2,18 @@
 
 [![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev) [![Tests](https://github.com/DenizGazitepe/application-project-ws24/actions/workflows/test.yml/badge.svg)](https://github.com/DenizGazitepe/application-project-ws24/actions/workflows/test.yml)
 
-A realtime web messanger for students at [Stuttgart Media University](https://www.hdm-stuttgart.de/)
+A realtime web messanger to connect students at [Stuttgart Media University](https://www.hdm-stuttgart.de/)
 
 ## Requirements
 
 This project uses Bun as its package manager and server runtime.
 To install it follow the instructions [here](https://bun.sh).
 
-You will also need [Node.js](https://nodejs.org/en/download)
+You will also need [Node.js](https://nodejs.org/en/download).
 
 ## Project structure
 
-We use [Turborepo](https://turbo.build) for managing our apps/packages
+We use [Turborepo](https://turbo.build) for managing our apps/packages.
 
 ### Apps
 
