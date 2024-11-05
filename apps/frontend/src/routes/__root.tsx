@@ -13,6 +13,7 @@ const TanStackRouterDevtools =
 			);
 
 export const Route = createRootRoute({
+	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
 			<div className="flex gap-2 p-2">
@@ -22,8 +23,10 @@ export const Route = createRootRoute({
 			</div>
 			<hr />
 			<Outlet />
-			<TanStackRouterDevtools />
-			<ReactQueryDevtools />
+			<Suspense>
+				<TanStackRouterDevtools />
+				<ReactQueryDevtools />
+			</Suspense>
 		</>
 	),
 });
