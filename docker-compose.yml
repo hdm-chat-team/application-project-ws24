@@ -12,7 +12,7 @@ services:
   
   db:
     container_name: postgres
-    image: postgres:16
+    image: postgres:latest
     restart: always
     environment:
       POSTGRES_USER: application-project-team
