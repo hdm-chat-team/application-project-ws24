@@ -29,8 +29,10 @@ dist
 dist-ssr
 dev-dist
 
-# TanStack router
+
+# code gen
 routeTree.gen.ts
+drizzle/
 
 # Debug
 npm-debug.log*
