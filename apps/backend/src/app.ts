@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import type { hc } from "hono/client";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
@@ -25,12 +24,8 @@ app
 app.use(serveStatic({ root: "./dist/client" }));
 
 // * Routes
-const routes = app.basePath("/api").get("/", (c) => {
+export const routes = app.basePath("/api").get("/", (c) => {
 	return c.text("Hello Hono!");
 });
 
-// * exports
 export default app;
-
-export type AppType = typeof routes;
-export type ClientType = ReturnType<typeof hc<AppType>>;
