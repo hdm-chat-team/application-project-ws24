@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { serveStatic } from "hono/bun";
 import type { hc } from "hono/client";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
@@ -9,7 +10,7 @@ const app = new Hono();
 
 // * Middleware
 app
-	.use(logger())
+	.use("/api", logger())
 	.use(prettyJSON({ space: 2 }))
 	.onError(async (error) => {
 		if (!(error instanceof HTTPException))
@@ -19,6 +20,9 @@ app
 			});
 		return error.getResponse();
 	});
+
+// * serve SPA
+app.use(serveStatic({ root: "./dist/client" }));
 
 // * Routes
 const routes = app.basePath("/api").get("/", (c) => {
