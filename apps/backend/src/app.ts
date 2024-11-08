@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { hc } from "hono/client";
+import { serveStatic } from "hono/bun";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
@@ -9,7 +9,7 @@ const app = new Hono();
 
 // * Middleware
 app
-	.use(logger())
+	.use("/api", logger())
 	.use(prettyJSON({ space: 2 }))
 	.onError(async (error) => {
 		if (!(error instanceof HTTPException))
@@ -20,13 +20,12 @@ app
 		return error.getResponse();
 	});
 
+// * serve SPA
+app.use(serveStatic({ root: "./dist/client" }));
+
 // * Routes
-const routes = app.basePath("/api").get("/", (c) => {
+export const routes = app.basePath("/api").get("/", (c) => {
 	return c.text("Hello Hono!");
 });
 
-// * exports
 export default app;
-
-export type AppType = typeof routes;
-export type ClientType = ReturnType<typeof hc<AppType>>;

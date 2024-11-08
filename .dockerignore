@@ -19,13 +19,15 @@ LICENSE
 .idea
 
 # Ignore build and coverage directories
-coverage*
-dist/
-build/
+out/
+build
+dist
+dist-ssr
+dev-dist
 
-# Ignore environment files
-.env
+# Generated files
+routeTree.gen.ts
+drizzle/
 
-# Ignore Makefile and Helm charts
-Makefile
-helm-charts
+# Turbo
+.turbo

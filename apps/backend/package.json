@@ -7,7 +7,7 @@
 		"preview": "bun run dist/index.js"
 	},
 	"exports": {
-		"./client": "./src/app.ts"
+		"./client": "./src/types.ts"
 	},
 	"dependencies": {
 		"hono": "4.6.9"
