@@ -1,6 +1,10 @@
 {
   "name": "@application-project-ws24/database",
   "type": "module",
+  "exports": {
+    ".": "./src/db.ts",
+    "./schema": "./src/schema.sql.ts"
+  },
   "scripts": {
     "db": "bunx drizzle-kit"
   },
