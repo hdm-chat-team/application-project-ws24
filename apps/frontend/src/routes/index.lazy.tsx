@@ -7,6 +7,12 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
+	const ws = api.ws.$ws();
+
+	ws.addEventListener("open", () => {
+		ws.send("Hello from client!");
+	});
+
 	const { data, isPending } = useQuery({
 		queryKey: ["data"],
 		queryFn: fetchData,

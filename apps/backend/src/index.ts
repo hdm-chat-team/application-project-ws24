@@ -1,5 +1,8 @@
 import readline from "node:readline";
+import { createBunWebSocket } from "hono/bun";
 import app from "./app";
+
+const { websocket } = createBunWebSocket();
 
 const SHUTDOWN_DELAY_MS = 10000;
 let isShuttingDown = false;
@@ -7,10 +10,8 @@ let isShuttingDown = false;
 // * server start up
 const server = Bun.serve({
 	port: 3000,
-	fetch: (req) =>
-		isShuttingDown
-			? new Response("Server is shutting down", { status: 503 })
-			: app.fetch(req),
+	fetch: app.fetch,
+	websocket,
 });
 
 console.log(`Server is running at ${server.url}`);
