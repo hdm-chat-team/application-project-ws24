@@ -1,51 +1,48 @@
 import { relations } from "drizzle-orm";
 import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-const defaultColumns = {
+const defaults = {
 	id: uuid().primaryKey().defaultRandom(),
 	createdAt: timestamp().defaultNow().notNull(),
 	updatedAt: timestamp(),
 };
 
 // * User
-export const userTable = pgTable("users", {
-	...defaultColumns,
+export const users = pgTable("users", {
+	...defaults,
 	email: varchar({ length: 255 }).notNull().unique(),
 	username: varchar({ length: 20 }).notNull().unique(),
 	passwordHash: varchar({ length: 255 }).notNull(),
 });
 
-export const userTableRelations = relations(userTable, ({ one }) => ({
-	profile: one(userProfileTable, {
-		fields: [userTable.id],
-		references: [userProfileTable.userId],
+export const userRelations = relations(users, ({ one }) => ({
+	profile: one(userProfiles, {
+		fields: [users.id],
+		references: [userProfiles.userId],
 		relationName: "profile",
 	}),
 }));
 
-export const userProfileTable = pgTable("user_profile", {
-	...defaultColumns,
+export const userProfiles = pgTable("user_profiles", {
+	...defaults,
 	userId: uuid()
-		.references(() => userTable.id, { onDelete: "cascade" })
+		.references(() => users.id, { onDelete: "cascade" })
 		.notNull(),
 	displayName: varchar({ length: 50 }).notNull(),
 });
 
-export const userProfileTableRelations = relations(
-	userProfileTable,
-	({ one }) => ({
-		owner: one(userTable, {
-			fields: [userProfileTable.userId],
-			references: [userTable.id],
-		}),
+export const userProfileRelations = relations(userProfiles, ({ one }) => ({
+	owner: one(users, {
+		fields: [userProfiles.userId],
+		references: [users.id],
 	}),
-);
+}));
 
 // * Session
-export const sessionTable = pgTable("session", {
-	...defaultColumns,
+export const sessions = pgTable("sessions", {
+	id: varchar({ length: 64 }).primaryKey(),
 	userId: uuid()
-		.references(() => userTable.id, { onDelete: "cascade" })
+		.references(() => users.id, { onDelete: "cascade" })
 		.notNull(),
 	expiresAt: timestamp("expires_at", {
 		withTimezone: true,
