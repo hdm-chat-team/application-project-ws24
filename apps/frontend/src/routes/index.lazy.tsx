@@ -26,7 +26,7 @@ function Index() {
 }
 
 async function fetchData() {
-	const response = await api.$get();
+	const response = await api.rest.$get();
 	if (!response.ok) {
 		throw new Error("Failed to fetch data");
 	}
