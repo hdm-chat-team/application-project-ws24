@@ -3,7 +3,7 @@ import { createBunWebSocket } from "hono/bun";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
-const ws = new Hono().get(
+export const ws = new Hono().get(
 	"/",
 	upgradeWebSocket(() => {
 		return {
@@ -17,5 +17,3 @@ const ws = new Hono().get(
 		};
 	}),
 );
-
-export default ws;
