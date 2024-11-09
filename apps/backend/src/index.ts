@@ -10,7 +10,10 @@ let isShuttingDown = false;
 // * server start up
 const server = Bun.serve({
 	port: 3000,
-	fetch: app.fetch,
+	fetch: (req) =>
+		isShuttingDown
+			? new Response("Server is shutting down", { status: 503 })
+			: app.fetch(req),
 	websocket,
 });
 
