@@ -3,4 +3,5 @@ import { hc } from "hono/client";
 
 const { api } = hc<AppType>("http://localhost:3000"); // ! "/" resulted in an error
 
+export const { rest: restApi, ws: socketApi } = api;
 export default api;
