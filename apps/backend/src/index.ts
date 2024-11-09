@@ -2,18 +2,22 @@ import readline from "node:readline";
 import { createBunWebSocket } from "hono/bun";
 import app from "./app";
 
+// * Setup
 const { websocket } = createBunWebSocket();
+
+const { PORT } = Bun.env;
+const port = PORT ?? 3000;
 
 const SHUTDOWN_DELAY_MS = 10000;
 let isShuttingDown = false;
 
 // * server start up
 const server = Bun.serve({
-	port: 3000,
-	fetch: (req) =>
+	port,
+	fetch: (request) =>
 		isShuttingDown
 			? new Response("Server is shutting down", { status: 503 })
-			: app.fetch(req),
+			: app.fetch(request),
 	websocket,
 });
 
