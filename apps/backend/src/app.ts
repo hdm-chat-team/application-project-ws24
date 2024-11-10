@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
 import { every } from "hono/combine";
 import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { config } from "./lib/config";
@@ -14,7 +15,10 @@ const app = new Hono();
 
 // * Middleware
 app
-	.use("/api/*", every(logger(), prettyJSON(), cors(config.cors)))
+	.use(
+		"/api/*",
+		every(logger(), prettyJSON(), cors(config.cors), csrf(config.csrf)),
+	)
 	.onError(errorHandler);
 
 // * serve SPA

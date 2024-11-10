@@ -19,4 +19,7 @@ export const config = {
 		methods: ["GET", "POST", "PUT", "DELETE"],
 		maxAge: isDev ? undefined : 3600,
 	},
+	csrf: {
+		origin,
+	},
 };
