@@ -1,16 +1,14 @@
-import readline from "node:readline";
+import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
 import app from "./app";
 
 // * Setup
-const { websocket } = createBunWebSocket();
-
+export const { websocket } = createBunWebSocket<ServerWebSocket>();
 const { PORT } = Bun.env;
-const port = PORT ?? 3000;
 
-// * server start up
+// * Server start up
 const server = Bun.serve({
-	port,
+	port: PORT ?? 3000,
 	fetch: app.fetch,
 	websocket,
 });

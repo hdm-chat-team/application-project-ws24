@@ -10,7 +10,7 @@ import { rest } from "./routes/rest";
 import { ws } from "./routes/sockets";
 
 // * App
-const app = new Hono().basePath("/api");
+const app = new Hono();
 
 // * Middleware
 app
@@ -21,6 +21,9 @@ app
 app.use(serveStatic({ root: "./dist/client" }));
 
 // * Routes
-export const routes = app.route("/ws", ws).route("/rest", rest);
+export const routes = app
+	.basePath("/api")
+	.route("/ws", ws)
+	.route("/rest", rest);
 
 export default app;
