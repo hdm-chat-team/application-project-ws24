@@ -3,7 +3,8 @@
   "type": "module",
   "exports": {
     ".": "./src/db.ts",
-    "./schema": "./src/schema.sql.ts"
+    "./schema": "./src/schema.sql.ts",
+    "./queries": "./src/queries.sql.ts"
   },
   "scripts": {
     "db": "bunx drizzle-kit"
