@@ -9,6 +9,7 @@ import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
 import { rest } from "./routes/rest";
 import { ws } from "./routes/sockets";
+import { requestId } from "hono/request-id";
 
 // * App
 const app = new Hono();
@@ -17,7 +18,13 @@ const app = new Hono();
 app
 	.use(
 		"/api/*",
-		every(logger(), prettyJSON(), cors(config.cors), csrf(config.csrf)),
+		every(
+			requestId(),
+			logger(),
+			prettyJSON(),
+			cors(config.cors),
+			csrf(config.csrf),
+		),
 	)
 	.onError(errorHandler);
 
