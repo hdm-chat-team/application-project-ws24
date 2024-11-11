@@ -3,7 +3,9 @@ import { createBunWebSocket } from "hono/bun";
 import app from "./app";
 
 // * Setup
-export const { websocket } = createBunWebSocket<ServerWebSocket>();
+export const { websocket } =
+	createBunWebSocket<ServerWebSocket<{ user: string }>>();
+
 const { PORT } = Bun.env;
 
 // * Server start up

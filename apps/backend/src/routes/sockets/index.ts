@@ -2,18 +2,37 @@ import type { ServerWebSocket } from "bun";
 import { Hono } from "hono";
 import { createBunWebSocket } from "hono/bun";
 
-const { upgradeWebSocket } = createBunWebSocket<ServerWebSocket>();
+const { upgradeWebSocket } =
+	createBunWebSocket<ServerWebSocket<{ user: string }>>();
+
+const topic = "chat";
 
 export const ws = new Hono().get(
 	"/",
-	upgradeWebSocket(() => {
+	upgradeWebSocket((c) => {
 		return {
-			onMessage(event, ws) {
-				console.log(`Message from client: ${event.data}`);
-				ws.send("Hello from server!");
+			onOpen: (_, ws) => {
+				const clientId = c.get("requestId");
+				const rawWs = ws.raw;
+				if (rawWs) {
+					rawWs.data.user = clientId;
+					const message = `${rawWs.data.user} joined the chat`;
+					rawWs.subscribe(topic);
+					rawWs.publish(topic, message);
+				}
 			},
-			onClose: () => {
-				console.log("Connection closed");
+			onMessage: (event, ws) => {
+				const rawWs = ws.raw;
+				const message = `${rawWs?.data.user}: ${event.data}`;
+				// Send to self first
+				rawWs?.send(message);
+				// Then publish to others
+				rawWs?.publish(topic, message);
+			},
+			onClose: (_, ws) => {
+				const rawWs = ws.raw;
+				const message = `${rawWs?.data.user} left the chat`;
+				rawWs?.publish(topic, message);
 			},
 		};
 	}),

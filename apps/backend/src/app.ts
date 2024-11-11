@@ -5,11 +5,11 @@ import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
+import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
 import { rest } from "./routes/rest";
 import { ws } from "./routes/sockets";
-import { requestId } from "hono/request-id";
 
 // * App
 const app = new Hono();
