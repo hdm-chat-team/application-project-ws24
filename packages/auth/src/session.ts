@@ -8,18 +8,26 @@ import type { Session } from "@application-project-ws24/database/schema";
 import type { SessionValidationResult } from "./types";
 import { hashToken } from "./utils";
 
-// * Constants and initialization
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const SESSION_DURATION = ONE_DAY * 30;
 const REFRESH_THRESHOLD = ONE_DAY * 15;
 
-export function generateSessionToken() {
+/**
+ * Generates a cryptographically secure random session token.
+ * @returns {string} A base64 encoded random token.
+ */
+export function generateSessionToken(): string {
 	return Buffer.from(crypto.getRandomValues(new Uint8Array(20))).toString(
 		"base64",
 	);
 }
 
-// * Session management
+/**
+ * Creates a new session for a user.
+ * @param {string} token - The session token generated for the user.
+ * @param {string} userId - The unique identifier of the user.
+ * @returns {Promise<Session>} The created session object.
+ */
 export async function createSession(
 	token: string,
 	userId: string,
@@ -33,6 +41,11 @@ export async function createSession(
 	return session;
 }
 
+/**
+ * Validates a session token and refreshes the session if needed.
+ * @param {string} token - The session token to validate.
+ * @returns {Promise<SessionValidationResult>} Object containing the session and user if valid, null values if invalid.
+ */
 export async function validateSessionToken(
 	token: string,
 ): Promise<SessionValidationResult> {
@@ -56,6 +69,11 @@ export async function validateSessionToken(
 	return { session, user: session.user };
 }
 
-export async function invalidateSession(sessionId: string) {
+/**
+ * Invalidates and removes a session.
+ * @param {string} sessionId - The ID of the session to invalidate.
+ * @returns {Promise<void>}
+ */
+export async function invalidateSession(sessionId: string): Promise<void> {
 	await deleteSessionById.execute({ sessionId });
 }
