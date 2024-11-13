@@ -49,3 +49,19 @@ export const sessions = pgTable("sessions", {
 		mode: "date",
 	}).notNull(),
 });
+
+// * Message
+export const messages = pgTable("messages", {
+	...defaults,
+	userId: uuid()
+		.references(() => users.id, { onDelete: "cascade" })
+		.notNull(),
+	text: varchar({ length: 1000 }).notNull(),
+});
+
+export const messageRelations = relations(messages, ({ one }) => ({	
+	sender: one(users, {
+		fields: [messages.userId],
+		references: [users.id],
+	}),
+}));
