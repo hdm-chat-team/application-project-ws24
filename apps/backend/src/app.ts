@@ -8,33 +8,33 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
-import { rest } from "./routes/rest";
-import { ws } from "./routes/sockets";
+import { chat } from "./routes/chat";
 
-// * App
-const app = new Hono();
-
-// * Middleware
-app
+// * API
+const api = new Hono()
 	.use(
-		"/api/*",
 		every(
-			requestId(),
-			logger(),
-			prettyJSON(),
 			cors(config.cors),
 			csrf(config.csrf),
+			logger(),
+			requestId(),
+			prettyJSON(),
 		),
 	)
 	.onError(errorHandler);
 
-// * serve SPA
-app.use(serveStatic({ root: "./dist/client" }));
+const apiRoutes = api
+	.basePath("/api")
+	.route("/chat", chat)
+	.get("/", (c) => {
+		return c.text("Hello Hono!");
+	});
+
+// * SPA
+const frontend = new Hono().use(serveStatic({ root: "./dist/client" }));
 
 // * Routes
-export const routes = app
-	.basePath("/api")
-	.route("/ws", ws)
-	.route("/rest", rest);
+const app = new Hono().route("/", api).route("/", frontend);
 
 export default app;
+export { apiRoutes };

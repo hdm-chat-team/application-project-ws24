@@ -13,7 +13,7 @@ function Index() {
 	const [inputMessage, setInputMessage] = useState("");
 
 	useEffect(() => {
-		const socket = api.ws.$ws();
+		const socket = api.chat.$ws();
 		socketRef.current = socket;
 
 		socket.onopen = (event) => {
@@ -70,7 +70,7 @@ function Index() {
 }
 
 async function fetchData() {
-	const response = await api.rest.$get();
+	const response = await api.$get();
 	if (!response.ok) {
 		throw new Error("Failed to fetch data");
 	}

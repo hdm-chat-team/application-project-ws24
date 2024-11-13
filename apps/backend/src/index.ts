@@ -1,10 +1,9 @@
-import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
 import app from "./app";
+import type { ChatSocket } from "./lib/types";
 
 // * Setup
-export const { websocket } =
-	createBunWebSocket<ServerWebSocket<{ user: string }>>();
+export const { websocket } = createBunWebSocket<ChatSocket>();
 
 const { PORT } = Bun.env;
 

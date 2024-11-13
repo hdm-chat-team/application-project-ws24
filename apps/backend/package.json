@@ -6,14 +6,14 @@
 		"build": "bun build src/index.ts --outdir dist --target bun --minify",
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
-	"exports": { 
-		"./types": "./src/types.ts"
+	"exports": {
+		"./client": "./src/client.ts"
 	},
 	"dependencies": {
-		"hono": "4.6.9"
+		"hono": "4.6.10"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "latest"
+		"@types/bun": "^1.1.13"
 	}
 }
