@@ -1,5 +1,5 @@
 import type { hc } from "hono/client";
-import type { routes } from "./app";
+import type { apiRoutes } from "./app";
 
-export type AppType = typeof routes;
+export type AppType = typeof apiRoutes;
 export type ClientType = ReturnType<typeof hc<AppType>>;
