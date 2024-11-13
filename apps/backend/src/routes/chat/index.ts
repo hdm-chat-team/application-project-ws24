@@ -1,9 +1,8 @@
-import type { ServerWebSocket } from "bun";
+import type { ChatSocket } from "src/lib/types";
 import { Hono } from "hono";
 import { createBunWebSocket } from "hono/bun";
 
-const { upgradeWebSocket } =
-	createBunWebSocket<ServerWebSocket<{ user: string }>>();
+const { upgradeWebSocket } = createBunWebSocket<ChatSocket>();
 
 const topic = "chat";
 
@@ -31,8 +30,10 @@ export const chat = new Hono().get(
 			},
 			onClose: (_, ws) => {
 				const rawWs = ws.raw;
-				const message = `${rawWs?.data.user} left the chat`;
-				rawWs?.publish(topic, message);
+				if (rawWs) {
+					const message = `${rawWs.data.user} left the chat`;
+					rawWs.publish(topic, message);
+				}
 			},
 		};
 	}),
