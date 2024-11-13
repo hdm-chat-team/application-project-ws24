@@ -8,8 +8,7 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
-import { rest } from "./routes/rest";
-import { ws } from "./routes/sockets";
+import { chat } from "./routes/chat";
 
 // * App
 const app = new Hono();
@@ -34,7 +33,9 @@ app.use(serveStatic({ root: "./dist/client" }));
 // * Routes
 export const routes = app
 	.basePath("/api")
-	.route("/ws", ws)
-	.route("/rest", rest);
+	.route("/chat", chat)
+	.get("/", (c) => {
+		return c.text("Hello Hono!");
+	});
 
 export default app;

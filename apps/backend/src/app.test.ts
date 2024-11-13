@@ -7,7 +7,7 @@ const { api } = testClient(app) as ClientType;
 
 describe("rest", () => {
 	test("GET /", async () => {
-		const res = await api.rest.$get();
+		const res = await api.$get();
 		expect(res.ok).toBe(true);
 	});
 });

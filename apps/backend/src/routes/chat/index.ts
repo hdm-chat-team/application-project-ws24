@@ -7,7 +7,7 @@ const { upgradeWebSocket } =
 
 const topic = "chat";
 
-export const ws = new Hono().get(
+export const chat = new Hono().get(
 	"/",
 	upgradeWebSocket((c) => {
 		return {
@@ -23,11 +23,11 @@ export const ws = new Hono().get(
 			},
 			onMessage: (event, ws) => {
 				const rawWs = ws.raw;
-				const message = `${rawWs?.data.user}: ${event.data}`;
-				// Send to self first
-				rawWs?.send(message);
-				// Then publish to others
-				rawWs?.publish(topic, message);
+				if (rawWs) {
+					const message = `${rawWs.data.user}: ${event.data}`;
+					rawWs.send(message);
+					rawWs.publish(topic, message);
+				}
 			},
 			onClose: (_, ws) => {
 				const rawWs = ws.raw;
