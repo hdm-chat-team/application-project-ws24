@@ -1,19 +1,19 @@
 {
 	"name": "@application-project-ws24/backend",
-	"module": "src/index.ts",
+	"module": "src/index.js",
 	"scripts": {
-		"dev": "bun run --hot src/index.ts",
+		"dev": "NODE_ENV=development bun run --hot src/index.ts",
 		"build": "bun build src/index.ts --outdir dist --target bun --minify",
-		"preview": "bun run dist/index.js"
+		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"exports": {
-		"./client": "./src/types.ts"
+		"./client": "./src/client.ts"
 	},
 	"dependencies": {
-		"hono": "4.6.9"
+		"hono": "4.6.10"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "latest"
+		"@types/bun": "^1.1.13"
 	}
 }
