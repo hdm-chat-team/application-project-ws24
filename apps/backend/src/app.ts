@@ -8,8 +8,8 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
-import { chat } from "./routes/chat";
 import { githubLoginRouter } from "./routes/auth/github.ts";
+import { chat } from "./routes/chat";
 
 // * API
 const api = new Hono()
