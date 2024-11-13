@@ -8,6 +8,7 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
+import { githubLoginRouter } from "./routes/auth/github.ts";
 import { rest } from "./routes/rest";
 import { ws } from "./routes/sockets";
 
@@ -30,6 +31,7 @@ app
 
 // * serve SPA
 app.use(serveStatic({ root: "./dist/client" }));
+app.route("/test", githubLoginRouter);
 
 // * Routes
 export const routes = app

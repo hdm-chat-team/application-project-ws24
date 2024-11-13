@@ -10,6 +10,7 @@ const defaults = {
 // * User
 export const userTable = pgTable("users", {
 	...defaults,
+	githubId: varchar({ length: 255 }).notNull().unique(),
 	email: varchar({ length: 255 }).notNull().unique(),
 	username: varchar({ length: 20 }).notNull().unique(),
 	passwordHash: varchar({ length: 255 }).notNull(),
