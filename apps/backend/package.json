@@ -7,7 +7,7 @@
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"exports": {
-		"./types": "./src/types.ts"
+		"./client": "./src/client.ts"
 	},
 	"dependencies": {
 		"hono": "4.6.10"
