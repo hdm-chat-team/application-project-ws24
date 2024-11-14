@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -63,7 +64,7 @@ function Index() {
 					onChange={(e) => setInputMessage(e.target.value)}
 					placeholder="Type your message"
 				/>
-				<button type="submit">Send</button>
+				<Button type="submit">Send</Button>
 			</form>
 		</div>
 	);
