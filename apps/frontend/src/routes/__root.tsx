@@ -1,3 +1,4 @@
+import { ThemeProvider } from "@/components/theme-provider";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { Suspense, lazy } from "react";
@@ -16,7 +17,9 @@ export const Route = createRootRoute({
 	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
-			<Outlet />
+			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+				<Outlet />
+			</ThemeProvider>
 			<Suspense>
 				<TanStackRouterDevtools />
 				<ReactQueryDevtools />
