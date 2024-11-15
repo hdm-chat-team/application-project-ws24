@@ -3,6 +3,6 @@
 	"compilerOptions": {
 		// Hono JSX
 		"jsx": "react-jsx",
-		"jsxImportSource": "hono/jsx",
+		"jsxImportSource": "hono/jsx"
 	}
 }
