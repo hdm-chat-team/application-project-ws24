@@ -1,13 +1,10 @@
 {
-	"name": "@application-project-ws24/backend",
+	"name": "@application-project-ws24/app",
 	"module": "src/index.js",
 	"scripts": {
-		"dev": "NODE_ENV=development bun run --hot src/index.ts",
-		"build": "bun build src/index.ts --outdir dist --target bun --minify",
+		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
+		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
 		"preview": "NODE_ENV=production bun run dist/index.js"
-	},
-	"exports": {
-		"./client": "./src/client.ts"
 	},
 	"dependencies": {
 		"hono": "4.6.10"
