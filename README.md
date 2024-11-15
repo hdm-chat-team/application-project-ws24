@@ -16,16 +16,16 @@ You will also need [Node.js](https://nodejs.org/en/download).
 ## 🏗️ Project structure
 
 We use 🚀 [Turborepo](https://turbo.build) for managing our apps/packages.
+Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### 🌐 Apps
 
-Each app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-- `/backend`: a 🔥 [Hono](https://hono.dev) app
-- `/frontend`: a ⚡ [Vite](https://vite.dev) app using
-  - ⚛️ [React](https://react.dev) for reactivity
-  - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes
-  - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
+- `/app`: a monorepo-style app
+  - `/backend`: a 🔥 [Hono](https://hono.dev) app
+  - `/frontend`: a ⚡ [Vite](https://vite.dev) app using
+    - ⚛️ [React](https://react.dev) for reactivity
+    - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes
+    - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
 
 ### 📦 Packages
 
@@ -34,7 +34,6 @@ Each app is 100% [TypeScript](https://www.typescriptlang.org/).
   - following the 🔐 [lucia-auth](https://lucia-auth.com/) tutorial
 - `/database`: package for handling db schema and access
   - using 💧 [Drizzle ORM](https://orm.drizzle.team/) with [PostgreSQL](https://www.postgresql.org/) on the server
-  - Local message Storage: TBD
 
 ## 🧰 Utilities
 
