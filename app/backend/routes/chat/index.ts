@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { createBunWebSocket } from "hono/bun";
-import type { ChatSocket } from "src/lib/types";
+import type { ChatSocket } from "backend/lib/types";
 
 const { upgradeWebSocket } = createBunWebSocket<ChatSocket>();
 
