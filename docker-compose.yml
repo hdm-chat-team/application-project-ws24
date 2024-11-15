@@ -10,18 +10,18 @@ services:
     networks:
       - app_network
   
-#  db:
-#    container_name: postgres
-#    image: postgres:latest
-#    restart: always
-#    environment:
-#      POSTGRES_USER: application-project-team
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: server-db
-#    ports:
-#      - 5432:5432
-#    networks:
-#      - app_network
+  db:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: application-project-team
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: server-db
+    ports:
+      - 5432:5432
+    networks:
+      - app_network
 
 networks:
   app_network:
