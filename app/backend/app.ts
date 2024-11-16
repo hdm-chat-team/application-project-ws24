@@ -1,5 +1,5 @@
+import { createApi, createRouter } from "#lib/create-app";
 import { serveStatic } from "hono/bun";
-import { createApi, createRouter } from "./lib/create-app";
 import { chat } from "./routes/chat";
 
 // * API
@@ -13,7 +13,6 @@ const api = createApi()
 // * SPA
 const frontend = createRouter().use(serveStatic({ root: "./dist/client" }));
 
-// * Routes
 const app = createRouter().route("/", api).route("/", frontend);
 
 export default app;

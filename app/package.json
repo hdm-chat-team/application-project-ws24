@@ -1,6 +1,9 @@
 {
 	"name": "@application-project-ws24/app",
 	"module": "src/index.js",
+	"imports": {
+		"#lib/*": "./backend/lib/*.ts"
+	},
 	"scripts": {
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
