@@ -1,5 +1,5 @@
-import { createApi, createRouter } from "#lib/create-app";
 import { serveStatic } from "hono/bun";
+import { createApi, createRouter } from "#lib/create-app";
 import { chat } from "./routes/chat";
 
 // * API
