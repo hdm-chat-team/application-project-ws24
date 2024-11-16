@@ -4,7 +4,7 @@ import { api } from "./app";
 
 const client = testClient(api);
 
-describe("rest", () => {
+describe("/api", () => {
 	test("GET /", async () => {
 		const res = await client.api.$get();
 		expect(res.ok).toBe(true);
