@@ -1,12 +1,12 @@
-import { Hono } from "hono";
-import { createBunWebSocket } from "hono/bun";
+import { createRouter } from "backend/lib/create-app";
 import type { ChatSocket } from "backend/lib/types";
+import { createBunWebSocket } from "hono/bun";
 
 const { upgradeWebSocket } = createBunWebSocket<ChatSocket>();
 
 const topic = "chat";
 
-export const chat = new Hono().get(
+export const chat = createRouter().get(
 	"/",
 	upgradeWebSocket((c) => {
 		return {

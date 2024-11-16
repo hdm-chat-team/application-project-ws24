@@ -1,13 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";
-import app from "src/app";
-import type { ClientType } from "src/client";
+import { api } from "./app";
 
-const { api } = testClient(app) as ClientType;
+const client = testClient(api);
 
 describe("rest", () => {
 	test("GET /", async () => {
-		const res = await api.$get();
+		const res = await client.api.$get();
 		expect(res.ok).toBe(true);
 	});
 });

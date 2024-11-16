@@ -1,29 +1,9 @@
-import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
-import { every } from "hono/combine";
-import { cors } from "hono/cors";
-import { csrf } from "hono/csrf";
-import { logger } from "hono/logger";
-import { prettyJSON } from "hono/pretty-json";
-import { requestId } from "hono/request-id";
-import { config } from "./lib/config";
-import { errorHandler } from "./lib/middleware";
+import { createApi, createRouter } from "./lib/create-app";
 import { chat } from "./routes/chat";
 
 // * API
-const api = new Hono()
-	.use(
-		every(
-			cors(config.cors),
-			csrf(config.csrf),
-			logger(),
-			requestId(),
-			prettyJSON(),
-		),
-	)
-	.onError(errorHandler);
-
-const apiRoutes = api
+const api = createApi()
 	.basePath("/api")
 	.route("/chat", chat)
 	.get("/", (c) => {
@@ -31,10 +11,10 @@ const apiRoutes = api
 	});
 
 // * SPA
-const frontend = new Hono().use(serveStatic({ root: "./dist/client" }));
+const frontend = createRouter().use(serveStatic({ root: "./dist/client" }));
 
 // * Routes
-const app = new Hono().route("/", api).route("/", frontend);
+const app = createRouter().route("/", api).route("/", frontend);
 
 export default app;
-export { apiRoutes };
+export { api };
