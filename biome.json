@@ -7,6 +7,7 @@
 		"defaultBranch": "main"
 	},
 	"linter": {
+		"ignore": ["app/frontend/src/components/ui/**"],
 		"rules": {
 			"nursery": {
 				"useSortedClasses": {
@@ -20,6 +21,6 @@
 		}
 	},
 	"files": {
-		"ignore": ["**/package.json", "apps/frontend/src/components/ui/**"]
+		"ignore": ["**/package.json"]
 	}
 }
