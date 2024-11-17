@@ -1,7 +1,7 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRoute,createRoute } from "@tanstack/react-router";
 import { Suspense, lazy } from "react";
-import TestPage from './testpage'; 
+import TestPage from './test-page'; 
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV === "production"
