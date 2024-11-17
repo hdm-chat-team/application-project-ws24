@@ -1,7 +1,6 @@
 import Dexie from 'dexie';
 import type { EntityTable } from 'dexie';
-import { v4 as uuidv4 } from 'uuid';
-
+import { randomUUID } from 'node:crypto';
 
 // * Define the message itself
 export interface Message {
@@ -38,7 +37,7 @@ class MessageService {
     private async addMessageToDb(content: string, type: 'sent' | 'received'): Promise<void> {
         try {
             await messageDb.table('messages').add({
-                id: uuidv4(),
+                id: randomUUID(),
                 content,
                 type,
                 timestamp: Date.now()
