@@ -12,7 +12,7 @@ const TanStackRouterDevtools =
 				})),
 			);
 
-export const rootRoute = createRootRoute({
+export const Route = createRootRoute({
 	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
@@ -24,5 +24,3 @@ export const rootRoute = createRootRoute({
 		</>
 	),
 });
-
-export const Route = rootRoute;
