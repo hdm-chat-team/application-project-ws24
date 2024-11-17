@@ -1,6 +1,5 @@
-import Dexie from 'dexie';
-import type { EntityTable } from 'dexie';
-import { randomUUID } from 'node:crypto';
+import Dexie from "dexie";
+import type { EntityTable } from "dexie";
 
 // * Define the message itself
 export interface Message {
@@ -45,7 +44,7 @@ class MessageService {
     // * Create a message object
     private createMessage(content: string, status: 'sent' | 'received'): Message {
         return {
-            id: randomUUID(),
+			id: crypto.randomUUID(),
             content,
             status,
             timestamp: Date.now()
