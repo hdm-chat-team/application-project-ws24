@@ -34,27 +34,39 @@ class MessageService {
     }
 
     // * Helper function to add a message to the local database
-    private async addMessageToDb(content: string, type: 'sent' | 'received'): Promise<void> {
+    private async addMessageToDb(message: Message): Promise<void> {
         try {
-            await messageDb.table('messages').add({
-                id: randomUUID(),
-                content,
-                type,
-                timestamp: Date.now()
-            });
+            await messageDb.table('messages').add(message);
         } catch (error) {
             console.error('Error adding message to database', error);
         }
     }
 
+    // * Create a message object
+    private createMessage(content: string, status: 'sent' | 'received'): Message {
+        return {
+            id: randomUUID(),
+            content,
+            status,
+            timestamp: Date.now()
+        };
+    }
+
+    // * Add a message to the local database
+    public async addMessage(message: Message): Promise<void> {
+        await this.addMessageToDb(message);
+    }
+
     // * Add a sent message to the local database
-    public async addMessage(content: string): Promise<void> {
-        await this.addMessageToDb(content, 'sent');
+    public async addSentMessage(content: string): Promise<void> {
+        const message = this.createMessage(content, 'sent');
+        await this.addMessage(message);
     }
 
     // * Add a received message to the local database
     public async addReceivedMessage(content: string): Promise<void> {
-        await this.addMessageToDb(content, 'received');
+        const message = this.createMessage(content, 'received');
+        await this.addMessage(message);
     }
 }
 
