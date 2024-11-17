@@ -13,7 +13,6 @@ export const userTable = pgTable("users", {
 	githubId: varchar({ length: 255 }).notNull().unique(),
 	email: varchar({ length: 255 }).notNull().unique(),
 	username: varchar({ length: 20 }).notNull().unique(),
-	passwordHash: varchar({ length: 255 }).notNull(),
 });
 
 export const userTableRelations = relations(userTable, ({ one }) => ({

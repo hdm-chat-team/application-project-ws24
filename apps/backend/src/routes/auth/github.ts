@@ -2,19 +2,19 @@ import { OAuth2RequestError, generateState } from "arctic";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
-import { github } from "./github-provider.ts";
 
+import { github } from "@application-project-ws24/auth/github";
 import {
 	createSession,
 	generateSessionToken,
-} from "@application-project-ws24/auth";
+} from "@application-project-ws24/auth/session";
 import db from "@application-project-ws24/database";
 import { userTable } from "@application-project-ws24/database/schema";
-import type { Context } from "./github-context.ts";
+import type { Context } from "../../lib/types.ts";
 
 export const githubLoginRouter = new Hono<Context>();
 
-githubLoginRouter.get("/login/github", async (c) => {
+githubLoginRouter.get("/github", async (c) => {
 	const state = generateState();
 	const url = github.createAuthorizationURL(state, ["user"]);
 	setCookie(c, "github_oauth_state", state, {
@@ -27,11 +27,11 @@ githubLoginRouter.get("/login/github", async (c) => {
 	return c.redirect(url.toString());
 });
 
-githubLoginRouter.get("/login/github/callback", async (c) => {
+githubLoginRouter.get("/github/callback", async (c) => {
 	const code = c.req.query("code")?.toString() ?? null;
 	const state = c.req.query("state")?.toString() ?? null;
-	// @ts-ignore
-	const storedState = getCookie(c).github_oauth_state ?? null;
+	const { github_oauth_state } = getCookie(c);
+	const storedState = github_oauth_state ?? null;
 	if (!code || !state || !storedState || state !== storedState) {
 		return c.body(null, 400);
 	}
@@ -60,8 +60,6 @@ githubLoginRouter.get("/login/github/callback", async (c) => {
 			githubId: githubUser.id,
 			username: githubUser.login,
 			email: "HABEN WIR NOCH NICHT VON GITHUB",
-			passwordHash:
-				"KEINE AHNUNG WARUM DAS HIER STEHEN SOLLTE, DIE NUTZER DATEN STEHEN IN GITHUB, ICH MÖCHTE KEIN PASSWORT HASH IN MEINER DB SPEICHERN!!!",
 		});
 		const session = await createSession(sessionID, githubUser.id);
 		setCookie(c, sessionID, JSON.stringify(session));

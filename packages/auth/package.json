@@ -3,7 +3,8 @@
   "type": "module",
   "types": "./src/types.ts",
   "exports": {
-    ".": "./src/session.ts"
+    "./session": "./src/session.ts",
+    "./github" : "./src/github-provider.ts"
   },
   "devDependencies": {
     "@application-project-ws24/tsconfig": "workspace:*",

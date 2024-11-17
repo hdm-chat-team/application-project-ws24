@@ -32,6 +32,7 @@ api.route("/test", githubLoginRouter);
 const apiRoutes = api
 	.basePath("/api")
 	.route("/chat", chat)
+	.route("/login", githubLoginRouter)
 	.get("/", (c) => {
 		return c.text("Hello Hono!");
 	});
