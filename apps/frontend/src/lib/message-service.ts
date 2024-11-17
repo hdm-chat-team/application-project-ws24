@@ -1,6 +1,5 @@
 import Dexie from 'dexie';
 import type { EntityTable } from 'dexie';
-import { useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -9,7 +8,7 @@ export interface Message {
     id?: string;
     content: string;
     timestamp: number;
-    type: 'sent' | 'received';
+    status: 'sent' | 'received';
 }
 
 // * Define the local database with the message table
@@ -59,22 +58,5 @@ class MessageService {
         await this.addMessageToDb(content, 'received');
     }
 }
-
-// * Create a custom hook to encapsulate the access to the MessageService
-export const useMessageService = () => {
-    const messageService = MessageService.getInstance();
-
-    
-    const addMessage = useCallback(async (content: string) => {
-        await messageService.addMessage(content);
-    }, [messageService]);
-
-    
-    const addReceivedMessage = useCallback(async (content: string) => {
-        await messageService.addReceivedMessage(content);
-    }, [messageService]);
-
-    return { addMessage, addReceivedMessage };
-};
 
 export { messageDb, MessageService };

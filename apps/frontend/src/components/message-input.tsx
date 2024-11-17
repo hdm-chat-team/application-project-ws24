@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useMessageService } from '../lib/message-service';
+import { useMessageService } from '../lib/hooks/use-message-service';
 
 
 // * Component to input a message which will be added to the local database
-export const MessageInput = () => {
+export default function MessageInput() {
     const { addMessage } = useMessageService();
     const [inputMessage, setInputMessage] = useState('');
 
@@ -28,5 +28,3 @@ export const MessageInput = () => {
         </form>
     );
 };
-
-export { MessageInput as default };

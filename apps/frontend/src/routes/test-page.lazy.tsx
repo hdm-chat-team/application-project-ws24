@@ -1,7 +1,8 @@
 import { lazy,useState, useEffect } from 'react'
 import { createLazyFileRoute } from '@tanstack/react-router'
 import MessageInput from '../components/message-input'
-import { messageDb, useMessageService } from '../lib/message-service'
+import { messageDb } from '../lib/message-service'
+import { useMessageService } from '../lib/hooks/use-message-service';
 import type { Message } from '../lib/message-service'
 
 // * Define the route for the test page
@@ -32,7 +33,7 @@ const TestPage = () => {
   // * Handle the save message button click
   const handleSaveMessage = async () => {
     if (receivedMessage.trim() === '') {
-      alert('Nachricht darf nicht leer sein')
+      alert('Message is empty')
       return
     }
     await addReceivedMessage(receivedMessage)
@@ -50,7 +51,7 @@ const TestPage = () => {
         type="text"
         value={receivedMessage}
         onChange={handleReceiveMessage}
-        placeholder="Empfangene Nachricht eingeben"
+        placeholder="type in the received message"
       />
       <button type="button" onClick={handleSaveMessage}>
         Nachricht speichern
@@ -58,7 +59,7 @@ const TestPage = () => {
       <ul>
         {messages.map((msg: Message) => (
           <li key={msg.id}>
-            {msg.content} ({msg.type})
+            {msg.content} ({msg.status})
           </li>
         ))}
       </ul>

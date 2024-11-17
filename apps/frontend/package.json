@@ -15,7 +15,8 @@
     "@tanstack/react-query-devtools": "^5.59.20",
     "hono": "4.6.10",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "dexie": "^4.0.9"
   },
   "devDependencies": {
     "@application-project-ws24/tsconfig": "workspace:*",
