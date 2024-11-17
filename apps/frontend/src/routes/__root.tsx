@@ -1,6 +1,7 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Outlet, createRootRoute } from "@tanstack/react-router";
+import { Outlet, createRootRoute,createRoute } from "@tanstack/react-router";
 import { Suspense, lazy } from "react";
+import TestPage from './testpage'; 
 
 const TanStackRouterDevtools =
 	process.env.NODE_ENV === "production"
@@ -12,7 +13,7 @@ const TanStackRouterDevtools =
 				})),
 			);
 
-export const Route = createRootRoute({
+export const rootRoute = createRootRoute({
 	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
@@ -24,3 +25,14 @@ export const Route = createRootRoute({
 		</>
 	),
 });
+
+// * Create a new route for the test page
+export const testPageRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/testpage',
+    component: TestPage,
+});
+
+rootRoute.addChildren([testPageRoute]);
+
+export const Route = rootRoute;

@@ -1,10 +1,12 @@
 import Dexie from 'dexie';
 import type { EntityTable } from 'dexie';
 import { useCallback } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+
 
 // * Define the message itself
-interface Message {
-    id?: number;
+export interface Message {
+    id?: string;
     content: string;
     timestamp: number;
     type: 'sent' | 'received';
@@ -37,6 +39,7 @@ class MessageService {
     private async addMessageToDb(content: string, type: 'sent' | 'received'): Promise<void> {
         try {
             await messageDb.table('messages').add({
+                id: uuidv4(),
                 content,
                 type,
                 timestamp: Date.now()
