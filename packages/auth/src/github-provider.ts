@@ -1,11 +1,11 @@
 import { GitHub } from "arctic";
 
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = process.env;
-if (!GITHUB_CLIENT_ID || !GITHUB_CLIENT_SECRET) {
-	throw new Error("GitHub ClientId or ClientSecret must be set");
+const { CLIENT_ID_GITHUB, CLIENT_SECRET_GITHUB } = process.env;
+if (!CLIENT_ID_GITHUB || !CLIENT_SECRET_GITHUB) {
+	throw new Error("GitHub ClientId and ClientSecret must be set");
 }
 export const github = new GitHub(
-	GITHUB_CLIENT_ID,
-	GITHUB_CLIENT_SECRET,
+	CLIENT_ID_GITHUB,
+	CLIENT_SECRET_GITHUB,
 	"http://localhost:3000/test/login/github/callback",
 );
