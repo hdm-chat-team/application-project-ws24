@@ -17,7 +17,7 @@ export const Route = createRootRoute({
 	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
-			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+			<ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
 				<Outlet />
 			</ThemeProvider>
 			<Suspense>
