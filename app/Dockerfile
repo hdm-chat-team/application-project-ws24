@@ -1,4 +1,4 @@
-ARG BUN_VERSION=1.1.34
+ARG BUN_VERSION=1.1.36
 
 ARG YARN_PKG_MANAGER="this.packageManager=\"yarn@1.22.22\""
 ARG BUN_PKG_MANAGER="this.packageManager=\"bun@${BUN_VERSION}\""
