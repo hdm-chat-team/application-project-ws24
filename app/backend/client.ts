@@ -1,3 +1,3 @@
-import type { api } from "./app";
+import type { apiRouter } from "./app";
 
-export type ApiType = typeof api;
+export type ApiType = typeof apiRouter;
