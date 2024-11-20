@@ -1,5 +1,5 @@
+import { MessageService } from "@/lib/message-service";
 import { useCallback } from "react";
-import { MessageService } from "../message-service";
 
 // * Create a custom hook to encapsulate the access to the MessageService
 export const useMessageService = () => {

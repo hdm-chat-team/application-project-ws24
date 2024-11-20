@@ -59,7 +59,7 @@ export default defineConfig({
 	server: {
 		proxy: {
 			"/api": {
-				target: "http://localhost:3000",
+				target: "http://127.0.0.1:3000",
 				changeOrigin: true,
 				secure: false,
 			},
@@ -68,10 +68,11 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": `${__dirname}/src`,
+			"@server": `${__dirname}/../backend/`,
 		},
 	},
 	build: {
-		outDir: "../backend/dist/client",
+		outDir: "../dist/client",
 		emptyOutDir: true,
 	},
 });
