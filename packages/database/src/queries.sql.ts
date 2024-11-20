@@ -1,7 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import db from "./db";
-import { sessionTable } from "./schema.sql";
+import { sessionTable, userTable } from "./schema.sql";
 
+// * Session Queries
 export const insertSession = db
 	.insert(sessionTable)
 	.values({
@@ -30,3 +31,10 @@ export const updateSessionExpiresAt = db
 	})
 	.where(eq(sessionTable.id, sql.placeholder("sessionId")))
 	.prepare("update_session_expires_at");
+
+// * User Queries
+export const selectUserBySessionId = db.query.userTable
+	.findFirst({
+		where: eq(userTable.githubId, sql.placeholder("githubId")),
+	})
+	.prepare("select_user_by_github_id");

@@ -5,6 +5,7 @@ import {
 	invalidateSession,
 } from "@application-project-ws24/auth/session";
 import db from "@application-project-ws24/database";
+import { selectUserBySessionId } from "@application-project-ws24/database/queries";
 import { userTable } from "@application-project-ws24/database/schema";
 import { OAuth2RequestError, generateState } from "arctic";
 import { eq } from "drizzle-orm";
@@ -52,8 +53,8 @@ export const githubRouter = createRouter()
 			});
 
 			const githubUser = (await githubUserResponse.json()) as GitHubUser;
-			const existingUser = await db.query.userTable.findFirst({
-				where: eq(userTable.githubId, githubUser.id),
+			const existingUser = await selectUserBySessionId.execute({
+				githubId: githubUser.id,
 			});
 
 			const sessionId = generateSessionToken();
