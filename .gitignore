@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # IDEs
+.copilot
 .idea
 .vscode/*
 !.vscode/extensions.json
@@ -11,7 +12,8 @@ node_modules
 .pnp.js
 
 # Local env files
-.env*.local
+.env*
+!.env*.example
 
 # Testing
 coverage
@@ -28,7 +30,6 @@ build
 dist
 dist-ssr
 dev-dist
-
 
 # code gen
 routeTree.gen.ts

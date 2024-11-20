@@ -1,0 +1,43 @@
+{
+  "name": "@application-project-ws24/frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bunx --bun vite",
+    "build": "bunx --bun vite build",
+    "preview": "vite preview",
+    "gen-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
+    "ui": "bunx shadcn@latest"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.1.0",
+    "@tanstack/react-query": "^5.61.0",
+    "@tanstack/react-query-devtools": "^5.61.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "hono": "4.6.11",
+    "lucide-react": "^0.460.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "dexie": "^4.0.10",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@application-project-ws24/tsconfig": "workspace:*",
+    "@tanstack/router-devtools": "^1.82.1",
+    "@tanstack/router-plugin": "^1.81.9",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vite-pwa/assets-generator": "^0.2.6",
+    "@vitejs/plugin-react-swc": "^3.7.1",
+    "autoprefixer": "^10.4.20",
+    "globals": "^15.12.0",
+    "postcss": "^8.4.49",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "tailwindcss": "^3.4.15",
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.21.0"
+  }
+}

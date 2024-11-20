@@ -1,9 +1,9 @@
 services:
   backend:
-    container_name: backend
+    container_name: app
     build:
       context: .
-      dockerfile: apps/backend/Dockerfile
+      dockerfile: app/Dockerfile
     restart: always
     ports:
       - 3000:3000
