@@ -12,7 +12,8 @@ node_modules
 .pnp.js
 
 # Local env files
-.env
+.env*
+!.env*.example
 
 # Testing
 coverage
