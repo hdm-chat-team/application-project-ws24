@@ -8,7 +8,8 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./lib/config";
 import { errorHandler } from "./lib/middleware";
-import { githubLoginRouter } from "./routes/auth/github.ts";
+import { githubLoginRouter } from "./routes/auth/github-login.ts";
+import { authMiddleware } from "./routes/auth/middleware.ts";
 import { chat } from "./routes/chat";
 
 // * API
@@ -26,11 +27,11 @@ const api = new Hono()
 
 // * serve SPA
 api.use(serveStatic({ root: "./dist/client" }));
-api.route("/test", githubLoginRouter);
 
 // * Routes
 const apiRoutes = api
 	.basePath("/api")
+	.use(authMiddleware())
 	.route("/chat", chat)
 	.route("/login", githubLoginRouter)
 	.get("/", (c) => {

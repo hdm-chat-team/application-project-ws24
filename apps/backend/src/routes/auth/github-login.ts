@@ -10,7 +10,7 @@ import {
 } from "@application-project-ws24/auth/session";
 import db from "@application-project-ws24/database";
 import { userTable } from "@application-project-ws24/database/schema";
-import type { Context } from "../../lib/types.ts";
+import type { Context, GitHubUser } from "../../lib/types.ts";
 
 export const githubLoginRouter = new Hono<Context>();
 
@@ -39,7 +39,7 @@ githubLoginRouter.get("/github/callback", async (c) => {
 		const tokens = await github.validateAuthorizationCode(code);
 		const githubUserResponse = await fetch("https://api.github.com/user", {
 			headers: {
-				Authorization: `Bearer ${tokens.accessToken}`,
+				Authorization: `Bearer ${tokens.accessToken()}`,
 			},
 		});
 		const githubUser: GitHubUser =
@@ -52,7 +52,8 @@ githubLoginRouter.get("/github/callback", async (c) => {
 		const sessionID = generateSessionToken();
 		if (existingUser) {
 			const session = await createSession(sessionID, existingUser[0].id);
-			setCookie(c, sessionID, JSON.stringify(session));
+			session.id = sessionID;
+			setCookie(c, "session", JSON.stringify(session));
 			return c.redirect("/");
 		}
 
@@ -62,7 +63,8 @@ githubLoginRouter.get("/github/callback", async (c) => {
 			email: "HABEN WIR NOCH NICHT VON GITHUB",
 		});
 		const session = await createSession(sessionID, githubUser.id);
-		setCookie(c, sessionID, JSON.stringify(session));
+		session.id = sessionID;
+		setCookie(c, "session", JSON.stringify(session));
 		return c.redirect("/");
 	} catch (e) {
 		if (
@@ -75,8 +77,3 @@ githubLoginRouter.get("/github/callback", async (c) => {
 		return c.body(null, 500);
 	}
 });
-
-interface GitHubUser {
-	id: string;
-	login: string;
-}

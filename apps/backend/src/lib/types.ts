@@ -10,3 +10,8 @@ export interface Context extends Env {
 		session: Session | null;
 	};
 }
+
+export interface GitHubUser {
+	id: string;
+	login: string;
+}
