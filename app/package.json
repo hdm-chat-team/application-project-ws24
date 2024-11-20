@@ -10,7 +10,7 @@
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"dependencies": {
-		"hono": "4.6.10"
+		"hono": "4.6.11"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",

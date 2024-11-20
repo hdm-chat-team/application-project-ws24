@@ -12,11 +12,11 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
-    "@tanstack/react-query": "^5.60.5",
-    "@tanstack/react-query-devtools": "^5.60.5",
+    "@tanstack/react-query": "^5.61.0",
+    "@tanstack/react-query-devtools": "^5.61.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "hono": "4.6.10",
+    "hono": "4.6.11",
     "lucide-react": "^0.460.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@application-project-ws24/tsconfig": "workspace:*",
-    "@tanstack/router-devtools": "^1.81.14",
+    "@tanstack/router-devtools": "^1.82.1",
     "@tanstack/router-plugin": "^1.81.9",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
