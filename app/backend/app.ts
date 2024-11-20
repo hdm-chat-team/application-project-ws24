@@ -1,12 +1,12 @@
 import { serveStatic } from "hono/bun";
 import { createApi, createRouter } from "#lib/factory";
+import { authRouter } from "./routes/auth";
 import { chat } from "./routes/chat";
-import { githubLoginRouter } from "./routes/auth/github";
 
 // * API
-const api = createApi()
+const apiRouter = createApi()
 	.basePath("/api")
-	.route("/login", githubLoginRouter)
+	.route("/auth", authRouter)
 	.route("/chat", chat)
 	.get("/", (c) => {
 		return c.text("Hello Hono!");
@@ -15,7 +15,7 @@ const api = createApi()
 // * SPA
 const frontend = createRouter().use(serveStatic({ root: "./dist/client" }));
 
-const app = createRouter().route("/", api).route("/", frontend);
+const app = createRouter().route("/", apiRouter).route("/", frontend);
 
 export default app;
-export { api };
+export { apiRouter };
