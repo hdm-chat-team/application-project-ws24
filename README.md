@@ -21,8 +21,8 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 ### 🌐 Apps
 
 - `/app`: a monorepo-style app
-  - `/backend`: a 🔥 [Hono](https://hono.dev) app
-  - `/frontend`: a ⚡ [Vite](https://vite.dev) app using
+  - `/backend`: a 🔥 [Hono](https://hono.dev) server providing api routes and serving the frontend
+  - `/frontend`: a ⚡ [Vite](https://vite.dev) SPA using
     - ⚛️ [React](https://react.dev) for reactivity
     - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes
     - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
