@@ -7,9 +7,10 @@
 		"useDefineForClassFields": true,
 		"noUncheckedSideEffectImports": true,
 
-		"baseUrl": "./",
+		"baseUrl": ".",
 		"paths": {
-			"@/*": ["./src/*"]
+			"@/*": ["./src/*"],
+			"@server/*": ["../backend/*"]
 		}
 	}
 }
