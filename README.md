@@ -92,3 +92,15 @@ bun dev
 ```
 
 Both Tanstack libraries will render development tools to debug their features.
+
+To use Drizzle-kit CLI [commands](https://orm.drizzle.team/docs/kit-overview) run:
+
+```zsh
+bun db <COMMAND>
+```
+
+To use shadcn/ui CLI [commands](https://ui.shadcn.com/docs/cli) run:
+
+```zsh
+bun ui <COMMAND>
+```
