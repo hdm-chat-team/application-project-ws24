@@ -8,7 +8,6 @@ import db from "@application-project-ws24/database";
 import { selectUserBySessionId } from "@application-project-ws24/database/queries";
 import { userTable } from "@application-project-ws24/database/schema";
 import { OAuth2RequestError, generateState } from "arctic";
-import { eq } from "drizzle-orm";
 import { getCookie, setCookie } from "hono/cookie";
 import { createRouter } from "#lib/factory";
 import type { GitHubUser } from "#lib/types";
@@ -61,7 +60,13 @@ export const githubRouter = createRouter()
 			if (existingUser) {
 				const session = await createSession(sessionId, existingUser.id);
 				session.id = sessionId;
-				setCookie(c, "session", JSON.stringify(session));
+				setCookie(c, "session", session.id, {
+					path: "/",
+					secure: process.env.NODE_ENV === "production",
+					httpOnly: true,
+					sameSite: "Lax",
+					expires: session.expiresAt,
+				});
 				return c.redirect("/");
 			}
 
@@ -71,8 +76,14 @@ export const githubRouter = createRouter()
 			});
 
 			const session = await createSession(sessionId, githubUser.id);
-			session.id = sessionId;
-			setCookie(c, "session", JSON.stringify(session));
+			setCookie(c, "session", session.id, {
+				path: "/",
+				secure: process.env.NODE_ENV === "production",
+				httpOnly: true,
+				sameSite: "Lax",
+				expires: session.expiresAt,
+			});
+
 			return c.redirect("/");
 		} catch (error) {
 			if (
