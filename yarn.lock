@@ -37,6 +37,8 @@
     "@application-project-ws24/tsconfig" "packages/tsconfig"
     "@types/bun" "^1.1.13"
   dependencies:
+    "@application-project-ws24/auth" "packages/auth"
+    "@application-project-ws24/database" "packages/database"
     drizzle-orm "^0.36.3"
     hono "4.6.11"
 

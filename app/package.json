@@ -10,6 +10,8 @@
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"dependencies": {
+		"@application-project-ws24/auth": "workspace:*",
+		"@application-project-ws24/database": "workspace:*",
 		"hono": "4.6.11",
 		"drizzle-orm": "^0.36.3"
 	},
