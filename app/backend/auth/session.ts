@@ -29,8 +29,8 @@ export function generateSessionToken(): string {
  * @returns {Promise<Session>} The created session object.
  */
 export async function createSession(
-	token: string,
 	userId: string,
+	token: string,
 ): Promise<Session> {
 	const session = {
 		id: hashToken(token),
