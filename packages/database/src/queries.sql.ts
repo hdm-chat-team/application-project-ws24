@@ -33,6 +33,15 @@ export const updateSessionExpiresAt = db
 	.prepare("update_session_expires_at");
 
 // * User Queries
+export const insertUser = db
+	.insert(userTable)
+	.values({
+		githubId: sql.placeholder("githubId"),
+		username: sql.placeholder("username"),
+	})
+	.returning({ id: userTable.id })
+	.prepare("insert_user");
+
 export const selectUserBySessionId = db.query.userTable
 	.findFirst({
 		where: eq(userTable.githubId, sql.placeholder("githubId")),

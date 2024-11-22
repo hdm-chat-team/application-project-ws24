@@ -1,16 +1,10 @@
 import { type InferSelectModel, relations } from "drizzle-orm";
-import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-
-const defaults = {
-	id: uuid().primaryKey().defaultRandom(),
-	createdAt: timestamp().defaultNow().notNull(),
-	updatedAt: timestamp(),
-};
+import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
 // * User
 export const userTable = pgTable("users", {
-	...defaults,
-	githubId: varchar({ length: 255 }).notNull().unique(),
+	id: uuid().primaryKey().defaultRandom(),
+	githubId: text().notNull().unique(),
 	username: varchar({ length: 20 }).notNull().unique(),
 });
 
@@ -25,7 +19,7 @@ export const userTableRelations = relations(userTable, ({ one }) => ({
 export type User = InferSelectModel<typeof userTable>;
 
 export const userProfileTable = pgTable("user_profiles", {
-	...defaults,
+	id: uuid().primaryKey().defaultRandom(),
 	userId: uuid()
 		.references(() => userTable.id, { onDelete: "cascade" })
 		.notNull(),
