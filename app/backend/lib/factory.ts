@@ -6,10 +6,10 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { config } from "./config";
-import type { Context } from "./types";
+import type { Env } from "./types";
 
 export function createRouter() {
-	return new Hono<Context>({
+	return new Hono<Env>({
 		strict: false,
 	});
 }
