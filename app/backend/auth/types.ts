@@ -1,4 +1,4 @@
-import type { Session, User } from "@application-project-ws24/database/schema";
+import type { Session, User } from "#db/schema.sql";
 
 export type SessionValidationResult =
 	| { session: Session; user: User }

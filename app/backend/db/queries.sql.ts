@@ -42,7 +42,7 @@ export const insertUser = db
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
 
-export const selectUserBySessionId = db.query.userTable
+export const selectUserByGithubId = db.query.userTable
 	.findFirst({
 		where: eq(userTable.githubId, sql.placeholder("githubId")),
 	})

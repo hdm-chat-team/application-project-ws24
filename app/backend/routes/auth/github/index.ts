@@ -1,16 +1,13 @@
-import { github } from "@application-project-ws24/auth/github";
+import { OAuth2RequestError, generateState } from "arctic";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import { HTTPException } from "hono/http-exception";
+import { github } from "#auth/github-provider";
 import {
 	createSession,
 	generateSessionToken,
 	invalidateSession,
-} from "@application-project-ws24/auth/session";
-import {
-	insertUser,
-	selectUserBySessionId,
-} from "@application-project-ws24/database/queries";
-import { OAuth2RequestError, generateState } from "arctic";
-import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { HTTPException } from "hono/http-exception";
+} from "#auth/session";
+import { insertUser, selectUserByGithubId } from "#db/queries.sql";
 import { createRouter } from "#lib/factory";
 import type { GitHubUser } from "#lib/types";
 
@@ -65,7 +62,7 @@ export const githubRouter = createRouter()
 			}
 
 			const githubUser = (await githubUserResponse.json()) as GitHubUser;
-			const existingUser = await selectUserBySessionId
+			const existingUser = await selectUserByGithubId
 				.execute({
 					githubId: githubUser.id,
 				})

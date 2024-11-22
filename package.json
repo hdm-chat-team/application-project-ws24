@@ -5,7 +5,6 @@
     "check": "turbo biome",
     "check:fix": "turbo biome:fix",
     "build": "turbo build",
-    "db": "bun run --filter=@application-project-ws24/database db",
     "ui": "bun run --filter=@application-project-ws24/frontend ui",
     "dev": "turbo dev",
     "preview": "turbo preview",

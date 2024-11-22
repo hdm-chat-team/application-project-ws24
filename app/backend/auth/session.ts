@@ -3,8 +3,8 @@ import {
 	insertSession,
 	selectSessionById,
 	updateSessionExpiresAt,
-} from "@application-project-ws24/database/queries";
-import type { Session } from "@application-project-ws24/database/schema";
+} from "#db/queries.sql";
+import type { Session } from "#db/schema.sql";
 import type { SessionValidationResult } from "./types";
 import { hashToken } from "./utils";
 
@@ -37,7 +37,10 @@ export async function createSession(
 		userId,
 		expiresAt: new Date(Date.now() + SESSION_DURATION),
 	};
-	await insertSession.execute(session);
+	await insertSession.execute(session).catch((err) => {
+		console.error("Failed to insert session:", err);
+		throw new Error("Failed to insert session");
+	});
 	return session;
 }
 

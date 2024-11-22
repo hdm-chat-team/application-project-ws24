@@ -8,5 +8,5 @@ if (!CLIENT_ID_GITHUB || !CLIENT_SECRET_GITHUB) {
 export const github = new GitHub(
 	CLIENT_ID_GITHUB,
 	CLIENT_SECRET_GITHUB,
-	"http://localhost:3000/api/auth/github/callback", // Changed from 5173 to 3000 and fixed path
+	"http://localhost:5173/api/auth/github/callback", // Changed from 5173 to 3000 and fixed path
 );

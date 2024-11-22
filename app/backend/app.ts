@@ -12,9 +12,12 @@ const apiRouter = createApi()
 		return c.text("Hello Hono!");
 	});
 
-const app = createRouter()
-	.route("/", apiRouter)
-	.use("*", serveStatic({ root: "./dist/client" }));
+const app = createRouter().route("/", apiRouter);
+
+// * server SPA
+app
+	.get("*", serveStatic({ root: "./dist/client" }))
+	.get("*", serveStatic({ path: "index.html" }));
 
 export default app;
 export { apiRouter };
