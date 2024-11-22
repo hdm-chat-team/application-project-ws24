@@ -37,8 +37,8 @@ export async function createSession(
 		userId,
 		expiresAt: new Date(Date.now() + SESSION_DURATION),
 	};
-	await insertSession.execute(session).catch((err) => {
-		console.error("Failed to insert session:", err);
+	await insertSession.execute(session).catch((error) => {
+		console.error("Failed to insert session:", error);
 		throw new Error("Failed to insert session");
 	});
 	return session;
