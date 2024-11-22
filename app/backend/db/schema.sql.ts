@@ -8,6 +8,10 @@ export const userTable = pgTable("users", {
 	username: varchar({ length: 20 }).notNull().unique(),
 });
 
+export const userTableRelations = relations(userTable, ({ many }) => ({
+	sessions: many(sessionTable),
+}));
+
 /* export const userTableRelations = relations(userTable, ({ one }) => ({
 	profile: one(userProfileTable, {
 		fields: [userTable.id],
@@ -40,9 +44,9 @@ export type User = InferSelectModel<typeof userTable>;
 export const sessionTable = pgTable("sessions", {
 	id: varchar({ length: 64 }).primaryKey(),
 	userId: uuid()
-		.references(() => userTable.id, { onDelete: "cascade" })
-		.notNull(),
-	expiresAt: timestamp("expires_at", {
+		.notNull()
+		.references(() => userTable.id, { onDelete: "cascade" }),
+	expiresAt: timestamp({
 		withTimezone: true,
 		mode: "date",
 	}).notNull(),

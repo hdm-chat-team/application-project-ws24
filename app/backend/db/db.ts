@@ -7,6 +7,6 @@ if (!DATABASE_URL) {
 	throw new Error("DATABASE_URL is not set");
 }
 
-const db = drizzle(DATABASE_URL, { schema });
+const db = drizzle(DATABASE_URL, { schema, casing: "snake_case" });
 
 export default db;
