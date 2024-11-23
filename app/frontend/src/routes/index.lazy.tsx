@@ -9,11 +9,13 @@ export const Route = createLazyFileRoute("/")({
 	component: Index,
 });
 
+// TODO: Implement logic so messages are loaded from the database
+
 function Index() {
 	const [messages, setMessages] = useState<string[]>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
-	const { addReceivedMessage } = useMessageService();
+	const { addReceivedMessage, addMessage } = useMessageService();
 
 	useEffect(() => {
 		const socket = api.chat.$ws();
@@ -35,10 +37,11 @@ function Index() {
 		};
 	}, [addReceivedMessage]);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (socketRef.current && inputMessage) {
 			socketRef.current.send(inputMessage);
+			await addMessage(inputMessage);
 			setInputMessage("");
 		}
 	};
