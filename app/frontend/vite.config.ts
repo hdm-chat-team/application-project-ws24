@@ -13,6 +13,9 @@ export default defineConfig({
 			emitFile: true,
 		}),
 		VitePWA({
+			workbox: {
+				navigateFallbackDenylist: [/^\/api/],
+			},
 			registerType: "autoUpdate",
 			devOptions: {
 				enabled: true,
@@ -61,7 +64,6 @@ export default defineConfig({
 			"/api": {
 				target: "http://localhost:3000",
 				changeOrigin: true,
-				secure: false,
 			},
 		},
 	},
