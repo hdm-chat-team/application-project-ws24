@@ -6,14 +6,15 @@ export interface Message {
 	content: string;
 	timestamp: number;
 	status: "sent" | "received";
+	userId: string;
 }
 
 const messageDb = new Dexie("MessageDatabase") as Dexie & {
 	messages: EntityTable<Message, "id">;
 };
 
-messageDb.version(1).stores({
-	messages: "++id, content, timestamp, type",
+messageDb.version(2).stores({
+	messages: "++id, content, timestamp, type, userId",
 });
 
 class MessageService {
@@ -42,6 +43,7 @@ class MessageService {
 			content,
 			status,
 			timestamp: Date.now(),
+			userId: "placeholder",
 		};
 	}
 
