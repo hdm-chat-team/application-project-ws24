@@ -3,6 +3,7 @@ import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useMessageService } from "@/hooks/use-message-service";
 
 export const Route = createLazyFileRoute("/")({
 	component: Index,
@@ -12,6 +13,7 @@ function Index() {
 	const [messages, setMessages] = useState<string[]>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
+	const { addReceivedMessage } = useMessageService();
 
 	useEffect(() => {
 		const socket = api.chat.$ws();
@@ -21,15 +23,17 @@ function Index() {
 			console.log("WebSocket client opened", event);
 		};
 
-		socket.onmessage = (event) => {
+		socket.onmessage = async (event) => {
 			console.log("WebSocket client received message", event);
+			const message = JSON.parse(event.data);
+			addReceivedMessage(message.content);
 			setMessages((prevMessages) => [...prevMessages, event.data]);
 		};
 
 		return () => {
 			socket.close();
 		};
-	}, []);
+	}, [addReceivedMessage]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
