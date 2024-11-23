@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMessageService } from "../lib/hooks/use-message-service";
+import { useMessageService } from "@/hooks/use-message-service";
 
 // * Component to input a message which will be added to the local database
 export default function MessageInput() {
