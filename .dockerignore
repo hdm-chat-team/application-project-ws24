@@ -1,33 +1,49 @@
-# Ignore node_modules directory
+# Dependencies
 node_modules
+.turbo
+.cache
 
-# Ignore Docker-related files
+# Version Control
+.git*
+.github
+
+# Build outputs and artifacts
+build/
+dist/
+dist-ssr/
+dev-dist/
+out/
+
+# Development tools and IDE
+.vscode
+.idea
+.editorconfig
+.copilot
+
+biome.json
+bunfig.toml
+
+# Testing
+coverage/
+**/*.test.*
+**/*.spec.*
+
+# Docker
 Dockerfile*
 docker-compose*
 
-# Ignore Git-related files
-.git
-.gitignore
+# Logs and temporary files
+*.log
+.DS_Store
+*.tmp
+*.temp
 
-# Ignore documentation files
+# Documentation
 README.md
 LICENSE
 
-# Ignore editor and IDE configurations
-.vscode
-.editorconfig
-.idea
-
-# Ignore build and coverage directories
-out/
-build
-dist
-dist-ssr
-dev-dist
-
-# Generated files
+# Generated code
 routeTree.gen.ts
-drizzle/
 
-# Turbo
-.turbo
+# SQL migrations
+drizzle/
