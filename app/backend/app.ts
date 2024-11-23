@@ -1,19 +1,25 @@
 import { serveStatic } from "hono/bun";
 import { createApi, createRouter } from "#lib/factory";
+import { authRouter } from "./routes/auth";
 import { chat } from "./routes/chat";
 
 // * API
-const api = createApi()
+const apiRouter = createApi();
+
+const apiRoutes = apiRouter
 	.basePath("/api")
+	.route("/auth", authRouter)
 	.route("/chat", chat)
 	.get("/", (c) => {
 		return c.text("Hello Hono!");
 	});
 
-// * SPA
-const frontend = createRouter().use(serveStatic({ root: "./dist/client" }));
-
-const app = createRouter().route("/", api).route("/", frontend);
+const app = createRouter()
+	.route("/", apiRouter)
+	.get("/*", serveStatic({ root: "./dist/client" }))
+	.get("/*", serveStatic({ path: "index.html" }));
 
 export default app;
-export { api };
+
+// * RPC client type
+export type ApiType = typeof apiRoutes;

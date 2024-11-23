@@ -2,18 +2,26 @@
 	"name": "@application-project-ws24/app",
 	"module": "src/index.js",
 	"imports": {
-		"#lib/*": "./backend/lib/*.ts"
+		"#auth/*": "./backend/auth/*.ts",
+		"#lib/*": "./backend/lib/*.ts",
+		"#db/*": "./backend/db/*.ts"
 	},
 	"scripts": {
-		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
+		"db": "bunx drizzle-kit",
+		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"dependencies": {
-		"hono": "4.6.11"
+		"arctic": "^2.2.2",
+		"hono": "4.6.11",
+		"drizzle-orm": "^0.36.4",
+		"pg": "^8.13.1"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "^1.1.13"
+		"@types/bun": "^1.1.13",
+		"@types/pg": "^8.11.10",
+		"drizzle-kit": "^0.28.1"
 	}
 }
