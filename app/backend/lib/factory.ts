@@ -19,7 +19,7 @@ const origin = isDev
 				throw new Error("Production origins must use HTTPS");
 			}
 			return origin;
-		}) ?? []);
+		}) ?? ["http://localhost:3000"]);
 
 export function createRouter() {
 	return new Hono<Env>({
