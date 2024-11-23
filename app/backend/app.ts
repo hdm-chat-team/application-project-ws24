@@ -4,7 +4,9 @@ import { authRouter } from "./routes/auth";
 import { chat } from "./routes/chat";
 
 // * API
-const apiRouter = createApi()
+const apiRouter = createApi();
+
+const apiRoutes = apiRouter
 	.basePath("/api")
 	.route("/auth", authRouter)
 	.route("/chat", chat)
@@ -12,12 +14,12 @@ const apiRouter = createApi()
 		return c.text("Hello Hono!");
 	});
 
-const app = createRouter().route("/", apiRouter);
-
-// * server SPA
-app
-	.get("*", serveStatic({ root: "./dist/client" }))
-	.get("*", serveStatic({ path: "index.html" }));
+const app = createRouter()
+	.route("/", apiRouter)
+	.get("/*", serveStatic({ root: "./dist/client" }))
+	.get("/*", serveStatic({ path: "index.html" }));
 
 export default app;
-export { apiRouter };
+
+// * RPC client type
+export type ApiType = typeof apiRoutes;
