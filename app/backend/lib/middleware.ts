@@ -1,8 +1,8 @@
-import { validateSessionToken } from "#auth/session";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
-import type { Env } from "./types";
 import { HTTPException } from "hono/http-exception";
+import { validateSessionToken } from "#auth/session";
+import type { Env } from "./types";
 
 const cookieConfig = {
 	path: "/",
