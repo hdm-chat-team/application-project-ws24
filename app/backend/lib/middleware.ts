@@ -10,9 +10,25 @@ const cookieConfig = {
 	domain: process.env.NODE_ENV === "development" ? "localhost" : ".example.com",
 };
 
-export const authMiddleware = createMiddleware(async (c, next) => {
+/**
+ * Middleware to handle authentication by validating session tokens.
+ *
+ * This middleware checks for the presence of an "auth_session" cookie.
+ * If the cookie is not found, it sets the user and session context to null and proceeds to the next middleware.
+ * If the cookie is found, it validates the session token.
+ *
+ * - If the session is valid and fresh, it updates the "auth_session" cookie with the new session ID and expiration date.
+ * - If the session is invalid, it deletes the "auth_session" cookie.
+ *
+ * The middleware sets the user and session context based on the validation result and proceeds to the next middleware.
+ *
+ * @param {Context} c - The context object representing the request and response.
+ * @param {Function} next - The next middleware function in the stack.
+ *
+ * @returns {Promise<void>} A promise that resolves when the middleware is complete.
+ */
+export const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionId = getCookie(c, "auth_session") ?? null;
-	console.log("sessionId", sessionId);
 	if (!sessionId) {
 		c.set("user", null);
 		c.set("session", null);
