@@ -54,10 +54,11 @@ export async function validateSessionToken(
 ): Promise<SessionValidationResult> {
 	const sessionId = hashToken(token);
 	const session = await selectSessionById.execute({ sessionId });
+	let fresh = false;
 
 	if (!session || Date.now() >= session.expiresAt.getTime()) {
 		await deleteSessionById.execute({ sessionId });
-		return { session: null, user: null };
+		return { session: null, user: null, fresh };
 	}
 
 	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
@@ -67,9 +68,10 @@ export async function validateSessionToken(
 			expiresAt: newExpiresAt,
 		});
 		session.expiresAt = newExpiresAt;
+		fresh = true;
 	}
 
-	return { session, user: session.user };
+	return { session, user: session.user, fresh };
 }
 
 /**

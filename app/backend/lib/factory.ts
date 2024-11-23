@@ -5,8 +5,21 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
-import { config } from "./config";
+import { authMiddleware } from "./middleware";
 import type { Env } from "./types";
+
+const { NODE_ENV, ALLOWED_ORIGINS } = Bun.env;
+const isDev = NODE_ENV === "development";
+
+const origin = isDev
+	? ["http://localhost:5173", "http://localhost:3000"]
+	: (ALLOWED_ORIGINS?.split(",").map((o) => {
+			const origin = o.trim();
+			if (!origin.startsWith("https://")) {
+				throw new Error("Production origins must use HTTPS");
+			}
+			return origin;
+		}) ?? []);
 
 export function createRouter() {
 	return new Hono<Env>({
@@ -16,8 +29,18 @@ export function createRouter() {
 
 export function createApi() {
 	return createRouter()
-		.use(cors(config.cors))
-		.use(csrf(config.csrf))
+		.use(
+			cors({
+				origin,
+				credentials: true,
+				/* allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"], */
+				/* allowHeaders: ["content-type", "authorization", "cookie"], */
+				maxAge: isDev ? undefined : 3600,
+				/* exposeHeaders: ["set-cookie"], */
+			}),
+		)
+		.use(csrf({ origin }))
+		.use(authMiddleware)
 		.use(logger())
 		.use(requestId())
 		.use(prettyJSON())

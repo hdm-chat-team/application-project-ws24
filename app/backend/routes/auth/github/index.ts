@@ -1,12 +1,12 @@
-import { OAuth2RequestError, generateState } from "arctic";
-import type { Context as HonoContext } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
-import { HTTPException } from "hono/http-exception";
 import { github } from "#auth/github-provider";
 import { createSession, generateSessionToken } from "#auth/session";
 import { insertUser, selectUserByGithubId } from "#db/queries.sql";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
+import { OAuth2RequestError, generateState } from "arctic";
+import type { Context as HonoContext } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
+import { HTTPException } from "hono/http-exception";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = "http://localhost:5173/";
@@ -15,8 +15,9 @@ const REDIRECT_URL = "http://localhost:5173/";
 const cookieConfig = {
 	path: "/",
 	secure: process.env.NODE_ENV !== "development",
-	httpOnly: true,
+	httpOnly: process.env.NODE_ENV !== "development",
 	sameSite: "lax" as const,
+	domain: process.env.NODE_ENV === "development" ? "localhost" : ".example.com",
 };
 
 export const githubRouter = createRouter()
@@ -70,12 +71,12 @@ async function setOAuthStateCookie(c: HonoContext<Env>, state: string) {
 }
 
 async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
-    const token = generateSessionToken();
-    const session = await createSession(userId, token);
-    setCookie(c, "auth_session", token, {
-        ...cookieConfig,
-        expires: session.expiresAt,
-    });
+	const token = generateSessionToken();
+	const session = await createSession(userId, token);
+	setCookie(c, "auth_session", token, {
+		...cookieConfig,
+		expires: session.expiresAt,
+	});
 }
 
 async function fetchGitHubUser(accessToken: string): Promise<GitHubUser> {
