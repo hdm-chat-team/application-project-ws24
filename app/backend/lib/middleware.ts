@@ -2,6 +2,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { validateSessionToken } from "#auth/session";
+import type { Session, User } from "#db/schema.sql";
 import type { Env } from "./types";
 
 const cookieConfig = {
@@ -13,21 +14,21 @@ const cookieConfig = {
 };
 
 /**
- * Middleware to handle authentication by validating session tokens.
+ * Middleware to handle authentication state by validating session tokens.
  *
- * This middleware checks for the presence of an "auth_session" cookie.
- * If the cookie is not found, it sets the user and session context to null and proceeds to the next middleware.
- * If the cookie is found, it validates the session token.
+ * @param {Context<Env>} c - The Hono context object
+ * @param {Function} next - The next middleware function
+ * @returns {Promise<void>} Promise that resolves after authentication check
  *
- * - If the session is valid and fresh, it updates the "auth_session" cookie with the new session ID and expiration date.
- * - If the session is invalid, it deletes the "auth_session" cookie.
+ * @description
+ * Checks for "auth_session" cookie and validates the session:
+ * - No cookie: Sets user and session to null
+ * - Valid cookie & fresh session: Updates cookie with new expiration
+ * - Invalid cookie: Deletes the cookie
  *
- * The middleware sets the user and session context based on the validation result and proceeds to the next middleware.
- *
- * @param {Context} c - The context object representing the request and response.
- * @param {Function} next - The next middleware function in the stack.
- *
- * @returns {Promise<void>} A promise that resolves when the middleware is complete.
+ * Sets the following context variables:
+ * - user: User object or null
+ * - session: Session object or null
  */
 export const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionId = getCookie(c, "auth_session") ?? null;
@@ -54,20 +55,32 @@ export const authMiddleware = createMiddleware<Env>(async (c, next) => {
 });
 
 /**
- * Middleware to protect routes by ensuring that both session and user are present in the context.
- * If either session or user is missing, it throws an HTTP 401 Unauthorized exception.
+ * Middleware to protect routes by requiring a valid user and session.
  *
- * @param c - The context object containing the session and user.
- * @param next - The next middleware function to call if the session and user are present.
- * @throws {HTTPException} - Throws a 401 Unauthorized exception if the session or user is not present.
+ * @description
+ * Sets the following context variables when successful:
+ * - authenticatedUser: Verified User object
+ * - authenticatedSession: Verified Session object
+ *
+ * @throws {HTTPException} 401 error if user or session is missing
  *
  * @example
- * .get("/protected", protectedRoute, async (c) => { ... })
+ * router.get("/protected", protectedRoute, async (c) => {
+ *   const user = c.get("authenticatedUser");
+ *   // Handle protected route...
+ * });
  */
-export const protectedRoute = createMiddleware<Env>(async (c, next) => {
+export const protectedRoute = createMiddleware<
+	Env & {
+		Variables: { authenticatedUser: User; authenticatedSession: Session };
+	}
+>(async (c, next) => {
 	const session = c.get("session");
 	const user = c.get("user");
 
 	if (!(session && user)) throw new HTTPException(401);
+
+	c.set("authenticatedUser", user);
+	c.set("authenticatedSession", session);
 	return next();
 });
