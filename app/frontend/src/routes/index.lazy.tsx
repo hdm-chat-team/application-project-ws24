@@ -73,6 +73,12 @@ function Index() {
 				/>
 				<Button type="submit">Send</Button>
 			</form>
+			<Button asChild>
+				<a href={api.auth.github.$url().toString()}>signin</a>
+			</Button>
+			<Button asChild>
+				<a href={api.auth.signout.$url().toString()}>signout</a>
+			</Button>
 		</div>
 	);
 }
