@@ -1,6 +1,8 @@
+import { validateSessionToken } from "#auth/session";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
-import { validateSessionToken } from "#auth/session";
+import type { Env } from "./types";
+import { HTTPException } from "hono/http-exception";
 
 const cookieConfig = {
 	path: "/",
@@ -48,5 +50,24 @@ export const authMiddleware = createMiddleware<Env>(async (c, next) => {
 
 	c.set("user", user);
 	c.set("session", session);
+	return next();
+});
+
+/**
+ * Middleware to protect routes by ensuring that both session and user are present in the context.
+ * If either session or user is missing, it throws an HTTP 401 Unauthorized exception.
+ *
+ * @param c - The context object containing the session and user.
+ * @param next - The next middleware function to call if the session and user are present.
+ * @throws {HTTPException} - Throws a 401 Unauthorized exception if the session or user is not present.
+ *
+ * @example
+ * .get("/protected", protectedRoute, async (c) => { ... })
+ */
+export const protectedRoute = createMiddleware<Env>(async (c, next) => {
+	const session = c.get("session");
+	const user = c.get("user");
+
+	if (!(session && user)) throw new HTTPException(401);
 	return next();
 });
