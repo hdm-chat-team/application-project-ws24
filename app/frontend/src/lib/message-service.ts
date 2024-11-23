@@ -13,8 +13,8 @@ const messageDb = new Dexie("MessageDatabase") as Dexie & {
 	messages: EntityTable<Message, "id">;
 };
 
-messageDb.version(2).stores({
-	messages: "++id, content, timestamp, type, userId",
+messageDb.version(3).stores({
+	messages: "++id, content, timestamp, status, userId",
 });
 
 class MessageService {
