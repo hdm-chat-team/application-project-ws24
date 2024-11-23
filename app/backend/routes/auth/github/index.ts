@@ -1,17 +1,16 @@
-import { github } from "#auth/github-provider";
-import { createSession, generateSessionToken } from "#auth/session";
-import { insertUser, selectUserByGithubId } from "#db/queries.sql";
-import { createRouter } from "#lib/factory";
-import type { Env, GitHubUser } from "#lib/types";
 import { OAuth2RequestError, generateState } from "arctic";
 import type { Context as HonoContext } from "hono";
 import { getCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
+import { github } from "#auth/oauth";
+import { createSession, generateSessionToken } from "#auth/session";
+import { insertUser, selectUserByGithubId } from "#db/queries.sql";
+import { createRouter } from "#lib/factory";
+import type { Env, GitHubUser } from "#lib/types";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = "http://localhost:5173/";
 
-// Cookie management utilities
 const cookieConfig = {
 	path: "/",
 	secure: process.env.NODE_ENV !== "development",
@@ -64,9 +63,10 @@ export const githubRouter = createRouter()
 	});
 
 async function setOAuthStateCookie(c: HonoContext<Env>, state: string) {
+	const TEN_MINUTES = 60 * 10;
 	setCookie(c, "github_oauth_state", state, {
 		...cookieConfig,
-		maxAge: 60 * 10,
+		maxAge: TEN_MINUTES,
 	});
 }
 

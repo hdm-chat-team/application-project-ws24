@@ -4,13 +4,16 @@ import {
 	selectSessionById,
 	updateSessionExpiresAt,
 } from "#db/queries.sql";
-import type { Session } from "#db/schema.sql";
-import type { SessionValidationResult } from "./types";
-import { hashToken } from "./utils";
+import type { Session, User } from "#db/schema.sql";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const SESSION_DURATION = ONE_DAY * 30;
 const REFRESH_THRESHOLD = ONE_DAY * 15;
+
+function hashToken(token: string): string {
+	const hasher = new Bun.CryptoHasher("sha256", Buffer.from("base64"));
+	return hasher.update(token).digest("base64");
+}
 
 /**
  * Generates a cryptographically secure random session token.
@@ -43,6 +46,10 @@ export async function createSession(
 	});
 	return session;
 }
+
+type SessionValidationResult =
+	| { session: Session; user: User; fresh: boolean }
+	| { session: null; user: null; fresh: boolean };
 
 /**
  * Validates a session token and refreshes the session if needed.
