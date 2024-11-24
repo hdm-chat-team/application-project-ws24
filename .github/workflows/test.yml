@@ -22,8 +22,8 @@ jobs:
               run: bun install
             - name: Run tests
               env:
-                NODE_ENV: test
-                CLIENT_ID_GITHUB: ${{ env.CLIENT_ID_GITHUB }}
+                CLIENT_ID_GITHUB: ${{ vars.CLIENT_ID_GITHUB }}
                 CLIENT_SECRET_GITHUB: ${{ secrets.CLIENT_SECRET_GITHUB }}
-                DATABASE_URL: ${{ env.DATABASE_URL }}
+                CALLBACK_URL_GITHUB: ${{ vars.CALLBACK_URL_GITHUB }}
+                DATABASE_URL: ${{ vars.DATABASE_URL }}
               run: bun test
