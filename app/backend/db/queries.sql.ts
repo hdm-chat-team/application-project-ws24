@@ -1,6 +1,6 @@
 import { eq, sql } from "drizzle-orm";
 import db from "./db";
-import { sessionTable, userTable } from "./schema.sql";
+import { sessionTable, userProfileTable, userTable } from "./schema.sql";
 
 // * Session Queries
 export const insertSession = db
@@ -41,6 +41,18 @@ export const insertUser = db
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
+
+// * Profile Queries
+export const insertProfile = db
+	.insert(userProfileTable)
+	.values({
+		userId: sql.placeholder("userId"),
+		displayName: sql.placeholder("displayname"),
+		email: sql.placeholder("email"),
+		avatar_url: sql.placeholder("avatar_url"),
+		html_url: sql.placeholder("html_url"),
+	})
+	.returning({ id: userProfileTable.id });
 
 export const selectUserByGithubId = db.query.userTable
 	.findFirst({
