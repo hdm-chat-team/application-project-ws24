@@ -114,6 +114,11 @@ async function handleUserAuthentication(githubUser: GitHubUser) {
 		.execute({
 			githubId: githubUser.id,
 			username: githubUser.login,
+			name: githubUser.name,
+			email: githubUser.email,
+			avatar_url: githubUser.avatar_url,
+			location: githubUser.location,
+			html_url: githubUser.html_url,
 		})
 		.then((result) => result[0]);
 }
