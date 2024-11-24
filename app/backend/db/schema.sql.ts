@@ -1,11 +1,12 @@
 import { type InferSelectModel, relations } from "drizzle-orm";
 import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 
-// * User (alles was den User genau definiert)
+// * User
 export const userTable = pgTable("users", {
 	id: uuid().primaryKey().defaultRandom(),
 	githubId: text().notNull().unique(),
 	username: varchar({ length: 20 }).notNull().unique(),
+	email: varchar({ length: 255 }),
 });
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
@@ -25,7 +26,6 @@ export const userProfileTable = pgTable("user_profiles", {
 		.references(() => userTable.id, { onDelete: "cascade" })
 		.notNull(),
 	displayName: varchar({ length: 255 }),
-	email: varchar({ length: 255 }),
 	avatar_url: varchar({ length: 255 }),
 	html_url: varchar({ length: 255 }),
 });
