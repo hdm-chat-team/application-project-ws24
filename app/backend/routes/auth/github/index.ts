@@ -1,24 +1,18 @@
+import { zValidator } from "@hono/zod-validator";
 import { OAuth2RequestError, generateState } from "arctic";
 import type { Context as HonoContext } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
+import { setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
 import { insertUser, selectUserByGithubId } from "#db/queries.sql";
-import env from "#env";
+import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
+import { oauthCallbackSchema, oauthStateSchema } from "./validation";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = "http://localhost:5173/";
-
-const cookieConfig = {
-	path: "/",
-	secure: env.NODE_ENV !== "development",
-	httpOnly: env.NODE_ENV !== "development",
-	sameSite: "lax" as const,
-	domain: env.NODE_ENV === "development" ? "localhost" : ".example.com",
-};
 
 export const githubRouter = createRouter()
 	.get("/", async (c) => {
@@ -27,41 +21,29 @@ export const githubRouter = createRouter()
 		await setOAuthStateCookie(c, state);
 		return c.redirect(url.toString());
 	})
-	.get("/callback", async (c) => {
-		const { code, state } = c.req.query();
-		const cookieAuthState = getCookie(c, "github_oauth_state");
+	.get(
+		"/callback",
+		zValidator("cookie", oauthStateSchema),
+		zValidator("query", oauthCallbackSchema),
+		async (c) => {
+			const { code, state } = c.req.valid("query");
+			const { github_oauth_state } = c.req.valid("cookie");
 
-		if (!code || !state || !cookieAuthState || state !== cookieAuthState) {
-			throw new HTTPException(400, {
-				message: "Invalid GitHub OAuth flow",
-				cause: "invalid_oauth_flow",
-			});
-		}
+			if (state !== github_oauth_state) {
+				throw new HTTPException(400, {
+					message: "Invalid GitHub OAuth flow",
+					cause: "invalid_oauth_flow",
+				});
+			}
 
-		try {
-			const tokens = await github.validateAuthorizationCode(code);
+			const tokens = (await github.validateAuthorizationCode(code));
 			const githubUser = await fetchGitHubUser(tokens.accessToken());
 			const user = await handleUserAuthentication(githubUser);
 			await createAndSetSessionCookie(c, user.id);
 
 			return c.redirect(REDIRECT_URL);
-		} catch (error) {
-			console.error("OAuth flow error:", error);
-			if (error instanceof OAuth2RequestError) {
-				throw new HTTPException(400, {
-					message: "Invalid OAuth request",
-					cause: error.message,
-				});
-			}
-			if (error instanceof HTTPException) {
-				throw error;
-			}
-			throw new HTTPException(500, {
-				message: "Failed to complete GitHub OAuth flow",
-				cause: "unknown_error",
-			});
-		}
-	});
+		},
+	);
 
 async function setOAuthStateCookie(c: HonoContext<Env>, state: string) {
 	const TEN_MINUTES = 60 * 10;
