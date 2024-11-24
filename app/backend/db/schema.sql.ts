@@ -1,5 +1,5 @@
 import { type InferSelectModel, relations } from "drizzle-orm";
-import { pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // * User
 export const userTable = pgTable("users", {
@@ -21,6 +21,8 @@ export const userTableRelations = relations(userTable, ({ many }) => ({
 })); */
 
 export type User = InferSelectModel<typeof userTable>;
+export const insertUserSchema = createInsertSchema(userTable);
+export const selectUserSchema = createSelectSchema(userTable);
 
 /* export const userProfileTable = pgTable("user_profiles", {
 	id: uuid().primaryKey().defaultRandom(),
