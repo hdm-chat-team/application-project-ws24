@@ -1,11 +1,12 @@
 import { type InferSelectModel, relations } from "drizzle-orm";
+import { bigint, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // * User
 export const userTable = pgTable("users", {
 	id: uuid().primaryKey().defaultRandom(),
-	githubId: text().notNull().unique(),
-	username: varchar({ length: 20 }).notNull().unique(),
+	githubId: bigint({ mode: "number" }).notNull().unique(),
+	username: varchar({ length: 39 }).notNull().unique(),
 });
 
 export const userTableRelations = relations(userTable, ({ many }) => ({
