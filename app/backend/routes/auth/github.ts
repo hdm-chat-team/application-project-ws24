@@ -5,6 +5,7 @@ import { HTTPException } from "hono/http-exception";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
 import { insertUser, selectUserByGithubId } from "#db/queries.sql";
+import env from "#env";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
 
@@ -13,10 +14,10 @@ const REDIRECT_URL = "http://localhost:5173/";
 
 const cookieConfig = {
 	path: "/",
-	secure: process.env.NODE_ENV !== "development",
-	httpOnly: process.env.NODE_ENV !== "development",
+	secure: env.NODE_ENV !== "development",
+	httpOnly: env.NODE_ENV !== "development",
 	sameSite: "lax" as const,
-	domain: process.env.NODE_ENV === "development" ? "localhost" : ".example.com",
+	domain: env.NODE_ENV === "development" ? "localhost" : ".example.com",
 };
 
 export const githubRouter = createRouter()

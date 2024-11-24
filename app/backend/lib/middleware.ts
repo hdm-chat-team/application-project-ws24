@@ -3,14 +3,15 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
+import env from "#env";
 import type { Env } from "./types";
 
 const cookieConfig = {
 	path: "/",
-	secure: process.env.NODE_ENV !== "development",
-	httpOnly: process.env.NODE_ENV !== "development",
+	secure: env.NODE_ENV !== "development",
+	httpOnly: env.NODE_ENV !== "development",
 	sameSite: "lax" as const,
-	domain: process.env.NODE_ENV === "development" ? "localhost" : ".example.com",
+	domain: env.NODE_ENV === "development" ? "localhost" : ".example.com",
 };
 
 /**
