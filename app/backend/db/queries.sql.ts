@@ -38,6 +38,7 @@ export const insertUser = db
 	.values({
 		githubId: sql.placeholder("githubId"),
 		username: sql.placeholder("username"),
+		email: sql.placeholder("email"),
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
@@ -48,7 +49,6 @@ export const insertProfile = db
 	.values({
 		userId: sql.placeholder("userId"),
 		displayName: sql.placeholder("displayname"),
-		email: sql.placeholder("email"),
 		avatar_url: sql.placeholder("avatar_url"),
 		html_url: sql.placeholder("html_url"),
 	})

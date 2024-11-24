@@ -117,12 +117,12 @@ async function handleUserAuthentication(githubUser: GitHubUser) {
 	const user = await insertUser.execute({
 		githubId: githubUser.id,
 		username: githubUser.login,
+		email: githubUser.email,
 	});
 
 	await insertProfile.execute({
 		userId: user[0].id,
 		displayname: githubUser.name,
-		email: githubUser.email,
 		avatar_url: githubUser.avatar_url,
 		html_url: githubUser.html_url,
 	});
