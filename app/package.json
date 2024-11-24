@@ -19,7 +19,7 @@
 		"drizzle-orm": "^0.36.4",
 		"hono": "4.6.11",
 		"pg": "^8.13.1",
-		"valibot": "^1.0.0-beta.8"
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",

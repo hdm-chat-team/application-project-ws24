@@ -1,49 +1,33 @@
-import {
-	url,
-	nonEmpty,
-	object,
-	optional,
-	parse,
-	picklist,
-	pipe,
-	startsWith,
-	string,
-	transform,
-	unknown,
-} from "valibot";
-import type { InferOutput } from "valibot";
+import { z } from "zod";
 
 const nodeEnvironments = ["development", "production", "test"] as const;
 
-export const EnvSchema = object({
+export const EnvSchema = z.object({
 	// * General
-	NODE_ENV: optional(pipe(string(), picklist(nodeEnvironments)), "development"),
-	PORT: optional(
-		pipe(
-			unknown(),
-			transform((value) => Number(value)),
-		),
-		3000,
-	),
+	NODE_ENV: z.enum(nodeEnvironments).default("development"),
+	PORT: z
+		.unknown()
+		.transform((value) => Number(value))
+		.default(3000),
 
 	// * PostgreSQL
-	DATABASE_URL: pipe(string(), startsWith("postgresql://")),
+	DATABASE_URL: z.string().url().startsWith("postgresql://"),
 
 	// * GitHub OAuth
-	CLIENT_ID_GITHUB: pipe(string(), nonEmpty()),
-	CLIENT_SECRET_GITHUB: pipe(string(), nonEmpty()),
-	CALLBACK_URL_GITHUB: pipe(string(), nonEmpty(), url()),
+	CLIENT_ID_GITHUB: z.string().min(1),
+	CLIENT_SECRET_GITHUB: z.string().min(1),
+	CALLBACK_URL_GITHUB: z.string().min(1).url(),
 });
 
-type NodeEnv = InferOutput<typeof EnvSchema>;
+type NodeEnv = z.infer<typeof EnvSchema>;
 
-let env: NodeEnv;
+const { data, error } = EnvSchema.safeParse(process.env);
 
-try {
-	env = parse(EnvSchema, process.env);
-} catch (error) {
-	console.error("❌ Invalid environment variables: \n", error);
+if (error) {
+	console.error("❌ Invalid Environment Variables:");
+	console.error(JSON.stringify(error.flatten().fieldErrors, null, 2));
 	process.exit(1);
 }
 
+const env: NodeEnv = data;
 export default env;
