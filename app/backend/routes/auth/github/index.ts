@@ -91,18 +91,20 @@ async function handleDbUser(githubUser: GitHubUser) {
 		return existingUser;
 	}
 
-	const user = await insertUser.execute({
-		githubId: githubUser.id,
-		username: githubUser.login,
-		email: githubUser.email,
-	});
+	const user = await insertUser
+		.execute({
+			githubId: githubUser.id,
+			username: githubUser.login,
+			email: githubUser.email,
+		})
+		.then((rows) => rows[0]);
 
 	await insertProfile.execute({
-		userId: user[0].id,
+		userId: user.id,
 		displayname: githubUser.name,
 		avatar_url: githubUser.avatar_url,
 		html_url: githubUser.html_url,
 	});
 
-	return user[0];
+	return user;
 }
