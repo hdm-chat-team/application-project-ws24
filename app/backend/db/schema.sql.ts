@@ -7,7 +7,7 @@ export const userTable = pgTable("users", {
 	id: uuid().primaryKey().defaultRandom(),
 	githubId: bigint({ mode: "number" }).notNull().unique(),
 	username: varchar({ length: 39 }).notNull().unique(),
-	email: varchar({ length: 255 }),
+	email: varchar({ length: 255 }).notNull().unique(),
 });
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
