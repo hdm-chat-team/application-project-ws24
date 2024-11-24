@@ -4,7 +4,11 @@ import { getCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import { insertUser, selectUserByGithubId } from "#db/queries.sql";
+import {
+	insertProfile,
+	insertUser,
+	selectUserByGithubId,
+} from "#db/queries.sql";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
 
@@ -110,10 +114,18 @@ async function handleUserAuthentication(githubUser: GitHubUser) {
 		return existingUser;
 	}
 
-	return insertUser
-		.execute({
-			githubId: githubUser.id,
-			username: githubUser.login,
-		})
-		.then((result) => result[0]);
+	const user = await insertUser.execute({
+		githubId: githubUser.id,
+		username: githubUser.login,
+		email: githubUser.email,
+	});
+
+	await insertProfile.execute({
+		userId: user[0].id,
+		displayname: githubUser.name,
+		avatar_url: githubUser.avatar_url,
+		html_url: githubUser.html_url,
+	});
+
+	return user[0];
 }

@@ -1,5 +1,4 @@
 import { GitHub } from "arctic";
-
 const { CLIENT_ID_GITHUB, CLIENT_SECRET_GITHUB, CALLBACK_URL_GITHUB } =
 	process.env;
 

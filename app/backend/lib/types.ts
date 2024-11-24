@@ -42,4 +42,7 @@ export type GitHubUser = {
 
 	/** ISO 8601 timestamp of when the account was last updated */
 	updated_at: string;
+
+	/** The location of the user set in GitHub */
+	location: string | null;
 };
