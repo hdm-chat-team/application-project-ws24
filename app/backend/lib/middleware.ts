@@ -3,16 +3,8 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
-import env from "#env";
 import type { Env } from "./types";
-
-const cookieConfig = {
-	path: "/",
-	secure: env.NODE_ENV !== "development",
-	httpOnly: env.NODE_ENV !== "development",
-	sameSite: "lax" as const,
-	domain: env.NODE_ENV === "development" ? "localhost" : ".example.com",
-};
+import cookieConfig from "#lib/cookie";
 
 /**
  * Middleware to handle authentication state by validating session tokens.
