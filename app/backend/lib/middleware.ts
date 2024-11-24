@@ -3,8 +3,8 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
-import type { Env } from "./types";
 import cookieConfig from "#lib/cookie";
+import type { Env } from "./types";
 
 /**
  * Middleware to handle authentication state by validating session tokens.
