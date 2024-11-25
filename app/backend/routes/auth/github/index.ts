@@ -13,7 +13,7 @@ import {
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
-import { oauthCallbackSchema, oauthStateSchema } from "./validation";
+import { oauthCallbackSchema, oauthStateSchema } from "./index.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = "http://localhost:5173/";
