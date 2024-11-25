@@ -6,7 +6,7 @@ const { upgradeWebSocket } = createBunWebSocket<ChatSocket>();
 
 const topic = "chat";
 
-export const chat = createRouter().get(
+export const chatRouter = createRouter().get(
 	"/",
 	upgradeWebSocket((c) => {
 		return {
