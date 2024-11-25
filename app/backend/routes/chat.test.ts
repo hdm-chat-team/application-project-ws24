@@ -1,12 +1,13 @@
+import { createApi } from "#lib/factory";
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";
-import { chat } from "./chat";
+import { chatRouter } from "./chat";
 
-const client = testClient(chat);
+const { chat } = testClient(createApi().route("/chat", chatRouter));
 
 describe("/api/chat", () => {
 	test("GET /", async () => {
-		const res = client.index.$ws();
+		const res = chat.$ws();
 		expect(res).toBeInstanceOf(WebSocket);
 	});
 });
