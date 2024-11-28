@@ -3,8 +3,10 @@
 	"module": "src/index.js",
 	"imports": {
 		"#auth/*": "./backend/auth/*.ts",
+		"#db/*": "./backend/db/*.ts",
+		"#env": "./env.ts",
 		"#lib/*": "./backend/lib/*.ts",
-		"#db/*": "./backend/db/*.ts"
+		"#types/*": "./backend/types/*.ts"
 	},
 	"scripts": {
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
@@ -13,10 +15,13 @@
 		"preview": "NODE_ENV=production bun run dist/index.js"
 	},
 	"dependencies": {
-		"arctic": "^2.2.2",
-		"hono": "4.6.11",
+		"@hono/zod-validator": "^0.4.1",
+		"arctic": "^2.3.0",
 		"drizzle-orm": "^0.36.4",
-		"pg": "^8.13.1"
+		"drizzle-zod": "^0.5.1",
+		"hono": "4.6.11",
+		"pg": "^8.13.1",
+		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",

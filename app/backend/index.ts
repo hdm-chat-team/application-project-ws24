@@ -1,4 +1,5 @@
 import { createBunWebSocket } from "hono/bun";
+import env from "#env";
 import type { ChatSocket } from "#lib/types";
 import app from "./app";
 
@@ -7,7 +8,7 @@ const { websocket } = createBunWebSocket<ChatSocket>();
 
 // * Server start up
 const server = Bun.serve({
-	port: 3000,
+	port: env.PORT,
 	fetch: app.fetch,
 	websocket,
 });
