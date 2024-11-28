@@ -9,7 +9,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-    const { data: user, isLoading } = useQuery({
+    const { data: user} = useQuery({
         queryKey: ['auth-user'],
         queryFn: async () => {
             const response = await api.auth.me.$get();
@@ -17,11 +17,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             return response.json() as Promise<User>;
         },
     });
-
-    if (isLoading) {
-        return <div>Laden...</div>;
-    }
-
+    
     return (
         <AuthContext.Provider value={user || null}>
             {children}
