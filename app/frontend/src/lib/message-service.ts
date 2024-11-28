@@ -1,5 +1,6 @@
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
+import type { User } from '@server/db/schema.sql';
 
 export interface Message {
 	id?: string;
@@ -7,18 +8,20 @@ export interface Message {
 	timestamp: number;
 	status: "sent" | "received";
 	userId: string;
+	username: string;
 }
 
 const messageDb = new Dexie("MessageDatabase") as Dexie & {
 	messages: EntityTable<Message, "id">;
 };
 
-messageDb.version(3).stores({
-	messages: "++id, content, timestamp, status, userId",
+messageDb.version(4).stores({
+	messages: "++id, content, timestamp, status, userId, username",
 });
 
 class MessageService {
 	private static instance: MessageService;
+	private currentUser: User | null = null;
 
 	private constructor() {}
 
@@ -37,14 +40,23 @@ class MessageService {
 		}
 	}
 
+	public setCurrentUser(user: User) {
+        this.currentUser = user;
+    }
+
 	private createMessage(content: string, status: "sent" | "received"): Message {
+		if (!this.currentUser) {
+			throw new Error("Current user not set");
+		}
+
 		return {
 			id: crypto.randomUUID(),
 			content,
 			status,
 			timestamp: Date.now(),
-			userId: "placeholder",
-		};
+			userId: this.currentUser.id,
+			username: this.currentUser.username,
+		};	
 	}
 
 	public async addMessage(message: Message) {
