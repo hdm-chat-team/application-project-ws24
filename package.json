@@ -31,5 +31,8 @@
     "core-js-pure",
     "esbuild",
     "sharp"
-  ]
+  ],
+  "dependencies": {
+    "react-icon": "^1.0.0"
+  }
 }

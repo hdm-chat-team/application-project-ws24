@@ -9,7 +9,7 @@ export const Route = createFileRoute("/login/")({
 function RouteComponent() {
 	return (
 		<Button asChild>
-			<a href="/api/auth/github">Login!</a>
+			<a href="/api/auth/github">Login!hello </a>
 		</Button>
 	);
 }
