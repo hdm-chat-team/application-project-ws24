@@ -19,13 +19,13 @@
 		"arctic": "^2.3.0",
 		"drizzle-orm": "^0.36.4",
 		"drizzle-zod": "^0.5.1",
-		"hono": "4.6.11",
+		"hono": "^4.6.12",
 		"pg": "^8.13.1",
 		"zod": "^3.23.8"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "^1.1.13",
+		"@types/bun": "^1.1.14",
 		"@types/pg": "^8.11.10",
 		"drizzle-kit": "^0.28.1"
 	}
