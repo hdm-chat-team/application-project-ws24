@@ -1,37 +1,33 @@
-ARG BUN_VERSION=1.1.36
-
-ARG YARN_PKG_MANAGER="this.packageManager=\"yarn@1.22.22\""
-ARG BUN_PKG_MANAGER="this.packageManager=\"bun@${BUN_VERSION}\""
-
-FROM oven/bun:${BUN_VERSION} as bun
+FROM oven/bun:alpine as base
 WORKDIR /app
 
-FROM oven/bun:${BUN_VERSION}-alpine as bun-alpine
-WORKDIR /app
+FROM base AS install
+COPY . /temp/dev
+RUN cd /temp/dev && bun install --frozen-lockfile
 
-# ================= TURBO PRUNE ===================
+COPY . /temp/prod
+RUN cd /temp/prod && bun install --frozen-lockfile --production
 
-FROM bun as pruned
-ARG YARN_PKG_MANAGER
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-RUN bunx json -I -f package.json -e ${YARN_PKG_MANAGER}
-RUN bunx turbo prune --scope="@application-project-ws24/app" --docker
-
-# =============== INSTALL & BUILD =================
-
-FROM bun as builder
-ARG BUN_PKG_MANAGER
-COPY --from=pruned /app/out/full/ .
-RUN bunx json -I -f package.json -e ${BUN_PKG_MANAGER}
-RUN bun install --production
 RUN bunx clean-modules -y "**/*.ts" "**/@types/**"
-RUN bunx turbo build --filter="@application-project-ws24/app"
+RUN bun run build
 
-# ================== RELEASE ======================
+# copy production dependencies and source code into final image
+FROM base AS release
+COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /app/app/dist .
+COPY --from=prerelease /app/package.json .
 
-FROM bun-alpine AS release
+# define default environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# run the app
 USER bun
-COPY --from=builder /app .
 EXPOSE 3000/tcp
-WORKDIR /app/app
-ENTRYPOINT [ "bun", "dist/index.js" ]
+WORKDIR /app
+ENTRYPOINT [ "bun", "run", "index.js" ]
