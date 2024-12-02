@@ -73,8 +73,4 @@ export default defineConfig({
 			"@server": `${__dirname}/../backend/`,
 		},
 	},
-	build: {
-		outDir: "../dist/client",
-		emptyOutDir: true,
-	},
 });
