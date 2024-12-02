@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
+import { Github } from "lucide-react";
 import { useRef, useState } from "react";
 export const Route = createFileRoute("/login/")({
 	component: Index,
 });
-import { FaGithub } from "react-icons/fa";
 function Index() {
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
@@ -48,7 +48,7 @@ function Index() {
 					<div className="flex w-full justify-end">
 						<Button
 							asChild
-							className="w-fit rounded-3xl bg-destructive hover:bg-destructive/80 text-white "
+							className="w-fit rounded-3xl bg-destructive text-white hover:bg-destructive/80 "
 						>
 							<a href={api.auth.github.$url().toString()}>Sign In</a>
 						</Button>
@@ -65,10 +65,11 @@ function Index() {
 				<div className="mt-5 flex w-full justify-center">
 					<Button
 						asChild
-						className="flex items-center gap-2 rounded-3xl bg-destructive hover:bg-destructive/80 px-4 py-2 text-white"
+						className="flex items-center gap-2 rounded-3xl bg-destructive px-4 py-2 text-white hover:bg-destructive/80"
 					>
 						<a href={api.auth.github.$url().toString()}>
-							GitHub <FaGithub />
+							GitHub
+							<Github />
 						</a>
 					</Button>
 				</div>
