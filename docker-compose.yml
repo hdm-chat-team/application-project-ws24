@@ -2,7 +2,6 @@ services:
   app:
     container_name: app
     build: .
-    restart: always
     env_file:
       - .env
     ports:
