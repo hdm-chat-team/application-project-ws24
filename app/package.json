@@ -10,9 +10,11 @@
 	},
 	"scripts": {
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
-		"db": "bunx drizzle-kit",
+		"db:dev": "NODE_ENV=development bunx drizzle-kit",
+		"db:prod": "NODE_ENV=production bunx drizzle-kit",
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
-		"preview": "NODE_ENV=production bun run dist/index.js"
+		"preview": "NODE_ENV=production bun run dist/index.js",
+		"start": "NODE_ENV=production bun run dist/index.js"
 	},
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.1",
