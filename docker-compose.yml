@@ -4,6 +4,8 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgres://application-project-team:postgres@db:5432/server-db
     ports:
       - 3000:3000
     networks:
