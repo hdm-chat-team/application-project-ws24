@@ -12,12 +12,12 @@
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.1.0",
-    "@tanstack/react-query": "^5.62.0",
-    "@tanstack/react-query-devtools": "^5.62.0",
+    "@tanstack/react-query": "^5.62.2",
+    "@tanstack/react-query-devtools": "^5.62.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "hono": "^4.6.12",
-    "lucide-react": "^0.462.0",
+    "lucide-react": "^0.465.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "dexie": "^4.0.10",
@@ -26,8 +26,8 @@
   },
   "devDependencies": {
     "@application-project-ws24/tsconfig": "workspace:*",
-    "@tanstack/router-devtools": "^1.85.0",
-    "@tanstack/router-plugin": "^1.84.4",
+    "@tanstack/router-devtools": "^1.85.5",
+    "@tanstack/router-plugin": "^1.85.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vite-pwa/assets-generator": "^0.2.6",
@@ -36,8 +36,8 @@
     "globals": "^15.13.0",
     "postcss": "^8.4.49",
     "rollup-plugin-visualizer": "^5.12.0",
-    "tailwindcss": "^3.4.15",
-    "vite": "^6.0.1",
+    "tailwindcss": "^3.4.16",
+    "vite": "^6.0.2",
     "vite-plugin-pwa": "^0.21.1"
   }
 }

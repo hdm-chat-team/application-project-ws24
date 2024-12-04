@@ -19,7 +19,7 @@
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.1",
 		"arctic": "^2.3.0",
-		"drizzle-orm": "^0.36.4",
+		"drizzle-orm": "^0.37.0",
 		"drizzle-zod": "^0.5.1",
 		"hono": "^4.6.12",
 		"pg": "^8.13.1",
@@ -29,6 +29,6 @@
 		"@application-project-ws24/tsconfig": "workspace:*",
 		"@types/bun": "^1.1.14",
 		"@types/pg": "^8.11.10",
-		"drizzle-kit": "^0.28.1"
+		"drizzle-kit": "^0.29.1"
 	}
 }
