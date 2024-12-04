@@ -20,6 +20,7 @@ RUN bun run build
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /app/app/dist .
+COPY --from=prerelease /app/app/frontend/dist frontend/dist
 COPY --from=prerelease /app/package.json .
 
 # define default environment variables

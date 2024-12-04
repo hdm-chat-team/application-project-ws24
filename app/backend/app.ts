@@ -16,7 +16,8 @@ const apiRoutes = apiRouter
 
 const app = createRouter()
 	.route("/", apiRouter)
-	.get("*", serveStatic({ root: "frontend/dist", path: "index.html" }));
+	.get("*", serveStatic({ root: "frontend/dist" }))
+	.get("*", serveStatic({ path: "index.html" }));
 
 export default app;
 
