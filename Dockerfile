@@ -19,8 +19,7 @@ RUN bun run build
 # copy production dependencies and source code into final image
 FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
-COPY --from=prerelease /app/app/dist .
-COPY --from=prerelease /app/app/frontend/dist frontend/dist
+COPY --from=prerelease /app/app/dist dist
 COPY --from=prerelease /app/package.json .
 
 # define default environment variables
@@ -31,4 +30,4 @@ ENV PORT=3000
 USER bun
 EXPOSE 3000/tcp
 WORKDIR /app
-ENTRYPOINT [ "bun", "run", "index.js" ]
+ENTRYPOINT [ "bun", "run", "dist/index.js" ]
