@@ -8,7 +8,7 @@ const REDIRECT_URL = "http://localhost:5173";
 export const authRouter = createRouter()
 	.route("/github", githubRouter)
 	.get("/signout", protectedRoute, async (c) => {
-		const { id } = c.get("authenticatedSession");
+		const { id } = c.get("session");
 		await invalidateSession(id);
 		return c.redirect(REDIRECT_URL);
 	});

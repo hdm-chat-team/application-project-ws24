@@ -68,16 +68,16 @@ export const authMiddleware = createMiddleware<Env>(async (c, next) => {
  */
 export const protectedRoute = createMiddleware<
 	Env & {
-		Variables: { authenticatedUser: User; authenticatedSession: Session };
+		Variables: { user: User; session: Session };
 	}
 >(async (c, next) => {
 	const session = c.get("session");
 	const user = c.get("user");
 
-	if (!(session && user)) throw new HTTPException(401);
+	if (!session || !user) throw new HTTPException(401);
 
-	c.set("authenticatedUser", user);
-	c.set("authenticatedSession", session);
+	c.set("user", user);
+	c.set("session", session);
 	return next();
 });
 
