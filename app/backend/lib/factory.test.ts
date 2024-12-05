@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, spyOn, test } from "bun:test";
-import { createRouter, createApi, onError } from "./factory";
 import { HTTPException } from "hono/http-exception";
+import { createApi, createRouter, onError } from "./factory";
 
 describe("factory", () => {
 	beforeAll(() => {

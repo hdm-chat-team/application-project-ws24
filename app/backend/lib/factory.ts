@@ -5,10 +5,10 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
+import type { HTTPResponseError } from "hono/types";
 import env from "#env";
 import { authMiddleware } from "./middleware";
 import type { Env } from "./types";
-import type { HTTPResponseError } from "hono/types";
 
 const origin =
 	env.NODE_ENV === "development"

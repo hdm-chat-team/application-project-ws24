@@ -1,5 +1,5 @@
-import { deleteSessionById, updateSessionExpiresAt } from "#db/queries.sql";
 import { beforeAll, describe, expect, mock, spyOn, test } from "bun:test";
+import { deleteSessionById, updateSessionExpiresAt } from "#db/queries.sql";
 import * as sessionManager from "./session";
 
 describe("session", () => {
