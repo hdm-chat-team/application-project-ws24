@@ -20,7 +20,8 @@ const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL =
 	env.NODE_ENV === "development"
 		? "http://localhost:5173"
-		: "http://localhost:3000";
+		: `http://localhost:${env.PORT}`;
+
 const TEN_MINUTES = 60 * 10;
 
 export const githubRouter = createRouter()
@@ -31,8 +32,6 @@ export const githubRouter = createRouter()
 		setCookie(c, "github_oauth_state", state, {
 			...cookieConfig,
 			maxAge: TEN_MINUTES,
-			// For development, explicitly set domain to localhost
-			...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
 		});
 		return c.redirect(url.toString());
 	})

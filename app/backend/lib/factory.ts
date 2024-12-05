@@ -11,8 +11,8 @@ import type { Env } from "./types";
 
 const origin =
 	env.NODE_ENV === "development"
-		? ["http://localhost:5173", "http://localhost:3000"]
-		: ["http://localhost:3000"];
+		? ["http://localhost:5173", `http://localhost:${env.PORT}`]
+		: [`http://localhost:${env.PORT}`];
 
 export function createRouter() {
 	return new Hono<Env>({
@@ -26,10 +26,7 @@ export function createApi() {
 			cors({
 				origin,
 				credentials: true,
-				/* allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"], */
-				/* allowHeaders: ["content-type", "authorization", "cookie"], */
 				maxAge: env.NODE_ENV === "development" ? undefined : 3600,
-				/* exposeHeaders: ["set-cookie"], */
 			}),
 		)
 		.use(csrf({ origin }))
