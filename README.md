@@ -71,16 +71,16 @@ bun run build
 
 ### 🐋 Docker
 
-To build the development database instance and dockerize the backends current build:
+To start the local database run:
 
 ```zsh
-docker compose build
+docker compose up db --detach
 ```
 
 To start both containers:
 
 ```zsh
-docker compose up -d
+docker compose up --build --detach
 ```
 
 ### 👨‍💻 Develop

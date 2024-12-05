@@ -4,6 +4,8 @@ import { protectedRoute } from "#lib/middleware";
 import type { Context } from "hono";
 import { githubRouter } from "./github";
 
+const REDIRECT_URL = "http://localhost:5173";
+
 export const authRouter = createRouter()
 	.route("/github", githubRouter)
 	.get("/signout", protectedRoute, async (c) => {
