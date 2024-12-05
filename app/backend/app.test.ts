@@ -7,6 +7,6 @@ const { api } = testClient(app as ApiType);
 describe("/api", () => {
 	test("GET /", async () => {
 		const res = await api.$get();
-		expect(res.ok).toBe(true);
+		expect(res.ok).toBeTrue();
 	});
 });

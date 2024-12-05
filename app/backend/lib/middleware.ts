@@ -91,9 +91,13 @@ export const protectedRoute = createMiddleware<
 export const limiter = rateLimiter({
 	windowMs: 10 * 1000,
 	limit: 10,
-	standardHeaders: "draft-6",
 	keyGenerator: (c) => {
-		return getConnInfo(c).remote.address ?? "default-key";
+		try {
+			const connInfo = getConnInfo(c);
+			return connInfo?.remote.address || "unknown";
+		} catch {
+			return "unknown";
+		}
 	},
 });
 
