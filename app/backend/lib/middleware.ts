@@ -51,18 +51,17 @@ export const authMiddleware = createMiddleware<Env>(async (c, next) => {
 });
 
 /**
- * Middleware to protect routes by requiring a valid user and session.
+ * Route protection middleware.
  *
  * @description
- * Sets the following context variables when successful:
- * - authenticatedUser: Verified User object
- * - authenticatedSession: Verified Session object
+ * makes sure that a valid session and user are present in the context, making them not be null.
  *
  * @throws {HTTPException} 401 error if user or session is missing
  *
  * @example
  * router.get("/protected", protectedRoute, async (c) => {
- *   const user = c.get("authenticatedUser");
+ *   const user = c.get("user");
+ *   const session = c.get("session");
  *   // Handle protected route...
  * });
  */
