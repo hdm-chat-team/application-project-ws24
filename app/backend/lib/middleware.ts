@@ -1,4 +1,5 @@
 import { rateLimiter } from "hono-rate-limiter";
+import { getConnInfo } from "hono/bun";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
@@ -7,7 +8,6 @@ import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
 import cookieConfig from "#lib/cookie";
 import type { Env } from "./types";
-import { getConnInfo } from "hono/bun";
 
 /**
  * Middleware to handle authentication state by validating session tokens.
@@ -92,7 +92,9 @@ export const limiter = rateLimiter({
 	windowMs: 10 * 1000,
 	limit: 10,
 	standardHeaders: "draft-6",
-	keyGenerator: (c) => getConnInfo(c).remote.address ?? "unknown",
+	keyGenerator: (c) => {
+		return getConnInfo(c).remote.address ?? "default-key";
+	},
 });
 
 /**
