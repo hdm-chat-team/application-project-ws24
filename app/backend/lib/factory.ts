@@ -8,6 +8,7 @@ import { requestId } from "hono/request-id";
 import env from "#env";
 import { authMiddleware } from "./middleware";
 import type { Env } from "./types";
+import type { HTTPResponseError } from "hono/types";
 
 const origin =
 	env.NODE_ENV === "development"
@@ -34,14 +35,17 @@ export function createApi() {
 		.use(logger())
 		.use(requestId())
 		.use(prettyJSON())
-		.onError(async (error) => {
-			console.error(error);
-			if (!(error instanceof HTTPException)) {
-				return new Response(error.message, {
-					status: 500,
-					statusText: `Internal error: ${error.cause}`,
-				});
-			}
-			return error.getResponse();
+		.onError((error) => onError(error));
+}
+
+// Change to export the onError function
+export async function onError(error: Error | HTTPResponseError) {
+	console.error(error);
+	if (!(error instanceof HTTPException)) {
+		return new Response(error.message, {
+			status: 500,
+			statusText: `Internal error: ${error.cause}`,
 		});
+	}
+	return error.getResponse();
 }
