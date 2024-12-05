@@ -1,7 +1,7 @@
 import { describe, expect, mock, test } from "bun:test";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { authMiddleware, protectedRoute } from "./middleware";
+import { authMiddleware, onError, protectedRoute } from "./middleware";
 import type { Env } from "./types";
 
 // @ts-ignore - intentionally loose
@@ -116,5 +116,27 @@ describe("protectedRoute", () => {
 		// @ts-ignore
 		expect(c.get("authenticatedSession")).toEqual(session);
 		expect(next).toHaveBeenCalled();
+	});
+
+	describe("onError", () => {
+		test("should handle non-HTTPException errors", async () => {
+			const error = new Error("Test error");
+			error.cause = "Test cause";
+
+			const response = await onError(error);
+			expect(response.status).toBe(500);
+			expect(response.statusText).toBe("Internal error: Test cause");
+			expect(await response.text()).toBe("Test error");
+		});
+
+		test("should handle HTTPException errors", async () => {
+			const httpError = new HTTPException(400, {
+				message: "Bad Request",
+			});
+
+			const response = await onError(httpError);
+			expect(response.status).toBe(400);
+			expect(await response.text()).toBe("Bad Request");
+		});
 	});
 });
