@@ -73,7 +73,11 @@ export const protectedRoute = createMiddleware<
 	const session = c.get("session");
 	const user = c.get("user");
 
-	if (!session || !user) throw new HTTPException(401);
+	if (!session || !user)
+		throw new HTTPException(401, {
+			message: "Unauthorized",
+			cause: "Missing session or user",
+		});
 
 	c.set("user", user);
 	c.set("session", session);
