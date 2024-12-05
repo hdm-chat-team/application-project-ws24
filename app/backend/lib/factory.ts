@@ -1,13 +1,11 @@
+import env from "#env";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
-import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
-import type { HTTPResponseError } from "hono/types";
-import env from "#env";
-import { authMiddleware } from "./middleware";
+import { authMiddleware, limiter, onError } from "./middleware";
 import type { Env } from "./types";
 
 const origin =
@@ -31,21 +29,10 @@ export function createApi() {
 			}),
 		)
 		.use(csrf({ origin }))
-		.use(authMiddleware)
-		.use(logger())
 		.use(requestId())
+		.use(logger())
 		.use(prettyJSON())
+		.use(authMiddleware)
+		.use(limiter)
 		.onError((error) => onError(error));
-}
-
-// Change to export the onError function
-export async function onError(error: Error | HTTPResponseError) {
-	console.error(error);
-	if (!(error instanceof HTTPException)) {
-		return new Response(error.message, {
-			status: 500,
-			statusText: `Internal error: ${error.cause}`,
-		});
-	}
-	return error.getResponse();
 }

@@ -1,10 +1,13 @@
+import { rateLimiter } from "hono-rate-limiter";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import type { HTTPResponseError } from "hono/types";
 import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
 import cookieConfig from "#lib/cookie";
 import type { Env } from "./types";
+import { getConnInfo } from "hono/bun";
 
 /**
  * Middleware to handle authentication state by validating session tokens.
@@ -77,3 +80,33 @@ export const protectedRoute = createMiddleware<
 	c.set("authenticatedSession", session);
 	return next();
 });
+
+/**
+ * Middleware for rate limiting requests.
+ *
+ * This middleware uses a rate limiter to restrict the number of requests
+ * that can be made within a specified time window.
+ *
+ */
+export const limiter = rateLimiter({
+	windowMs: 10 * 1000,
+	limit: 10,
+	standardHeaders: "draft-6",
+	keyGenerator: (c) => getConnInfo(c).remote.address ?? "unknown",
+});
+
+/**
+ * Handles errors by logging them and returning an appropriate HTTP response.
+ *
+ * @param error - The error to handle, which can be an instance of `Error` or `HTTPResponseError`.
+ * @returns A `Response` object with a status code and message based on the error type.
+ */
+export async function onError(error: Error | HTTPResponseError) {
+	console.error(error);
+	return !(error instanceof HTTPException)
+		? new Response(error.message, {
+				status: 500,
+				statusText: `Internal error: ${error.cause}`,
+			})
+		: error.getResponse();
+}
