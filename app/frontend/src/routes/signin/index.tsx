@@ -1,4 +1,5 @@
 import Logo from "@/assets/hdm-logo-clipart-lg.png";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -31,12 +32,15 @@ function SignIn() {
 
 	return (
 		<Card className="flex h-[100vh] w-full items-center justify-center bg-white px-10 md:px-20">
-			<div className="-mt-4 flex w-[50rem] flex-col items-center gap-2 rounded-xl bg-secondary p-4 px-32">
+			<div className="-mt-4 relative flex w-[50rem] flex-col items-center gap-2 rounded-xl bg-secondary p-4 px-32">
 				<img
 					src={Logo}
 					className="-mt-[2.75rem] h-[5.5rem] w-auto"
 					alt="Hdm-Logo"
 				/>
+				<div className="absolute top-2 right-2">
+					<ModeToggle />
+				</div>
 				<CardHeader>
 					<CardTitle className="mt-2 font-sans text-3xl">
 						StudyConnect
