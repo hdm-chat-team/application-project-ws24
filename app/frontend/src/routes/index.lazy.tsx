@@ -1,3 +1,4 @@
+import TopNav from "@/components/nav/top-nav";
 import { SideBar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
@@ -47,6 +48,7 @@ function Index() {
 
 	return (
 		<div>
+			<TopNav />
 			<h1 className="text-3xl text-blue-300">
 				{isPending ? "Loading..." : data}
 			</h1>
