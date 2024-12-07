@@ -1,2 +1,2 @@
-[install.lockfile]
-print = "yarn"
+[test]
+coverageSkipTestFiles = true

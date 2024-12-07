@@ -11,7 +11,15 @@ export const EnvSchema = z.object({
 		.default(3000),
 
 	// * PostgreSQL
-	DATABASE_URL: z.string().url().startsWith("postgresql://"),
+	DATABASE_URL: z
+		.string()
+		.url("Must be a valid URL")
+		.refine(
+			(url) => url.startsWith("postgresql://") || url.startsWith("postgres://"),
+			{
+				message: "URL must start with postgresql:// or postgres://",
+			},
+		),
 
 	// * GitHub OAuth
 	CLIENT_ID_GITHUB: z.string().min(1),

@@ -1,14 +1,6 @@
 {
   "name": "application-project-ws24",
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "turbo": "^2.3.1",
-    "typescript": "5.6.3"
-  },
-  "engines": {
-    "bun": ">=1.1.36"
-  },
-  "packageManager": "bun@1.1.36",
+
   "private": true,
   "scripts": {
     "check": "turbo biome",
@@ -20,16 +12,26 @@
     "biome": "biome check",
     "biome:fix": "biome check --write"
   },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "turbo": "^2.3.3",
+    "typescript": "5.6.3"
+  },
+  "engines": {
+    "bun": ">=1.1.36"
+  },
+  "packageManager": "bun@1.1.36",
+  "workspaces": [
+    "app",
+    "app/frontend",
+    "packages/*"
+  ],
   "trustedDependencies": [
     "@biomejs/biome",
     "@swc/core",
     "core-js-pure",
     "esbuild",
     "sharp"
-  ],
-  "workspaces": [
-    "app",
-    "app/frontend",
-    "packages/*"
   ]
+
 }
