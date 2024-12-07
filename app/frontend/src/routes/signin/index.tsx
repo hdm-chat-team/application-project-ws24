@@ -72,7 +72,7 @@ function SignIn() {
 						</div>
 					</form>
 				</CardContent>
-				<CardFooter className="flex flex-col  w-full">
+				<CardFooter className="flex w-full flex-col">
 					<hr className="w-full border-gray-400" />
 					<h1>or sign in with</h1>
 					<div className="mt-5 flex w-full justify-center">
