@@ -4,6 +4,7 @@ import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
 import { routeTree } from "./routeTree.gen";
+import { AuthProvider } from "./lib/auth-provider";
 
 // * Initialize React Query client for managing server state
 const queryClient = new QueryClient();
@@ -35,7 +36,9 @@ if (!rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+				<AuthProvider>
+					<RouterProvider router={router} />
+				</AuthProvider>
 			</QueryClientProvider>
 		</StrictMode>,
 	);

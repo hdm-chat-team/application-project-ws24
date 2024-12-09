@@ -53,7 +53,7 @@ function TestPage() {
 			<ul>
 				{messages.map((msg: Message) => (
 					<li key={msg.id}>
-						{msg.content} ({msg.status})
+						{msg.content})
 					</li>
 				))}
 			</ul>

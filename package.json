@@ -31,5 +31,6 @@
     "core-js-pure",
     "esbuild",
     "sharp"
-  ]
+  ],
+  "dependencies": {}
 }
