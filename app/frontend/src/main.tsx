@@ -3,17 +3,21 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
+import DefaultNotFound from "@/components/default-not-found";
 import { routeTree } from "./routeTree.gen";
 
 // * Initialize React Query client for managing server state
 const queryClient = new QueryClient();
 
-// * Configure router with React Query integration
-// * - Sets up automatic data loading on route changes
-// * - Configures cache behavior for route data
+/*
+ * Configure router with React Query integration:
+ * - sets a default not found component for missing routes
+ * - sets up automatic data loading on route changes
+ * - configures cache behavior for route data
+ */
 const router = createRouter({
 	routeTree,
-	defaultNotFoundComponent: () => <div>404 Not Found</div>,
+	defaultNotFoundComponent: DefaultNotFound,
 	context: { queryClient },
 	defaultPreload: "intent", //	Preload data when user shows intent to navigate
 	defaultStaleTime: 0, // 		Always fetch fresh data on route change
