@@ -29,5 +29,3 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 		),
 	},
 );
-
-export const Route = rootRoute;
