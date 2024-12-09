@@ -13,6 +13,7 @@ const queryClient = new QueryClient();
 // * - Configures cache behavior for route data
 const router = createRouter({
 	routeTree,
+	defaultNotFoundComponent: () => <div>404 Not Found</div>,
 	context: { queryClient },
 	defaultPreload: "intent", //	Preload data when user shows intent to navigate
 	defaultStaleTime: 0, // 		Always fetch fresh data on route change
