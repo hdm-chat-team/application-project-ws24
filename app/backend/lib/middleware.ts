@@ -12,10 +12,6 @@ import type { Env } from "./types";
 /**
  * Middleware to handle authentication state by validating session tokens.
  *
- * @param {Context<Env>} c - The Hono context object
- * @param {Function} next - The next middleware function
- * @returns {Promise<void>} Promise that resolves after authentication check
- *
  * @description
  * Checks for "auth_session" cookie and validates the session:
  * - No cookie: Sets user and session to null
