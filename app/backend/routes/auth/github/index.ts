@@ -10,17 +10,16 @@ import {
 	insertUser,
 	selectUserByGithubId,
 } from "#db/queries.sql";
-import env from "#env";
+import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
 import { oauthCallbackSchema, oauthStateSchema } from "./index.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
-const REDIRECT_URL =
-	env.NODE_ENV === "development"
-		? "http://localhost:5173"
-		: `http://localhost:${env.PORT}`;
+const REDIRECT_URL = DEV
+	? "http://localhost:5173"
+	: `http://localhost:${env.PORT}`;
 
 const TEN_MINUTES = 60 * 10;
 
@@ -78,8 +77,6 @@ async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
 	setCookie(c, "auth_session", token, {
 		...cookieConfig,
 		expires: session.expiresAt,
-		// For development, explicitly set domain to localhost
-		...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
 	});
 }
 
