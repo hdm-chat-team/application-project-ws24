@@ -1,28 +1,24 @@
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
-import type { User } from "@server/db/schema.sql";
 
 export interface Message {
 	id?: string;
 	content: string;
 	timestamp: number;
-	status: "sent" | "received";
 	userId: string;
-	username: string;
 }
 
 const messageDb = new Dexie("MessageDatabase") as Dexie & {
 	messages: EntityTable<Message, "id">;
 };
 
-messageDb.version(4).stores({
-	messages: "++id, content, timestamp, status, userId, username",
+messageDb.version(5).stores({
+	messages: "++id, content, timestamp, userId",
 });
 
 // * MessageService singleton for managing messages
 class MessageService {
 	private static instance: MessageService;
-	private currentUser: User | null = null;
 	private constructor() {
 		console.log("MessageService instance created");
 	}
@@ -34,43 +30,22 @@ class MessageService {
 		return MessageService.instance;
 	}
 
-	public setCurrentUser(user: User | null) {
-		this.currentUser = user;
-	}
-	private createMessage(content: string, status: "sent" | "received"): Message {
-		if (!this.currentUser) {
-			throw new Error("Please login to send messages.");
-		}
-
+	private createMessage(content: string, userId: string): Message {
 		return {
 			id: crypto.randomUUID(),
 			content,
-			status,
 			timestamp: Date.now(),
-			userId: this.currentUser.id,
-			username: this.currentUser.username,
+			userId,
 		};
 	}
 
-	public async addSentMessage(content: string): Promise<void> {
-		if (!this.currentUser) {
-			throw new Error("Login to send messages.");
-		}
-		await this.addMessageWithStatus(content, "sent");
+	public async addSentMessage(content: string, userId: string): Promise<void> {
+		const message = this.createMessage(content, userId);
+		await this.addMessage(message);
 	}
 
-	public async addReceivedMessage(content: string) {
-		if (!this.currentUser) {
-			throw new Error("MessageService must be initialized before use");
-		}
-		await this.addMessageWithStatus(content, "received");
-	}
-
-	private async addMessageWithStatus(
-		content: string,
-		status: "sent" | "received",
-	): Promise<void> {
-		const message = this.createMessage(content, status);
+	public async addReceivedMessage(content: string, userId: string) {
+		const message = this.createMessage(content, userId);
 		await this.addMessage(message);
 	}
 

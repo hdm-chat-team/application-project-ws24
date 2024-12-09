@@ -2,9 +2,6 @@ import type { ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "./auth-context";
 import api from "@/lib/api";
-import type { User } from "@server/db/schema.sql";
-import { useEffect } from "react";
-import { MessageService } from "./message-service";
 
 // * Loading the user data and initializing the message service
 
@@ -16,17 +13,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	const { data: user } = useQuery({
 		queryKey: ["auth-user"],
 		queryFn: async () => {
-			const response = await api.auth.me.$get();
+			const response = await api.auth.user.$get();
 			if (!response.ok) return null;
-			return response.json() as Promise<User>;
+			const data = await response.json();
+			return data.user;
 		},
 	});
-
-	useEffect(() => {
-		if (user) {
-			MessageService.getInstance().setCurrentUser(user);
-		}
-	}, [user]);
 
 	return (
 		<AuthContext.Provider value={user || null}>
