@@ -1,8 +1,8 @@
-import env from "#env";
+import { DEV } from "#env";
 
 const cookieConfig = {
 	path: "/",
-	secure: env.NODE_ENV !== "development",
+	secure: !DEV,
 	httpOnly: true,
 	sameSite: "lax" as const,
 };

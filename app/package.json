@@ -21,7 +21,8 @@
 		"arctic": "^2.3.0",
 		"drizzle-orm": "^0.37.0",
 		"drizzle-zod": "^0.5.1",
-		"hono": "^4.6.12",
+		"hono": "^4.6.13",
+		"hono-rate-limiter": "^0.4.2",
 		"pg": "^8.13.1",
 		"zod": "^3.23.8"
 	},
