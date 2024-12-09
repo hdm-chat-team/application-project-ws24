@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import api from "@/lib/api";
+import { Separator } from "@/components/ui/separator";
 import { createFileRoute } from "@tanstack/react-router";
 import { Github } from "lucide-react";
 
@@ -20,15 +21,15 @@ export const Route = createFileRoute("/signin/")({
 function SignIn() {
 	return (
 		<div className="flex min-h-screen items-center justify-center">
-			<Card className="flex px-10 md:px-20">
-				<div className="-mt-4 relative flex w-[50rem] flex-col items-center gap-2 p-4 px-32">
+			<Card className="relative flex px-5">
+				<div className="flex-col items-center gap-2 py-4">
 					<img
 						src={Logo}
-						className="-mt-[2.75rem] h-[5.5rem] w-auto"
+						className="-top-[2.75rem] -translate-x-1/2 absolute left-1/2 h-[5.5rem] w-auto"
 						alt="Hdm-Logo"
 					/>
-					<CardHeader>
-						<CardTitle className="mt-2 font-sans text-3xl">
+					<CardHeader className="my-3">
+						<CardTitle className="mt-2 text-center font-sans text-3xl">
 							StudyConnect
 						</CardTitle>
 					</CardHeader>
@@ -53,8 +54,8 @@ function SignIn() {
 							</div>
 						</form>
 					</CardContent>
+					<Separator />
 					<CardFooter className="flex w-full flex-col">
-						<hr className="w-full border-gray-400" />
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
 							<Button
