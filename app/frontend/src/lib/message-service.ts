@@ -1,6 +1,6 @@
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
-import type { User } from '@server/db/schema.sql';
+import type { User } from "@server/db/schema.sql";
 
 export interface Message {
 	id?: string;
@@ -19,11 +19,13 @@ messageDb.version(4).stores({
 	messages: "++id, content, timestamp, status, userId, username",
 });
 
+// * MessageService singleton for managing messages
 class MessageService {
 	private static instance: MessageService;
 	private currentUser: User | null = null;
-
-	private constructor() {}
+	private constructor() {
+		console.log("MessageService instance created");
+	}
 
 	public static getInstance() {
 		if (!MessageService.instance) {
@@ -32,21 +34,12 @@ class MessageService {
 		return MessageService.instance;
 	}
 
-	private async addMessageToDb(message: Message) {
-		try {
-			await messageDb.table("messages").add(message);
-		} catch (error) {
-			console.error("Error adding message to database", error);
-		}
+	public setCurrentUser(user: User | null) {
+		this.currentUser = user;
 	}
-
-	public setCurrentUser(user: User) {
-        this.currentUser = user;
-    }
-
 	private createMessage(content: string, status: "sent" | "received"): Message {
 		if (!this.currentUser) {
-			throw new Error("Current user not set");
+			throw new Error("Please login to send messages.");
 		}
 
 		return {
@@ -56,21 +49,38 @@ class MessageService {
 			timestamp: Date.now(),
 			userId: this.currentUser.id,
 			username: this.currentUser.username,
-		};	
+		};
 	}
 
-	public async addMessage(message: Message) {
-		await this.addMessageToDb(message);
-	}
-
-	public async addSentMessage(content: string) {
-		const message = this.createMessage(content, "sent");
-		await this.addMessage(message);
+	public async addSentMessage(content: string): Promise<void> {
+		if (!this.currentUser) {
+			throw new Error("Login to send messages.");
+		}
+		await this.addMessageWithStatus(content, "sent");
 	}
 
 	public async addReceivedMessage(content: string) {
-		const message = this.createMessage(content, "received");
+		if (!this.currentUser) {
+			throw new Error("MessageService must be initialized before use");
+		}
+		await this.addMessageWithStatus(content, "received");
+	}
+
+	private async addMessageWithStatus(
+		content: string,
+		status: "sent" | "received",
+	): Promise<void> {
+		const message = this.createMessage(content, status);
 		await this.addMessage(message);
+	}
+
+	private async addMessage(message: Message) {
+		try {
+			await messageDb.table("messages").add(message);
+		} catch (error) {
+			console.error("Error adding message to database:", error);
+			throw new Error("Error adding message to database");
+		}
 	}
 }
 
