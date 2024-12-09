@@ -1,4 +1,3 @@
-import { SideBar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
@@ -50,7 +49,6 @@ function Index() {
 			<h1 className="text-3xl text-blue-300">
 				{isPending ? "Loading..." : data}
 			</h1>
-			<SideBar />
 			<div>
 				<h2>Chat Messages</h2>
 				<ul>

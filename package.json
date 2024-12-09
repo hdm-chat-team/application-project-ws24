@@ -1,6 +1,5 @@
 {
   "name": "application-project-ws24",
-
   "private": true,
   "scripts": {
     "check": "turbo biome",
@@ -33,5 +32,4 @@
     "esbuild",
     "sharp"
   ]
-
 }
