@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { AuthContext } from "./auth-context";
 import api from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import type { ReactNode } from "react";
+import { AuthContext } from "./auth-context";
 
 // * Loading the user data and initializing the message service
 
@@ -21,8 +21,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 	});
 
 	return (
-		<AuthContext.Provider value={user || null}>
-			{children}
-		</AuthContext.Provider>
+		<AuthContext.Provider value={user || null}>{children}</AuthContext.Provider>
 	);
 }

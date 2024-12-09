@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { useMessageService } from "@/hooks/use-message-service";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useMessageService } from "@/hooks/use-message-service";
 
 export const Route = createLazyFileRoute("/")({
 	component: Index,
