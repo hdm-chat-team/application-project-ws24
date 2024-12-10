@@ -1,11 +1,11 @@
-import { useAuthContext } from "@/lib/auth-context";
+import { useAuth } from "@/hooks/auth";
 import { MessageService } from "@/lib/message-service";
 import { useCallback } from "react";
 
 // * Hook to use the message service
 
 export const useMessageService = () => {
-	const user = useAuthContext();
+	const user = useAuth();
 	const messageService = MessageService.getInstance();
 
 	const addMessage = useCallback(
