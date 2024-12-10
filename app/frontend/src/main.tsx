@@ -20,8 +20,6 @@ const router = createRouter({
 	routeTree,
 	defaultNotFoundComponent: DefaultNotFound,
 	context: { queryClient },
-	defaultPreload: "intent", //	Preload data when user shows intent to navigate
-	defaultStaleTime: 0, // 		Always fetch fresh data on route change
 });
 
 // * TypeScript type registration for router instance
