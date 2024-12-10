@@ -8,8 +8,8 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import api from "@/lib/api";
 import { Separator } from "@/components/ui/separator";
+import api from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { Github } from "lucide-react";
 
@@ -35,13 +35,13 @@ function SignIn() {
 					</CardHeader>
 					<CardContent>
 						<form
-							onSubmit={(e) => {
-								e.preventDefault();
+							onSubmit={(event) => {
+								event.preventDefault();
 								window.alert("submitted");
 							}}
 							className="mt-7 mb-5 flex flex-col gap-2"
 						>
-							<div className="flex gap-2 ">
+							<div className="flex gap-2">
 								<h3 className="w-2/5">E-Mail</h3>
 								<Input type="email" />
 							</div>
