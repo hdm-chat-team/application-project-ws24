@@ -1,9 +1,9 @@
 import api from "@/lib/api";
+import type { User } from "@server/db/schema.sql";
 import { useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
-import { AuthContext } from "./auth-context";
+import { createContext, type ReactNode } from "react";
 
-// * Loading the user data and initializing the message service
+export const AuthContext = createContext<User | null>(null);
 
 interface AuthProviderProps {
 	children: ReactNode;
