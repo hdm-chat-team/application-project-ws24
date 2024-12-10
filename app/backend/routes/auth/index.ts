@@ -12,9 +12,7 @@ export const authRouter = createRouter()
 		await invalidateSession(id);
 		return c.redirect(REDIRECT_URL);
 	})
-
-	.get("/user", protectedRoute, async (c) => {
+	.get("/", protectedRoute, async (c) => {
 		const user = c.get("user");
-
-		return c.json({ user });
+		return c.json(user);
 	});

@@ -1,31 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { AuthProvider } from "@/context/auth-provider";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
-import { AuthProvider } from "./lib/auth-provider";
-import { routeTree } from "./routeTree.gen";
-
-// * Initialize React Query client for managing server state
-const queryClient = new QueryClient();
-
-// * Configure router with React Query integration
-// * - Sets up automatic data loading on route changes
-// * - Configures cache behavior for route data
-const router = createRouter({
-	routeTree,
-	context: { queryClient },
-	defaultPreload: "intent", //	Preload data when user shows intent to navigate
-	defaultStaleTime: 0, // 		Always fetch fresh data on route change
-});
-
-// * TypeScript type registration for router instance
-declare module "@tanstack/react-router" {
-	// * Register the router instance for type safety
-	interface Register {
-		router: typeof router;
-	}
-}
+import { QueryClientProvider } from "@/context/query-provider";
+import { RouterProvider } from "@/context/router-provider";
 
 // * Mount React application with Router and Query providers
 // biome-ignore lint/style/noNonNullAssertion: default
@@ -35,9 +13,9 @@ if (!rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<QueryClientProvider client={queryClient}>
+			<QueryClientProvider>
 				<AuthProvider>
-					<RouterProvider router={router} />
+					<RouterProvider />
 				</AuthProvider>
 			</QueryClientProvider>
 		</StrictMode>,
