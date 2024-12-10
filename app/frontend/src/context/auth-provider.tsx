@@ -1,7 +1,7 @@
-import api from "@/lib/api";
+import { authQueryOptions } from "@/lib/query-options";
 import type { User } from "@server/db/schema.sql";
 import { useQuery } from "@tanstack/react-query";
-import { createContext, type ReactNode } from "react";
+import { type ReactNode, createContext } from "react";
 
 export const AuthContext = createContext<User | null>(null);
 
@@ -10,16 +10,7 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-	const { data: user } = useQuery({
-		queryKey: ["auth-user"],
-		queryFn: async () => {
-			const response = await api.auth.user.$get();
-			if (!response.ok) return null;
-			const data = await response.json();
-			return data.user;
-		},
-	});
-
+	const { data: user } = useQuery(authQueryOptions);
 	return (
 		<AuthContext.Provider value={user || null}>{children}</AuthContext.Provider>
 	);
