@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -11,6 +12,7 @@ export const Route = createLazyFileRoute("/")({
 // TODO: Implement logic so messages are loaded from the database
 
 function Index() {
+	const user = useAuth();
 	const [messages, setMessages] = useState<string[]>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
@@ -52,6 +54,7 @@ function Index() {
 			<h1 className="text-3xl text-blue-300">
 				{isPending ? "Loading..." : data}
 			</h1>
+			<h1>You are logged in as: {user?.username} </h1>
 			<div>
 				<h2>Chat Messages</h2>
 				<ul>
