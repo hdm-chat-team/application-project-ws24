@@ -1,7 +1,6 @@
-import MessageInput from "@/components/message-input";
-import { useMessageService } from "@/hooks/use-message-service";
-import type { Message } from "@/lib/message-service";
-import { messageDb } from "@/lib/message-service";
+import MessageInput from "@/features/chat/components/message-input";
+import { useMessageService } from "@/features/chat/hooks/use-message-service";
+import { type Message, messageDb } from "@/features/db";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 

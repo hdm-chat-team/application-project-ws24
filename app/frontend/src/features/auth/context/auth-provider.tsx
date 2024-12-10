@@ -1,4 +1,4 @@
-import { authQueryOptions } from "@/lib/query-options";
+import { authQueryOptions } from "@/features/auth/queries";
 import type { User } from "@server/db/schema.sql";
 import { useQuery } from "@tanstack/react-query";
 import { type ReactNode, createContext } from "react";

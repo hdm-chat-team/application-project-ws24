@@ -1,9 +1,9 @@
-import { AuthProvider } from "@/context/auth-provider";
+import { QueryClientProvider } from "@/context/query-provider";
+import { RouterProvider } from "@/context/router-provider";
+import { AuthProvider } from "@/features/auth/context/auth-provider";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
-import { QueryClientProvider } from "@/context/query-provider";
-import { RouterProvider } from "@/context/router-provider";
 
 // * Mount React application with Router and Query providers
 // biome-ignore lint/style/noNonNullAssertion: default
