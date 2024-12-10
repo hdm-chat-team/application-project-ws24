@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { useMessageService } from "@/hooks/use-message-service";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -8,10 +9,13 @@ export const Route = createLazyFileRoute("/")({
 	component: Index,
 });
 
+// TODO: Implement logic so messages are loaded from the database
+
 function Index() {
 	const [messages, setMessages] = useState<string[]>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
+	const { addReceivedMessage, addMessage } = useMessageService();
 
 	useEffect(() => {
 		const socket = api.chat.$ws();
@@ -21,20 +25,23 @@ function Index() {
 			console.log("WebSocket client opened", event);
 		};
 
-		socket.onmessage = (event) => {
+		socket.onmessage = async (event) => {
 			console.log("WebSocket client received message", event);
+			const message = JSON.parse(event.data);
+			addReceivedMessage(message.content);
 			setMessages((prevMessages) => [...prevMessages, event.data]);
 		};
 
 		return () => {
 			socket.close();
 		};
-	}, []);
+	}, [addReceivedMessage]);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (socketRef.current && inputMessage) {
 			socketRef.current.send(inputMessage);
+			await addMessage(inputMessage);
 			setInputMessage("");
 		}
 	};
