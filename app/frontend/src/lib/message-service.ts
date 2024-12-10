@@ -5,21 +5,23 @@ export interface Message {
 	id?: string;
 	content: string;
 	timestamp: number;
-	status: "sent" | "received";
+	userId: string;
 }
 
 const messageDb = new Dexie("MessageDatabase") as Dexie & {
 	messages: EntityTable<Message, "id">;
 };
 
-messageDb.version(1).stores({
-	messages: "++id, content, timestamp, type",
+messageDb.version(5).stores({
+	messages: "++id, content, timestamp, userId",
 });
 
+// * MessageService singleton for managing messages
 class MessageService {
 	private static instance: MessageService;
-
-	private constructor() {}
+	private constructor() {
+		console.log("MessageService instance created");
+	}
 
 	public static getInstance() {
 		if (!MessageService.instance) {
@@ -28,35 +30,32 @@ class MessageService {
 		return MessageService.instance;
 	}
 
-	private async addMessageToDb(message: Message) {
-		try {
-			await messageDb.table("messages").add(message);
-		} catch (error) {
-			console.error("Error adding message to database", error);
-		}
-	}
-
-	private createMessage(content: string, status: "sent" | "received"): Message {
+	private createMessage(content: string, userId: string): Message {
 		return {
 			id: crypto.randomUUID(),
 			content,
-			status,
 			timestamp: Date.now(),
+			userId,
 		};
 	}
 
-	public async addMessage(message: Message) {
-		await this.addMessageToDb(message);
-	}
-
-	public async addSentMessage(content: string) {
-		const message = this.createMessage(content, "sent");
+	public async addSentMessage(content: string, userId: string): Promise<void> {
+		const message = this.createMessage(content, userId);
 		await this.addMessage(message);
 	}
 
-	public async addReceivedMessage(content: string) {
-		const message = this.createMessage(content, "received");
+	public async addReceivedMessage(content: string, userId: string) {
+		const message = this.createMessage(content, userId);
 		await this.addMessage(message);
+	}
+
+	private async addMessage(message: Message) {
+		try {
+			await messageDb.table("messages").add(message);
+		} catch (error) {
+			console.error("Error adding message to database:", error);
+			throw new Error("Error adding message to database");
+		}
 	}
 }
 
