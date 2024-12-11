@@ -9,9 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import api from "@/lib/api";
+import GithubSignInButton from "@/features/auth/components/github-signin-button";
 import { createFileRoute } from "@tanstack/react-router";
-import { Github } from "lucide-react";
 
 export const Route = createFileRoute("/(auth)/signin")({
 	component: SignIn,
@@ -58,15 +57,7 @@ function SignIn() {
 					<CardFooter className="flex w-full flex-col">
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
-							<Button
-								asChild
-								className="flex items-center gap-2 rounded-3xl px-4 py-2"
-							>
-								<a href={api.auth.github.$url().toString()}>
-									GitHub
-									<Github />
-								</a>
-							</Button>
+							<GithubSignInButton />
 						</div>
 					</CardFooter>
 				</div>
