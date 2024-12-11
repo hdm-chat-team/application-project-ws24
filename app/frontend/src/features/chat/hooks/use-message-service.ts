@@ -1,4 +1,4 @@
-import { useUser } from "@/features/auth/hooks/use-user";
+import { useUser } from "@/features/auth";
 import { MessageService } from "@/features/chat/message-service";
 import { useCallback } from "react";
 

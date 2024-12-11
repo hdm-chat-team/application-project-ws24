@@ -1,6 +1,6 @@
 import { QueryClientProvider } from "@/context/query-provider";
 import { RouterProvider } from "@/context/router-provider";
-import { AuthProvider } from "@/features/auth/context/auth-provider";
+import { AuthProvider } from "@/features/auth";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
