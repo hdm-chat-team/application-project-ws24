@@ -9,7 +9,7 @@ export const Route = createFileRoute("/(app)/_authenticated")({
 			staleTime: Number.POSITIVE_INFINITY,
 		});
 		if (!user) {
-			throw redirect({ to: "/signin" });
+			throw redirect({ to: "/signin", search: { from: location.href } });
 		}
 	},
 	component: () => <Outlet />,

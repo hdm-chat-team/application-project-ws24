@@ -12,12 +12,23 @@ import { Separator } from "@/components/ui/separator";
 import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
 import { createFileRoute } from "@tanstack/react-router";
 
+type SignInSearch = {
+	from: string;
+};
+
 export const Route = createFileRoute("/(auth)/signin")({
 	component: SignIn,
 	ssr: true,
+	validateSearch: (search: Record<string, unknown>): SignInSearch => {
+		const { from } = search;
+		return {
+			from: (from as string) || "",
+		};
+	},
 });
 
 function SignIn() {
+	const { from } = Route.useSearch();
 	return (
 		<div className="flex min-h-screen items-center justify-center">
 			<Card className="relative flex px-5">
@@ -57,7 +68,7 @@ function SignIn() {
 					<CardFooter className="flex w-full flex-col">
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
-							<GithubSignInButton />
+							<GithubSignInButton from={from} />
 						</div>
 					</CardFooter>
 				</div>
