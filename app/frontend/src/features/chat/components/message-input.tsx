@@ -1,4 +1,4 @@
-import { useMessageService } from "@/hooks/use-message-service";
+import { useMessageService } from "@/features/chat/hooks/use-message-service";
 import { useState } from "react";
 
 // * Component to input a message which will be added to the local database
