@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const oauthStateSchema = z.object({
+export const callbackCookieSchema = z.object({
 	github_oauth_state: z
 		.string({
 			required_error: "Invalid GitHub OAuth flow",
@@ -8,7 +8,7 @@ export const oauthStateSchema = z.object({
 		.min(1, "OAuth state cannot be empty"),
 });
 
-export const oauthCallbackSchema = z.object({
+export const callbackQuerySchema = z.object({
 	code: z
 		.string({
 			required_error: "GitHub authorization code is required",

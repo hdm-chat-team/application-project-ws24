@@ -14,7 +14,7 @@ import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
-import { oauthCallbackSchema, oauthStateSchema } from "./github.schemas";
+import { callbackCookieSchema, callbackQuerySchema } from "./github.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = DEV
@@ -36,8 +36,8 @@ export const githubRouter = createRouter()
 	})
 	.get(
 		"/callback",
-		zValidator("cookie", oauthStateSchema),
-		zValidator("query", oauthCallbackSchema),
+		zValidator("cookie", callbackCookieSchema),
+		zValidator("query", callbackQuerySchema),
 		async (c) => {
 			const { code, state } = c.req.valid("query");
 			const { github_oauth_state } = c.req.valid("cookie");
