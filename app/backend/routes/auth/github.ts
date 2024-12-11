@@ -14,7 +14,7 @@ import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
-import { oauthCallbackSchema, oauthStateSchema } from "./index.schemas";
+import { oauthCallbackSchema, oauthStateSchema } from "./github.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = DEV
