@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import GithubSignInButton from "@/features/auth/components/github-signin-button";
+import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(auth)/signin")({
