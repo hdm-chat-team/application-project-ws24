@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useUser } from "@/features/auth/hooks/use-user";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -12,7 +12,7 @@ export const Route = createLazyFileRoute("/")({
 // TODO: Implement logic so messages are loaded from the database
 
 function Index() {
-	const user = useAuth();
+	const { user } = useUser();
 	const [messages, setMessages] = useState<string[]>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");

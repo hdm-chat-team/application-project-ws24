@@ -1,11 +1,11 @@
-import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useUser } from "@/features/auth/hooks/use-user";
 import { MessageService } from "@/features/chat/message-service";
 import { useCallback } from "react";
 
 // * Hook to use the message service
 
 export const useMessageService = () => {
-	const user = useAuth();
+	const { user } = useUser();
 	const messageService = MessageService.getInstance();
 
 	const addMessage = useCallback(
