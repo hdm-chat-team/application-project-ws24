@@ -1,6 +1,12 @@
-import { AuthContext } from "@/features/auth/context/auth-provider"; // Adjust the import path as necessary
+import { AuthContext } from "@/features/auth/context/auth-provider";
 import { useContext } from "react";
 
 export function useUser() {
-	return useContext(AuthContext);
+	const context = useContext(AuthContext);
+
+	if (context === undefined) {
+		throw new Error("useUser must be used within an AuthProvider");
+	}
+
+	return context;
 }
