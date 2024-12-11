@@ -4,7 +4,7 @@ import { type Message, messageDb } from "@/features/db";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export const Route = createLazyFileRoute("/test-page")({
+export const Route = createLazyFileRoute("/(wip)/test-page")({
 	component: TestPage,
 });
 
