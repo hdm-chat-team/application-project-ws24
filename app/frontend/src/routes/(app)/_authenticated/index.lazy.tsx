@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createLazyFileRoute("/(app)/_authenticated/")({
 	component: Index,
 });
 

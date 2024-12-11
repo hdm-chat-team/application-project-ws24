@@ -13,7 +13,7 @@ import api from "@/lib/api";
 import { createFileRoute } from "@tanstack/react-router";
 import { Github } from "lucide-react";
 
-export const Route = createFileRoute("/signin/")({
+export const Route = createFileRoute("/(auth)/signin")({
 	component: SignIn,
 	ssr: true,
 });
