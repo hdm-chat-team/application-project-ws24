@@ -18,18 +18,18 @@
 	},
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.1",
-		"arctic": "^2.3.0",
-		"drizzle-orm": "^0.37.0",
-		"drizzle-zod": "^0.5.1",
+		"arctic": "^2.3.1",
+		"drizzle-orm": "^0.38.1",
+		"drizzle-zod": "^0.6.0",
 		"hono": "^4.6.13",
 		"hono-rate-limiter": "^0.4.2",
 		"pg": "^8.13.1",
-		"zod": "^3.23.8"
+		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
 		"@types/bun": "^1.1.14",
 		"@types/pg": "^8.11.10",
-		"drizzle-kit": "^0.29.1"
+		"drizzle-kit": "^0.30.0"
 	}
 }
