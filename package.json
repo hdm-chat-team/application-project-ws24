@@ -1,33 +1,29 @@
 {
-  "name": "application-project-ws24",
-  "private": true,
-  "scripts": {
-    "check": "biome check",
-    "check:fix": "biome check --write",
-    "build": "turbo build",
-    "ui": "bun run --filter=@application-project-ws24/frontend ui",
-    "dev": "turbo dev",
-    "preview": "turbo preview"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "turbo": "^2.3.3",
-    "typescript": "5.7.2"
-  },
-  "engines": {
-    "bun": ">=1.1.36"
-  },
-  "packageManager": "bun@1.1.36",
-  "workspaces": [
-    "app",
-    "app/frontend",
-    "packages/*"
-  ],
-  "trustedDependencies": [
-    "@biomejs/biome",
-    "@swc/core",
-    "core-js-pure",
-    "esbuild",
-    "sharp"
-  ]
+	"name": "application-project-ws24",
+	"private": true,
+	"scripts": {
+		"check": "biome check",
+		"check:fix": "biome check --write",
+		"build": "turbo build",
+		"ui": "bun run --filter=@application-project-ws24/frontend ui",
+		"dev": "turbo dev",
+		"preview": "turbo preview"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"turbo": "^2.3.3",
+		"typescript": "5.7.2"
+	},
+	"engines": {
+		"bun": ">=1.1.36"
+	},
+	"packageManager": "bun@1.1.36",
+	"workspaces": ["app", "app/frontend", "packages/*"],
+	"trustedDependencies": [
+		"@biomejs/biome",
+		"@swc/core",
+		"core-js-pure",
+		"esbuild",
+		"sharp"
+	]
 }
