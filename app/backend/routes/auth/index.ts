@@ -9,6 +9,10 @@ const REDIRECT_URL = "http://localhost:5173";
 
 export const authRouter = createRouter()
 	.route("/github", githubRouter)
+	.get("/", protectedRoute, async (c) => {
+		const user = c.get("user");
+		return c.json(user);
+	})
 	.get(
 		"/signout",
 		protectedRoute,
@@ -17,10 +21,6 @@ export const authRouter = createRouter()
 			const { id } = c.get("session");
 			const { from } = c.req.valid("query");
 			await invalidateSession(id);
-			return c.redirect(from || REDIRECT_URL);
+			return c.redirect(from ?? REDIRECT_URL);
 		},
-	)
-	.get("/", protectedRoute, async (c) => {
-		const user = c.get("user");
-		return c.json(user);
-	});
+	);
