@@ -10,7 +10,9 @@ import type { User, Session } from "#db/schema.sql";
 
 //* Define the profile route
 
-const profileRoute = new Hono<{Variables: { user: User; session: Session };}>();
+const profileRoute = new Hono<{
+	Variables: { user: User; session: Session };
+}>();
 
 profileRoute
 	.use("*", limiter)
@@ -23,11 +25,15 @@ profileRoute
 		if (!data) {
 			throw new HTTPException(404, { message: "profile not found" });
 		}
-			return c.json({ data });
-		})
+		return c.json({ data });
+	})
 
 	//* Endpoint to get a profile by id
-	.get("/:id",protectedRoute,zValidator("param", GUIDParamSchema),async (c) => {
+	.get(
+		"/:id",
+		protectedRoute,
+		zValidator("param", GUIDParamSchema),
+		async (c) => {
 			const { id } = c.req.valid("param");
 			const userData = await getUserProfile.execute({ id });
 			if (!userData) {
@@ -38,7 +44,11 @@ profileRoute
 	)
 
 	//* Endpoint to update the profile
-	.put("/me",protectedRoute,zValidator("json", profileEditSchema),async (c) => {
+	.put(
+		"/me",
+		protectedRoute,
+		zValidator("json", profileEditSchema),
+		async (c) => {
 			const user = c.get("user");
 			const profile = c.req.valid("json");
 			await updateUserProfile.execute({ id: user.id, ...profile });
@@ -48,15 +58,19 @@ profileRoute
 	);
 
 //* Prepared statement for getting user profiles
-const getUserProfile = db.query.userProfileTable.findFirst({with: {owner: true,},
+const getUserProfile = db.query.userProfileTable
+	.findFirst({
+		with: { owner: true },
 		where: eq(userProfileTable.userId, sql.placeholder("id")),
 	})
 	.prepare("get_user_profile");
 
-const updateUserProfile = db.update(userProfileTable).set({
-	displayName: sql.placeholder("displayName") as unknown as string,
-	avatar_url: sql.placeholder("avatar_url") as unknown as string,
-})
+const updateUserProfile = db
+	.update(userProfileTable)
+	.set({
+		displayName: sql.placeholder("displayName") as unknown as string,
+		avatar_url: sql.placeholder("avatar_url") as unknown as string,
+	})
 	.where(eq(userProfileTable.userId, sql.placeholder("id")))
 	.prepare("update_user_profile");
 
