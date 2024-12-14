@@ -93,7 +93,7 @@ async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
 
 async function handleDbUser(githubUser: GitHubUser) {
 	const existingUser = await selectUserByGithubId
-		.execute({ githubId: githubUser.id })
+		.execute({ githubId: githubUser.id.toString() })
 		.catch((error) => {
 			console.error("Database query error:", error);
 			throw new HTTPException(500, {
@@ -108,7 +108,7 @@ async function handleDbUser(githubUser: GitHubUser) {
 
 	const user = await insertUser
 		.execute({
-			githubId: githubUser.id,
+			githubId: githubUser.id.toString(),
 			username: githubUser.login,
 			email: githubUser.email,
 		})
