@@ -118,8 +118,8 @@ export const protectedRoute = createMiddleware<
  * This middleware includes:
  * - `cors()`:			Cross-Origin Resource Sharing.
  * - `csrf()`: 			Cross-Site Request Forgery protection.
- * - `limiter`: 		Rate limiter.
  * - `authMiddleware`: 	to sync app and database auth sessions.
+ * - `limiter`: 		Rate limiter.
  */
 export const securityMiddlewares = every(
 	cors({
@@ -128,8 +128,8 @@ export const securityMiddlewares = every(
 		maxAge: DEV ? undefined : 3600,
 	}),
 	csrf({ origin }),
-	limiter,
 	authMiddleware,
+	limiter,
 );
 
 /**
