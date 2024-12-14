@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/context/theme-provider";
+import { ThemeProvider } from "@/context";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
