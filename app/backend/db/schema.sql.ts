@@ -1,8 +1,8 @@
+import { createId, length } from "@application-project-ws24/cuid";
 import { relations } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { createId, length } from "@application-project-ws24/cuid";
 
 // * User
 export const userTable = pgTable("users", {
