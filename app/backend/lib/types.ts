@@ -2,7 +2,7 @@ import type { ServerWebSocket } from "bun";
 import type { Env as HonoEnv } from "hono";
 import type { Session, User } from "#db/schema.sql";
 
-export type ChatSocket = ServerWebSocket<{ user: string }>;
+export type ChatSocket = ServerWebSocket<{ user: User }>;
 
 export interface Env extends HonoEnv {
 	Variables: {

@@ -1,6 +1,7 @@
 import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#lib/factory";
 import type { ChatSocket } from "#lib/types";
+import { protectedRoute } from "#lib/middleware";
 
 const { upgradeWebSocket } = createBunWebSocket<ChatSocket>();
 
@@ -8,14 +9,15 @@ const topic = "chat";
 
 export const chatRouter = createRouter().get(
 	"/",
+	protectedRoute,
 	upgradeWebSocket((c) => {
 		return {
 			onOpen: (_, ws) => {
-				const clientId = c.get("requestId");
+				const user = c.get("user");
 				const rawWs = ws.raw;
 				if (rawWs) {
-					rawWs.data.user = clientId;
-					const message = `${rawWs.data.user} joined the chat`;
+					rawWs.data.user = user;
+					const message = `${rawWs.data.user.username} joined the chat`;
 					rawWs.subscribe(topic);
 					rawWs.publish(topic, message);
 				}
@@ -23,7 +25,7 @@ export const chatRouter = createRouter().get(
 			onMessage: (event, ws) => {
 				const rawWs = ws.raw;
 				if (rawWs) {
-					const message = `${rawWs.data.user}: ${event.data}`;
+					const message = `${rawWs.data.user.username}: ${event.data}`;
 					rawWs.send(message);
 					rawWs.publish(topic, message);
 				}
@@ -31,7 +33,7 @@ export const chatRouter = createRouter().get(
 			onClose: (_, ws) => {
 				const rawWs = ws.raw;
 				if (rawWs) {
-					const message = `${rawWs.data.user} left the chat`;
+					const message = `${rawWs.data.user.username} left the chat`;
 					rawWs.publish(topic, message);
 				}
 			},
