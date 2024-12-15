@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/features/auth";
+import { SignoutButton } from "@/features/auth/components/signout-button";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -72,12 +73,7 @@ function Index() {
 				/>
 				<Button type="submit">Send</Button>
 			</form>
-			<Button asChild>
-				<a href={api.auth.github.$url().toString()}>signin</a>
-			</Button>
-			<Button asChild>
-				<a href={api.auth.signout.$url().toString()}>signout</a>
-			</Button>
+			<SignoutButton />
 		</div>
 	);
 }

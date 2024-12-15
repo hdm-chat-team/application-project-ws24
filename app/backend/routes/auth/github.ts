@@ -14,7 +14,11 @@ import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";
 import type { Env, GitHubUser } from "#lib/types";
-import { oauthCallbackSchema, oauthStateSchema } from "./github.schemas";
+import {
+	callbackCookieSchema,
+	callbackQuerySchema,
+	githubQuerySchema,
+} from "./github.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
 const REDIRECT_URL = DEV
@@ -24,23 +28,30 @@ const REDIRECT_URL = DEV
 const TEN_MINUTES = 60 * 10;
 
 export const githubRouter = createRouter()
-	.get("/", async (c) => {
+	.get("/", zValidator("query", githubQuerySchema), async (c) => {
 		const state = generateState();
 		const url = github.createAuthorizationURL(state, ["user"]);
+		const { from } = c.req.valid("query");
 
 		setCookie(c, "github_oauth_state", state, {
 			...cookieConfig,
 			maxAge: TEN_MINUTES,
 		});
+		if (from) {
+			setCookie(c, "oauth_redirect_to", from, {
+				...cookieConfig,
+				maxAge: TEN_MINUTES,
+			});
+		}
 		return c.redirect(url.toString());
 	})
 	.get(
 		"/callback",
-		zValidator("cookie", oauthStateSchema),
-		zValidator("query", oauthCallbackSchema),
+		zValidator("cookie", callbackCookieSchema),
+		zValidator("query", callbackQuerySchema),
 		async (c) => {
 			const { code, state } = c.req.valid("query");
-			const { github_oauth_state } = c.req.valid("cookie");
+			const { github_oauth_state, oauth_redirect_to } = c.req.valid("cookie");
 
 			if (state !== github_oauth_state) {
 				throw new HTTPException(400, {
@@ -67,7 +78,7 @@ export const githubRouter = createRouter()
 			const user = await handleDbUser(githubUser);
 
 			await createAndSetSessionCookie(c, user.id);
-			return c.redirect(REDIRECT_URL);
+			return c.redirect(oauth_redirect_to || REDIRECT_URL);
 		},
 	);
 
@@ -82,7 +93,7 @@ async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
 
 async function handleDbUser(githubUser: GitHubUser) {
 	const existingUser = await selectUserByGithubId
-		.execute({ githubId: githubUser.id })
+		.execute({ githubId: githubUser.id.toString() })
 		.catch((error) => {
 			console.error("Database query error:", error);
 			throw new HTTPException(500, {
@@ -97,7 +108,7 @@ async function handleDbUser(githubUser: GitHubUser) {
 
 	const user = await insertUser
 		.execute({
-			githubId: githubUser.id,
+			githubId: githubUser.id.toString(),
 			username: githubUser.login,
 			email: githubUser.email,
 		})

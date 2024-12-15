@@ -10,11 +10,7 @@ export const AuthContext = createContext<{
 	isLoading: boolean;
 }>({ user: null, isSignedIn: false, isLoaded: false, isLoading: true });
 
-interface AuthProviderProps {
-	children: ReactNode;
-}
-
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({ children }: { children: ReactNode }) {
 	const { data, isFetched, isLoading } = useQuery(authQueryOptions);
 	return (
 		<AuthContext.Provider
