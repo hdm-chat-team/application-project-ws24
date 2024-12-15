@@ -1,20 +1,11 @@
-import { z } from "zod";
 import type { ServerWebSocket } from "bun";
-import type { Env as HonoEnv } from "hono";
-import type { Session, User } from "#db/schema.sql";
+import { z } from "zod";
 
 // * Set of rules for the profile
 // * Defines how the data should be validated
 // * Set what are valid inputs and what fields are allowed
 
 export type ChatSocket = ServerWebSocket<{ user: string }>;
-
-export interface Env extends HonoEnv {
-	Variables: {
-		user: User | null;
-		session: Session | null;
-	};
-}
 
 export const GUIDParamSchema = z.object({
 	id: z.string().uuid(),
