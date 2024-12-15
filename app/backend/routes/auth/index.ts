@@ -18,9 +18,9 @@ export const authRouter = createRouter()
 		protectedRoute,
 		zValidator("query", signoutQuerySchema),
 		async (c) => {
-			const { id } = c.get("session");
+			const { token } = c.get("session");
 			const { from } = c.req.valid("query");
-			await invalidateSession(id);
+			await invalidateSession(token);
 			return c.redirect(from ?? REDIRECT_URL);
 		},
 	);

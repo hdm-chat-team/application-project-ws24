@@ -1,4 +1,5 @@
 import { type Message, messageDb } from "@/features/db";
+import { createId } from "@application-project-ws24/cuid";
 
 // * MessageService singleton for managing messages
 class MessageService {
@@ -16,7 +17,7 @@ class MessageService {
 
 	private createMessage(content: string, userId: string): Message {
 		return {
-			id: crypto.randomUUID(),
+			id: createId(),
 			content,
 			timestamp: Date.now(),
 			userId,
