@@ -1,12 +1,9 @@
-import type { ServerWebSocket } from "bun";
 import { z } from "zod";
+import { profileResponseSchema, type ProfileResponse } from "../../db/schema.sql";
+
+export { profileResponseSchema, type ProfileResponse };	
 
 // * Set of rules for the profile
-// * Defines how the data should be validated
-// * Set what are valid inputs and what fields are allowed
-
-export type ChatSocket = ServerWebSocket<{ user: string }>;
-
 export const GUIDParamSchema = z.object({
 	id: z.string().uuid(),
 });
@@ -21,16 +18,4 @@ export const profileEditSchema = z.object({
 	avatar_url: z.string().url("Please enter a valid URL").optional().nullable(),
 });
 
-export const profileResponseSchema = z.object({
-	// * Profile Informations to display
-
-	displayName: z.string().nullable(),
-	avatar_url: z.string().nullable(),
-
-	// * User Informations to display
-	username: z.string(),
-	email: z.string().email(),
-});
-
 export type ProfileEditData = z.infer<typeof profileEditSchema>;
-export type ProfileResponse = z.infer<typeof profileResponseSchema>;
