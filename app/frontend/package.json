@@ -29,7 +29,7 @@
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@tanstack/router-devtools": "^1.89.0",
+		"@tanstack/router-devtools": "^1.90.0",
 		"@tanstack/router-plugin": "^1.87.13",
 		"@types/react": "^18.3.16",
 		"@types/react-dom": "^18.3.5",
