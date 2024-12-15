@@ -11,7 +11,7 @@ export function createRouter() {
 
 export function createApi() {
 	return createRouter()
-		.use(securityMiddlewares)
 		.use(utilityMiddlewares)
+		.use(securityMiddlewares)
 		.onError((error) => onError(error));
 }
