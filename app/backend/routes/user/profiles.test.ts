@@ -15,7 +15,7 @@ interface ProfileData {
 		id: string;
 		email: string;
 		username: string;
-		githubId: number;
+		githubId: string;
 	};
 }
 
@@ -43,7 +43,7 @@ const getUserProfile = {
 			id,
 			email: "test@example.com",
 			username: "testuser",
-			githubId: 12345,
+			githubId: "12345",
 		},
 	}),
 };
@@ -78,7 +78,7 @@ const authMiddleware = async (c: Context, next: () => Promise<void>) => {
 		id: "test-id",
 		email: "test@mail.de",
 		username: "test",
-		githubId: 12345,
+		githubId: "12345",
 	};
 	const testSession: Session = {
 		id: "test-session",
