@@ -1,7 +1,4 @@
 import { z } from "zod";
-import { profileResponseSchema, type ProfileResponse } from "../../db/schema.sql";
-
-export { profileResponseSchema, type ProfileResponse };	
 
 // * Set of rules for the profile
 export const GUIDParamSchema = z.object({
