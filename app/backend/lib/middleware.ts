@@ -1,3 +1,7 @@
+import { validateSessionToken } from "#auth/session";
+import type { Session, User } from "#db/schema.sql";
+import env, { DEV } from "#env";
+import cookieConfig from "#lib/cookie";
 import { rateLimiter } from "hono-rate-limiter";
 import { getConnInfo } from "hono/bun";
 import { every } from "hono/combine";
@@ -8,12 +12,7 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { requestId } from "hono/request-id";
 import type { HTTPResponseError } from "hono/types";
-import { validateSessionToken } from "#auth/session";
-import type { Session, User } from "#db/schema.sql";
-import env, { DEV } from "#env";
-import cookieConfig from "#lib/cookie";
 import type { Env } from "./types";
 
 const origin = DEV
@@ -137,11 +136,10 @@ export const securityMiddlewares = every(
  *
  * @description
  * This middleware includes:
- * - `requestId()`: 	Adds a unique request ID to each incoming request.
  * - `logger()`: 		Logs request and response details.
  * - `prettyJSON()`: 	Formats JSON responses to be more readable.
  */
-export const utilityMiddlewares = every(requestId(), logger(), prettyJSON());
+export const utilityMiddlewares = every(logger(), prettyJSON());
 
 /**
  * Handles errors by logging them and returning an appropriate HTTP response.
