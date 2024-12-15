@@ -63,7 +63,7 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const { session, user, fresh } = await validateSessionToken(sessionId);
 
 	if (session && fresh) {
-		setCookie(c, "auth_session", session.id, {
+		setCookie(c, "auth_session", session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
