@@ -72,7 +72,7 @@ describe("middleware integration", () => {
 		const testUser: User = {
 			id: "test-id",
 			email: "test@mail.de",
-			githubId: 1234,
+			githubId: "1234",
 			username: "test",
 		};
 		const testSession: Session = {
@@ -135,7 +135,7 @@ describe("middleware integration", () => {
 		const testUser: User = {
 			id: "test-id",
 			email: "test@mail.de",
-			githubId: 1234,
+			githubId: "1234",
 			username: "test",
 		};
 		const testSession: Session = {
@@ -154,8 +154,8 @@ describe("middleware integration", () => {
 			headers: { Cookie: "auth_session=valid-session" },
 		});
 
-		expect(res.headers.has("Set-Cookie")).toBe(true);
-		expect(res.headers.get("Set-Cookie")).toContain("auth_session=");
+		expect(res.headers.getSetCookie()).toBeTruthy();
+		expect(res.headers.getSetCookie()[0]).toContain("auth_session=");
 	});
 
 	describe("should handle different error types", async () => {

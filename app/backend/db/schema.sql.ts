@@ -1,12 +1,12 @@
 import { relations } from "drizzle-orm";
-import { bigint, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // * User
 export const userTable = pgTable("users", {
 	id: uuid().primaryKey().defaultRandom(),
-	githubId: bigint({ mode: "number" }).notNull().unique(),
+	githubId: varchar({ length: 20 }).notNull().unique(),
 	username: varchar({ length: 39 }).notNull().unique(),
 	email: varchar({ length: 255 }).notNull().unique(),
 });
