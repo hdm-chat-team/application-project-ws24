@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
-import { length, createId } from "#shared/cuid2";
+import { createId, length } from "#shared/cuid2";
 
 // * User
 export const userTable = pgTable("users", {
@@ -55,6 +55,7 @@ export type UserProfile = z.infer<typeof selectUserProfileSchema>;
 
 // * Session
 export const sessionTable = pgTable("sessions", {
+	token: varchar({ length: 64 }).primaryKey(),
 	userId: varchar({ length })
 		.notNull()
 		.references(() => userTable.id),

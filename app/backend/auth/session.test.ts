@@ -1,11 +1,11 @@
 import { beforeAll, describe, expect, mock, spyOn, test } from "bun:test";
-import { deleteSessionById, updateSessionExpiresAt } from "#db/queries.sql";
+import { deleteSessionByToken, updateSessionExpiresAt } from "#db/queries.sql";
 import * as sessionManager from "./session";
 
 describe("session", () => {
 	// Mock database queries
 	mock.module("#db/queries.sql", () => ({
-		deleteSessionById: { execute: mock(() => Promise.resolve()) },
+		deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
 		insertSession: { execute: mock(() => Promise.resolve()) },
 		selectSessionById: { execute: mock(() => Promise.resolve()) },
 		updateSessionExpiresAt: { execute: mock(() => Promise.resolve()) },
@@ -34,7 +34,7 @@ describe("session", () => {
 
 			const session = await sessionManager.createSession(userId, token);
 
-			expect(session).toHaveProperty("id");
+			expect(session).toHaveProperty("token");
 			expect(session).toHaveProperty("userId", userId);
 			expect(session.expiresAt instanceof Date).toBe(true);
 		});
@@ -118,7 +118,7 @@ describe("session", () => {
 	describe("invalidateSession", () => {
 		test("deletes session", async () => {
 			await sessionManager.invalidateSession("test-session-id");
-			expect(deleteSessionById.execute).toHaveBeenCalled();
+			expect(deleteSessionByToken.execute).toHaveBeenCalled();
 		});
 	});
 });
