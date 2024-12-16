@@ -2,10 +2,11 @@
 	"name": "@application-project-ws24/cuid",
 	"module": "index.ts",
 	"type": "module",
+	"main": "./index.ts",
 	"exports": {
 		".": {
 			"import": "./index.ts",
-			"require": "./index.js"
+			"require": "./index.ts"
 		}
 	},
 	"devDependencies": {
