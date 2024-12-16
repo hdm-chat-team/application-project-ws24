@@ -1,6 +1,6 @@
+import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
-import { SocketProvider } from "@/context";
 
 // * Layout for authenticated routes
 export const Route = createFileRoute("/(app)/_authenticated")({

@@ -1,6 +1,6 @@
 import api from "@/lib/api";
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
-import { createContext, type ReactNode } from "react";
+import { type UseQueryResult, useQuery } from "@tanstack/react-query";
+import { type ReactNode, createContext } from "react";
 
 export const SocketContext = createContext<
 	UseQueryResult<WebSocket, Error> | undefined

@@ -1,7 +1,3 @@
-import { validateSessionToken } from "#auth/session";
-import type { Session, User } from "#db/schema.sql";
-import env, { DEV } from "#env";
-import cookieConfig from "#lib/cookie";
 import { rateLimiter } from "hono-rate-limiter";
 import { getConnInfo } from "hono/bun";
 import { every } from "hono/combine";
@@ -13,6 +9,10 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
+import { validateSessionToken } from "#auth/session";
+import type { Session, User } from "#db/schema.sql";
+import env, { DEV } from "#env";
+import cookieConfig from "#lib/cookie";
 import type { Env } from "./types";
 
 const origin = DEV
