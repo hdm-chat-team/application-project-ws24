@@ -4,10 +4,7 @@ import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 // * Layout for authenticated routes
 export const Route = createFileRoute("/(app)/_authenticated")({
 	beforeLoad: async ({ context }) => {
-		const user = await context.queryClient.fetchQuery({
-			...authQueryOptions,
-			staleTime: Number.POSITIVE_INFINITY,
-		});
+		const user = await context.queryClient.fetchQuery(authQueryOptions);
 		if (!user) {
 			throw redirect({ to: "/signin", search: { from: location.href } });
 		}

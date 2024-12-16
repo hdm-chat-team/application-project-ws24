@@ -9,4 +9,5 @@ export const authQueryOptions = queryOptions<User | null>({
 		if (!response.ok) return null;
 		return await response.json();
 	},
+	staleTime: Number.POSITIVE_INFINITY,
 });
