@@ -4,9 +4,18 @@ import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// * Common Fields
+const id = varchar({ length }).primaryKey().$default(createId);
+
+const timestamps = {
+	createdAt: timestamp().notNull().defaultNow(),
+	updatedAt: timestamp(),
+};
+
 // * User
 export const userTable = pgTable("users", {
-	id: varchar({ length }).primaryKey().$defaultFn(createId),
+	id,
+	...timestamps,
 	githubId: varchar({ length: 20 }).notNull().unique(),
 	username: varchar({ length: 39 }).notNull().unique(),
 	email: varchar({ length: 255 }).notNull().unique(),
@@ -30,7 +39,8 @@ export const selectUserSchema = createSelectSchema(userTable, {
 export type User = z.infer<typeof selectUserSchema>;
 
 export const userProfileTable = pgTable("user_profiles", {
-	id: varchar({ length }).primaryKey().$defaultFn(createId),
+	id,
+	...timestamps,
 	userId: varchar({ length })
 		.notNull()
 		.references(() => userTable.id),
@@ -61,7 +71,6 @@ export const sessionTable = pgTable("sessions", {
 		.references(() => userTable.id),
 	expiresAt: timestamp({
 		withTimezone: true,
-		mode: "date",
 	}).notNull(),
 });
 
