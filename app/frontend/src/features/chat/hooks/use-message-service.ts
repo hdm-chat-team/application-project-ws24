@@ -1,13 +1,42 @@
 import { useUser } from "@/features/auth";
 import { MessageService } from "@/features/chat/message-service";
-import { useCallback } from "react";
+import api from "@/lib/api.ts";
+import { useCallback, useEffect, useRef } from "react";
 
 // * Hook to use the message service
 
 export const useMessageService = () => {
 	const { user } = useUser();
 	const messageService = MessageService.getInstance();
+	let keyPair: CryptoKeyPair | null = null;
+	const socketRef = useRef<WebSocket | null>(null);
 
+	useEffect(() => {
+		console.log("useMessageService");
+		const socket = api.chat.$ws();
+		socketRef.current = socket;
+		const asyncData = async () => {
+			if (!keyPair) {
+				keyPair = await messageService.generateKeyPair();
+				const exported = await window.crypto.subtle.exportKey(
+					"jwk",
+					keyPair.publicKey,
+				);
+				console.log(exported);
+				socketRef?.current?.send(
+					JSON.stringify({
+						type: "register",
+						username: user?.username,
+						publicKey: exported,
+					}),
+				);
+			}
+		};
+		socket.onopen = () => {
+			asyncData();
+			console.log("Socket is open");
+		};
+	}, [messageService, keyPair, user]);
 	const addMessage = useCallback(
 		async (content: string) => {
 			if (!user) {

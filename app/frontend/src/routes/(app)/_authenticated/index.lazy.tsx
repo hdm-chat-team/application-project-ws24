@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/features/auth";
+import MessageInput from "@/features/chat/components/message-input.tsx";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -71,6 +72,7 @@ function Index() {
 					placeholder="Type your message"
 				/>
 				<Button type="submit">Send</Button>
+				<MessageInput />
 			</form>
 			<Button asChild>
 				<a href={api.auth.github.$url().toString()}>signin</a>
