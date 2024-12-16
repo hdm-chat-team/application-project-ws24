@@ -1,12 +1,13 @@
+import { createId, length } from "@application-project-ws24/cuid";
 import { relations } from "drizzle-orm";
-import { bigint, pgTable, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
+import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // * User
 export const userTable = pgTable("users", {
-	id: uuid().primaryKey().defaultRandom(),
-	githubId: bigint({ mode: "number" }).notNull().unique(),
+	id: varchar({ length }).primaryKey().$defaultFn(createId),
+	githubId: varchar({ length: 20 }).notNull().unique(),
 	username: varchar({ length: 39 }).notNull().unique(),
 	email: varchar({ length: 255 }).notNull().unique(),
 });
@@ -29,10 +30,10 @@ export const selectUserSchema = createSelectSchema(userTable, {
 export type User = z.infer<typeof selectUserSchema>;
 
 export const userProfileTable = pgTable("user_profiles", {
-	id: uuid().primaryKey().defaultRandom(),
-	userId: uuid()
-		.references(() => userTable.id, { onDelete: "cascade" })
-		.notNull(),
+	id: varchar({ length }).primaryKey().$defaultFn(createId),
+	userId: varchar({ length })
+		.notNull()
+		.references(() => userTable.id),
 	displayName: varchar({ length: 255 }),
 	avatar_url: varchar({ length: 255 }),
 	html_url: varchar({ length: 255 }),
@@ -54,10 +55,10 @@ export type UserProfile = z.infer<typeof selectUserProfileSchema>;
 
 // * Session
 export const sessionTable = pgTable("sessions", {
-	id: varchar({ length: 64 }).primaryKey(),
-	userId: uuid()
+	token: varchar({ length: 64 }).primaryKey(),
+	userId: varchar({ length })
 		.notNull()
-		.references(() => userTable.id, { onDelete: "cascade" }),
+		.references(() => userTable.id),
 	expiresAt: timestamp({
 		withTimezone: true,
 		mode: "date",

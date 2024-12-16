@@ -1,6 +1,5 @@
 import { beforeAll, describe, expect, spyOn, test } from "bun:test";
-import { HTTPException } from "hono/http-exception";
-import { createApi, createRouter, onError } from "./factory";
+import { createApi, createRouter } from "./factory";
 
 describe("factory", () => {
 	beforeAll(() => {
@@ -23,28 +22,6 @@ describe("factory", () => {
 			const api = createApi();
 			expect(api).toBeDefined();
 			expect(api.routes).toBeDefined();
-		});
-	});
-
-	describe("onError", () => {
-		test("should handle non-HTTPException errors", async () => {
-			const error = new Error("Test error");
-			error.cause = "Test cause";
-
-			const response = await onError(error);
-			expect(response.status).toBe(500);
-			expect(response.statusText).toBe("Internal error: Test cause");
-			expect(await response.text()).toBe("Test error");
-		});
-
-		test("should handle HTTPException errors", async () => {
-			const httpError = new HTTPException(400, {
-				message: "Bad Request",
-			});
-
-			const response = await onError(httpError);
-			expect(response.status).toBe(400);
-			expect(await response.text()).toBe("Bad Request");
 		});
 	});
 });

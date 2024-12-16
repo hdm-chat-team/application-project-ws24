@@ -1,13 +1,13 @@
-import React from "react";
 import Logo from "@/assets/hdm-logo-clipart-lg.png";
-import { Settings, LogOut, User } from "lucide-react";
+import { LogOut, Settings, User } from "lucide-react";
+import React from "react";
+import { ModeToggle } from "../mode-toggle";
 import {
 	DropdownMenu,
-	DropdownMenuTrigger,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { ModeToggle } from "../mode-toggle";
 
 const TopNav = () => {
 	return (

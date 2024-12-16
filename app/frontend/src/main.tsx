@@ -1,32 +1,22 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { QueryClientProvider } from "@/context";
+import { RouterProvider } from "@/context";
+import { AuthProvider } from "@/features/auth";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import "./main.css";
-import { routeTree } from "./routeTree.gen";
 
-// * Create a new router instance
-const router = createRouter({ routeTree });
-
-// * Register the router instance for type safety
-declare module "@tanstack/react-router" {
-	interface Register {
-		router: typeof router;
-	}
-}
-
-// * Create a new query client instance
-const queryClient = new QueryClient();
-
-// * Render the app
+// * Mount React application with Router and Query providers
 // biome-ignore lint/style/noNonNullAssertion: default
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
+	// * Render the app
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<QueryClientProvider client={queryClient}>
-				<RouterProvider router={router} />
+			<QueryClientProvider>
+				<AuthProvider>
+					<RouterProvider />
+				</AuthProvider>
 			</QueryClientProvider>
 		</StrictMode>,
 	);

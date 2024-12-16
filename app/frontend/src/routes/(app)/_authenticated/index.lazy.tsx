@@ -1,15 +1,13 @@
 import ChatContent from "@/components/chat/chat";
-import Demo from "@/components/demo";
 import TopNav from "@/components/nav/top-nav";
 import Sidebar from "@/components/sidebar";
-import { Button } from "@/components/ui/button";
 import { users } from "@/data/data";
 import api from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
-export const Route = createLazyFileRoute("/")({
+export const Route = createLazyFileRoute("/(app)/_authenticated/")({
 	component: Index,
 });
 
@@ -25,11 +23,11 @@ function Index() {
 		const socket = api.chat.$ws();
 		socketRef.current = socket;
 
-		socket.onopen = (event) => {
+		socket.onopen = (event: Event) => {
 			console.log("WebSocket client opened", event);
 		};
 
-		socket.onmessage = (event) => {
+		socket.onmessage = (event: MessageEvent) => {
 			console.log("WebSocket client received message", event);
 			setMessages((prevMessages) => [
 				...prevMessages,
@@ -112,12 +110,9 @@ function Index() {
 					/>
 				)}
 			</div>
-			{/*
-			
 			<h1 className="text-3xl text-blue-300">
 				{isPending ? "Loading..." : data}
 			</h1>
-			 */}
 		</div>
 	);
 }

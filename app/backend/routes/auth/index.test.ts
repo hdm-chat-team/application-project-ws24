@@ -1,20 +1,41 @@
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";
-import { createApi } from "#lib/factory";
+import { createRouter } from "#lib/factory";
 import { authRouter } from ".";
 
-// Create test API with mocked auth state
-const { auth } = testClient(createApi().route("/auth", authRouter));
+const { auth } = testClient(createRouter().route("/auth", authRouter));
 
 describe("/api/auth", () => {
-	test("GET /signout without auth returns 401", async () => {
-		const res = await auth.signout.$get();
-		expect(res.ok).toBeFalse();
+	describe("GET /signout", () => {
+		test("without auth returns 401", async () => {
+			const res = await auth.signout.$get({
+				query: { from: "" },
+			});
+			expect(res.ok).toBeFalse();
+		});
+
+		test.todo("with auth redirects", async () => {
+			const from = "http://localhost:5173";
+			const res = await auth.signout.$get({
+				query: { from },
+			});
+			expect(res.ok).toBeTrue();
+			expect(res.status).toBe(302);
+			expect(res.headers.get("location")).toBe(from);
+		});
 	});
 
-	test.todo("GET /signout with auth redirects", async () => {
-		const res = await auth.signout.$get();
-		expect(res.ok).toBeTrue();
-		expect(res.redirect).toBeTruthy();
+	describe("GET /", () => {
+		test.todo("with auth returns user data", async () => {
+			const res = await auth.$get();
+			expect(res.ok).toBeTrue();
+			const data = await res.json();
+			expect(data).toEqual({
+				id: "test-user",
+				githubId: "1234",
+				username: "Test User",
+				email: "test@example.com",
+			});
+		});
 	});
 });

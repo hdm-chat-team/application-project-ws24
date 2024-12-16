@@ -47,7 +47,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 			</div>
 			<form
 				onSubmit={handleSubmit}
-				className="flex items-center gap-2 border-t border-gray-300 p-4"
+				className="flex items-center gap-2 border-gray-300 border-t p-4"
 			>
 				<input
 					type="text"
@@ -58,7 +58,7 @@ const ChatContent: React.FC<ChatContentProps> = ({
 				/>
 				<Button
 					type="submit"
-					className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+					className="rounded-lg bg-blue-500 px-4 py-2 text-white"
 				>
 					Send
 				</Button>

@@ -17,8 +17,8 @@
 			"cache": false,
 			"persistent": true
 		},
-		"//#biome": {},
-		"//#biome:fix": {
+		"//#check": {},
+		"//#check:fix": {
 			"cache": false
 		}
 	}
