@@ -1,4 +1,4 @@
-import { createId } from "@application-project-ws24/cuid";
+import { createId, isCuid, length } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
@@ -50,6 +50,10 @@ export const chatRouter = createRouter()
 	.post(
 		"/:recipientId",
 		zValidator(
+			"param",
+			z.object({ recipientId: z.string().length(length).refine(isCuid) }),
+		),
+		zValidator(
 			"form",
 			z.object({
 				content: z.string().min(1),
@@ -57,8 +61,8 @@ export const chatRouter = createRouter()
 		),
 		protectedRoute,
 		async (c) => {
-			const content = await c.req.formData();
-			const recipientId = c.req.param("recipientId");
+			const { content } = c.req.valid("form");
+			const { recipientId } = c.req.valid("param");
 			const user = c.get("user");
 
 			server.publish(

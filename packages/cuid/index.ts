@@ -1,8 +1,10 @@
-import { init } from "@paralleldrive/cuid2";
+import { init, isCuid } from "@paralleldrive/cuid2";
 
-export const length = 15;
+const length = 15;
 
-export const createId = init({
+const createId = init({
 	length,
 	fingerprint: "Hello from our project team! Here is a cookie for you: 🍪",
 });
+
+export { length, createId, isCuid };
