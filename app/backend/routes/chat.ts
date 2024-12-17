@@ -48,10 +48,10 @@ export const chatRouter = createRouter()
 		}),
 	)
 	.post(
-		"/:recipientId",
+		"/:topic",
 		zValidator(
 			"param",
-			z.object({ recipientId: z.string().length(length).refine(isCuid) }),
+			z.object({ topic: z.string().length(length).refine(isCuid) }),
 		),
 		zValidator(
 			"form",
@@ -62,11 +62,11 @@ export const chatRouter = createRouter()
 		protectedRoute,
 		async (c) => {
 			const { content } = c.req.valid("form");
-			const { recipientId } = c.req.valid("param");
+			const { topic } = c.req.valid("param");
 			const user = c.get("user");
 
 			getServer().publish(
-				recipientId,
+				topic,
 				JSON.stringify({
 					type: "message",
 					content: {

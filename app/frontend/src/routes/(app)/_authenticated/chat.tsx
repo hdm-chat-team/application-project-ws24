@@ -25,8 +25,8 @@ function Chat() {
 		defaultValues: { content: "" },
 		onSubmit: async ({ value }) => {
 			if (user) {
-				const res = await api.chat[":recipientId"].$post({
-					param: { recipientId: user.id },
+				const res = await api.chat[":topic"].$post({
+					param: { topic: user.id },
 					form: { content: value.content },
 				});
 				if (!res.ok) {
@@ -44,7 +44,7 @@ function Chat() {
 				<h2>Chat Messages</h2>
 				<ul>
 					{messages.map((message) => (
-						<li key={message.id}>{message.content}</li>
+						<li key={message}>{message}</li>
 					))}
 				</ul>
 				<h2>Chat Socket Status: {chatSocket?.readyState}</h2>
