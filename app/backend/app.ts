@@ -2,6 +2,7 @@ import { serveStatic } from "hono/bun";
 import { createApi, createRouter } from "#lib/factory";
 import { authRouter } from "./routes/auth";
 import { chatRouter } from "./routes/chat";
+import profileRouter from "./routes/user/profiles";
 
 // * API
 const apiRouter = createApi();
@@ -10,6 +11,7 @@ const apiRoutes = apiRouter
 	.basePath("/api")
 	.route("/auth", authRouter)
 	.route("/chat", chatRouter)
+	.route("/profile", profileRouter)
 	.get("/", (c) => {
 		return c.text("Hello Hono!");
 	});
