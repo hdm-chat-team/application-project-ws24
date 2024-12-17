@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ChatSocketProvider } from "@/features/chat/context/chat-provider";
-import { useState, type FormEvent } from "react";
-import { useChatSocket } from "@/features/chat/hooks/use-chat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useUser } from "@/features/auth";
+import { ChatSocketProvider } from "@/features/chat/context/chat-provider";
+import { useChatSocket } from "@/features/chat/hooks/use-chat";
+import { useSocket } from "@/hooks/use-socket";
+import api from "@/lib/api";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat")({
 	component: () => (
@@ -15,17 +18,24 @@ export const Route = createFileRoute("/(app)/_authenticated/chat")({
 
 function Chat() {
 	const { messages, chatSocket } = useChatSocket();
+	const { user } = useUser();
+	useSocket();
 
-	const [inputMessage, setInputMessage] = useState("");
-
-	function handleSubmit(event: FormEvent<HTMLFormElement>): void {
-		event.preventDefault();
-		if (inputMessage && chatSocket) {
-			chatSocket.send(inputMessage);
-		}
-
-		setInputMessage("");
-	}
+	const form = useForm({
+		defaultValues: { content: "" },
+		onSubmit: async ({ value }) => {
+			if (user) {
+				const res = await api.chat[":recipientId"].$post({
+					param: { recipientId: user.id },
+					form: { content: value.content },
+				});
+				if (!res.ok) {
+					alert("Failed to send message");
+				}
+			}
+			form.reset();
+		},
+	});
 
 	return (
 		<>
@@ -34,19 +44,38 @@ function Chat() {
 				<h2>Chat Messages</h2>
 				<ul>
 					{messages.map((message) => (
-						<li key={message}>{message}</li>
+						<li key={message.id}>{message.content}</li>
 					))}
 				</ul>
 				<h2>Chat Socket Status: {chatSocket?.readyState}</h2>
 
-				<form onSubmit={handleSubmit}>
-					<Input
-						type="text"
-						value={inputMessage}
-						onChange={(e) => setInputMessage(e.target.value)}
-						placeholder="Type your message"
-					/>
-					<Button type="submit">Send</Button>
+				<form
+					onSubmit={(event) => {
+						event.preventDefault();
+						event.stopPropagation();
+						form.handleSubmit();
+					}}
+				>
+					<form.Field name="content">
+						{(field) => (
+							<Input
+								id={field.name}
+								name={field.name}
+								value={field.state.value}
+								type="text"
+								onChange={(event) => field.handleChange(event.target.value)}
+							/>
+						)}
+					</form.Field>
+					<form.Subscribe
+						selector={(state) => [state.canSubmit, state.isSubmitting]}
+					>
+						{([canSubmit, isSubmitting]) => (
+							<Button type="submit" disabled={!canSubmit}>
+								{isSubmitting ? "..." : "Submit"}
+							</Button>
+						)}
+					</form.Subscribe>
 				</form>
 			</div>
 		</>
