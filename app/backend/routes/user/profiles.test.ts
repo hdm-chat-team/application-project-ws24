@@ -81,7 +81,7 @@ const authMiddleware = async (c: Context, next: () => Promise<void>) => {
 		githubId: "12345",
 	};
 	const testSession: Session = {
-		id: "test-session",
+		token: "test-session",
 		userId: "test-id",
 		expiresAt: new Date(Date.now() + 1000 * 60 * 60),
 	};
