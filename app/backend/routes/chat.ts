@@ -5,7 +5,7 @@ import { createBunWebSocket } from "hono/bun";
 import { z } from "zod";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
-import { server } from "..";
+import { getServer } from "#lib/utils";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
@@ -65,7 +65,7 @@ export const chatRouter = createRouter()
 			const { recipientId } = c.req.valid("param");
 			const user = c.get("user");
 
-			server.publish(
+			getServer().publish(
 				recipientId,
 				JSON.stringify({
 					type: "message",
