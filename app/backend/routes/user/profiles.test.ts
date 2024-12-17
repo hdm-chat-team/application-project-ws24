@@ -1,10 +1,10 @@
 import { describe, expect, mock, test } from "bun:test";
-import type { Session, User } from "#db/schema.sql";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import type { Context } from "hono";
+import type { Session, User } from "#db/schema.sql";
 import { protectedRoute } from "../../lib/middleware";
-import { zValidator } from "@hono/zod-validator";
-import { profileEditSchema, GUIDParamSchema } from "./types";
+import { GUIDParamSchema, profileEditSchema } from "./types";
 
 interface ProfileData {
 	id: string;
