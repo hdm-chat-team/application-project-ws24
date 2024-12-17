@@ -1,11 +1,11 @@
 import { createId } from "@application-project-ws24/cuid";
+import { zValidator } from "@hono/zod-validator";
+import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
+import { z } from "zod";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
-import type { ServerWebSocket } from "bun";
 import { server } from "..";
-import { zValidator } from "@hono/zod-validator";
-import { z } from "zod";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
