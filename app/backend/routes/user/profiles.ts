@@ -76,6 +76,5 @@ const updateUserProfile = db
 	.returning()
 	.prepare("update_user_profile");
 
-
 export default profileRouter;
 export type ProfileRoute = typeof profileRouter;
