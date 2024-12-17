@@ -1,7 +1,7 @@
-import { createRouter } from "#lib/factory";
-import { protectedRoute } from "#lib/middleware";
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
+import { createRouter } from "#lib/factory";
+import { protectedRoute } from "#lib/middleware";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
@@ -13,7 +13,7 @@ export const socketRouter = createRouter().get(
 			onOpen: (_, ws) => {
 				const socket = ws.raw as ServerWebSocket;
 				const { id } = c.get("user");
-				
+
 				socket.subscribe(id);
 				console.log("Client connected");
 			},
