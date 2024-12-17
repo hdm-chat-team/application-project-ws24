@@ -1,5 +1,5 @@
 import {
-	deleteSessionById,
+	deleteSessionByToken,
 	insertSession,
 	selectSessionById,
 	updateSessionExpiresAt,
@@ -36,7 +36,7 @@ export async function createSession(
 	token: string,
 ): Promise<Session> {
 	const session = {
-		id: hashToken(token),
+		token: hashToken(token),
 		userId,
 		expiresAt: new Date(Date.now() + SESSION_DURATION),
 	};
@@ -59,19 +59,19 @@ type SessionValidationResult =
 export async function validateSessionToken(
 	token: string,
 ): Promise<SessionValidationResult> {
-	const sessionId = hashToken(token);
-	const session = await selectSessionById.execute({ sessionId });
+	const sessionToken = hashToken(token);
+	const session = await selectSessionById.execute({ token: sessionToken });
 	let fresh = false;
 
 	if (!session || Date.now() >= session.expiresAt.getTime()) {
-		await deleteSessionById.execute({ sessionId });
+		await deleteSessionByToken.execute({ token: sessionToken });
 		return { session: null, user: null, fresh };
 	}
 
 	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
 		const newExpiresAt = new Date(Date.now() + SESSION_DURATION);
 		await updateSessionExpiresAt.execute({
-			sessionId,
+			token: sessionToken,
 			expiresAt: newExpiresAt,
 		});
 		session.expiresAt = newExpiresAt;
@@ -83,9 +83,9 @@ export async function validateSessionToken(
 
 /**
  * Invalidates and removes a session.
- * @param {string} sessionId - The ID of the session to invalidate.
+ * @param {string} sessionToken - The ID of the session to invalidate.
  * @returns {Promise<void>}
  */
-export async function invalidateSession(sessionId: string): Promise<void> {
-	await deleteSessionById.execute({ sessionId });
+export async function invalidateSession(sessionToken: string): Promise<void> {
+	await deleteSessionByToken.execute({ token: sessionToken });
 }
