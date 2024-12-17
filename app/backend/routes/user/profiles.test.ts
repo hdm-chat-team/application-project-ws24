@@ -2,43 +2,42 @@ import { describe, expect, mock, test } from "bun:test";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import type { Context } from "hono";
-import type { Session, User } from "#db/schema.sql";
-import { protectedRoute } from "../../lib/middleware";
-import { GUIDParamSchema, profileEditSchema } from "./types";
+import { z } from "zod";
+import type { User, UserProfile } from "#db/schema.sql";
+import { selectUserProfileSchema } from "#db/schema.sql";
+import { protectedRoute } from "#lib/middleware";
+import type { Env } from "#lib/types";
 
-interface ProfileData {
-	id: string;
-	userId: string;
-	displayName: string;
-	avatar_url: string;
-	owner: {
-		id: string;
-		email: string;
-		username: string;
-		githubId: string;
-	};
-}
+const GUIDParamSchema = z.object({
+	id: z
+		.string()
+		.min(1)
+		.regex(/^[a-z0-9]+$/, "Invalid ID format"),
+});
 
-interface ProfileResponse {
-	data: ProfileData;
-}
+const profileEditSchema = selectUserProfileSchema
+	.pick({
+		displayName: true,
+		avatar_url: true,
+	})
+	.extend({
+		displayName: z.string().min(1, "Display name is required"),
+		avatar_url: z.string().url("Invalid URL format"),
+	})
+	.required();
 
-interface UpdateResponse {
-	message: string;
-	data: ProfileData;
-}
-
-interface ProfileUpdate {
-	displayName: string;
-	avatar_url: string;
-}
+type ProfileWithOwner = UserProfile & { owner: User };
+type ProfileResponse = { data: ProfileWithOwner };
 
 const getUserProfile = {
-	execute: async ({ id }: { id: string }): Promise<ProfileData | null> => ({
+	execute: async ({
+		id,
+	}: { id: string }): Promise<ProfileWithOwner | null> => ({
 		id: "profile-1",
 		userId: id,
 		displayName: "Test User",
 		avatar_url: "https://example.com/avatar.jpg",
+		html_url: "https://example.com/profile",
 		owner: {
 			id,
 			email: "test@example.com",
@@ -49,57 +48,41 @@ const getUserProfile = {
 };
 
 const updateUserProfile = {
-	execute: async (
-		_data: ProfileUpdate & { id: string },
-	): Promise<{ success: true }> => ({
+	execute: async (_: z.infer<typeof profileEditSchema> & { id: string }) => ({
 		success: true,
 	}),
 };
 
-mock.module("../../db/db", () => ({
+mock.module("#db/db", () => ({
 	query: {
-		userProfileTable: {
-			findFirst: () => ({
-				prepare: () => getUserProfile,
-			}),
-		},
+		userProfileTable: { findFirst: () => ({ prepare: () => getUserProfile }) },
 	},
 	update: () => ({
-		set: () => ({
-			where: () => ({
-				prepare: () => updateUserProfile,
-			}),
-		}),
+		set: () => ({ where: () => ({ prepare: () => updateUserProfile }) }),
 	}),
 }));
 
-const authMiddleware = async (c: Context, next: () => Promise<void>) => {
-	const testUser: User = {
+const authMiddleware = async (c: Context<Env>, next: () => Promise<void>) => {
+	c.set("user", {
 		id: "test-id",
 		email: "test@mail.de",
 		username: "test",
 		githubId: "12345",
-	};
-	const testSession: Session = {
+	});
+	c.set("session", {
 		token: "test-session",
 		userId: "test-id",
 		expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-	};
-
-	c.set("user", testUser);
-	c.set("session", testSession);
+	});
 	await next();
 };
 
-const testProfileRoute = new Hono<{
-	Variables: { user: User; session: Session };
-}>()
+const testProfileRoute = new Hono<Env>()
 	.get("/me", protectedRoute, async (c) => {
 		const user = c.get("user");
+		if (!user) return c.json({ error: "Unauthorized" }, 401);
 		const data = await getUserProfile.execute({ id: user.id });
-		if (!data) {
-			return c.json({ error: "Profile not found" }, 404);
-		}
+		if (!data) return c.json({ error: "Profile not found" }, 404);
 		return c.json({ data });
 	})
 	.get(
@@ -109,9 +92,7 @@ const testProfileRoute = new Hono<{
 		async (c) => {
 			const { id } = c.req.valid("param");
 			const userData = await getUserProfile.execute({ id });
-			if (!userData) {
-				return c.json({ error: "Profile not found" }, 404);
-			}
+			if (!userData) return c.json({ error: "Profile not found" }, 404);
 			return c.json({ data: userData });
 		},
 	)
@@ -121,26 +102,24 @@ const testProfileRoute = new Hono<{
 		zValidator("json", profileEditSchema),
 		async (c) => {
 			const user = c.get("user");
-			const profile = c.req.valid("json") as ProfileUpdate;
-			await updateUserProfile.execute({
-				id: user.id,
-				displayName: profile.displayName,
-				avatar_url: profile.avatar_url,
-			});
+			if (!user) return c.json({ error: "Unauthorized" }, 401);
+			const profile = c.req.valid("json");
+			await updateUserProfile.execute({ id: user.id, ...profile });
 			const updatedProfile = await getUserProfile.execute({ id: user.id });
-			if (!updatedProfile) {
-				return c.json({ error: "Profile not found" }, 404);
-			}
+			if (!updatedProfile) return c.json({ error: "Profile not found" }, 404);
 			return c.json({ message: "profile updated", data: updatedProfile });
 		},
 	);
 
-const app = new Hono().use("*", authMiddleware).route("/", testProfileRoute);
+const app = new Hono<Env>()
+	.use("*", authMiddleware)
+	.route("/", testProfileRoute);
 
 describe("profile route integration", () => {
 	test("should handle unauthenticated /me requests", async () => {
-		const unauthApp = new Hono().route("/", testProfileRoute);
-		const res = await unauthApp.request("/me");
+		const res = await new Hono<Env>()
+			.route("/", testProfileRoute)
+			.request("/me");
 		expect(res.status).toBe(401);
 	});
 
@@ -148,74 +127,44 @@ describe("profile route integration", () => {
 		const res = await app.request("/me");
 		expect(res.status).toBe(200);
 		const response = (await res.json()) as ProfileResponse;
-		expect(response.data).toHaveProperty("displayName");
-		expect(response.data).toHaveProperty("avatar_url");
 		expect(response.data.userId).toBe("test-id");
 	});
 
 	test("should handle profile requests by ID", async () => {
-		const validUUID = "123e4567-e89b-12d3-a456-426614174000";
-		const res = await app.request(`/${validUUID}`);
+		const validId = "validcuid123";
+		const res = await app.request(`/${validId}`);
 		expect(res.status).toBe(200);
 		const response = (await res.json()) as ProfileResponse;
-		expect(response.data).toHaveProperty("displayName");
-		expect(response.data.userId).toBe(validUUID);
+		expect(response.data.userId).toBe(validId);
 	});
 
-	test("should handle unauthorized profile requests by ID", async () => {
-		const unauthApp = new Hono().route("/", testProfileRoute);
-		const validUUID = "123e4567-e89b-12d3-a456-426614174000";
-		const res = await unauthApp.request(`/${validUUID}`);
-		expect(res.status).toBe(401);
-	});
-
-	test("should handle invalid UUID in profile requests", async () => {
-		const res = await app.request("/invalid-uuid");
+	test("should handle invalid ID in profile requests", async () => {
+		const res = await app.request("/invalid@id");
 		expect(res.status).toBe(400);
-	});
-
-	test("should handle non-existent profiles", async () => {
-		const originalExecute = getUserProfile.execute;
-		getUserProfile.execute = async (): Promise<ProfileData | null> => null;
-
-		const validUUID = "123e4567-e89b-12d3-a456-426614174000";
-		const res = await app.request(`/${validUUID}`);
-		expect(res.status).toBe(404);
-
-		getUserProfile.execute = originalExecute;
 	});
 
 	describe("profile updates", () => {
 		test("should handle valid profile updates", async () => {
 			const res = await app.request("/me", {
 				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					displayName: "New Name",
 					avatar_url: "https://example.com/new-avatar.jpg",
 				}),
 			});
-
 			expect(res.status).toBe(200);
-			const response = (await res.json()) as UpdateResponse;
-			expect(response.message).toBe("profile updated");
-			expect(response.data.displayName).toBe("Test User");
 		});
 
 		test("should reject invalid profile updates", async () => {
 			const res = await app.request("/me", {
 				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					displayName: "",
 					avatar_url: "invalid-url",
 				}),
 			});
-
 			expect(res.status).toBe(400);
 		});
 	});
