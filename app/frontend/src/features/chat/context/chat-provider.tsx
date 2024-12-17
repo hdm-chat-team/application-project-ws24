@@ -8,8 +8,8 @@ export const ChatSocketContext = createContext<
 
 export function ChatSocketProvider({ children }: { children: ReactNode }) {
 	const query = useQuery({
-		queryKey: [api.socket.chat.$url().pathname],
-		queryFn: async () => api.socket.chat.$ws(),
+		queryKey: [api.chat.$url().pathname],
+		queryFn: async () => api.chat.$ws(),
 		staleTime: Number.POSITIVE_INFINITY,
 	});
 

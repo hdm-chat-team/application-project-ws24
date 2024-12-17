@@ -3,7 +3,7 @@ import type { User } from "@server/db/schema.sql";
 import { queryOptions } from "@tanstack/react-query";
 
 export const authQueryOptions = queryOptions<User | null>({
-	queryKey: ["auth-user"],
+	queryKey: [api.auth.$url().pathname],
 	queryFn: async () => {
 		const response = await api.auth.$get();
 		if (!response.ok) return null;
