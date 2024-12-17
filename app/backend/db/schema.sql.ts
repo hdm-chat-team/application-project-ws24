@@ -72,19 +72,6 @@ export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
 	}),
 }));
 
-export const profileResponseSchema = z.object({
-	// * Profile Informations to display
-
-	displayName: z.string().nullable(),
-	avatar_url: z.string().nullable(),
-
-	// * User Informations to display
-	username: z.string(),
-	email: z.string().email(),
-});
-
-export type ProfileResponse = z.infer<typeof profileResponseSchema>;
-
 export const insertSessionSchema = createInsertSchema(sessionTable);
 export const selectSessionSchema = createSelectSchema(sessionTable);
 export type Session = z.infer<typeof selectSessionSchema>;
