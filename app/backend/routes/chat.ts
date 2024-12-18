@@ -5,7 +5,11 @@ import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 import { getServer } from "#lib/utils";
-import { cuidParamSchema, messageFormSchema } from "./chat.schemas";
+import {
+	createMessage,
+	messageFormSchema,
+	stringifyMessage,
+} from "#shared/message";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
@@ -48,27 +52,17 @@ export const chatRouter = createRouter()
 		}),
 	)
 	.post(
-		"/:topic",
+		"/:id",
 		zValidator("param", cuidParamSchema),
 		zValidator("form", messageFormSchema),
 		protectedRoute,
 		async (c) => {
-			const { content } = c.req.valid("form");
-			const { topic } = c.req.valid("param");
-			const user = c.get("user");
+			const { body } = c.req.valid("form");
+			const { id: topic } = c.req.valid("param");
+			const { id: userId } = c.get("user");
 
-			getServer().publish(
-				topic,
-				JSON.stringify({
-					type: "message",
-					content: {
-						id: createId(),
-						content,
-						timestamp: Date.now(),
-						userId: user.id,
-					},
-				}),
-			);
+			const message = createMessage(userId, body);
+			getServer().publish(topic, stringifyMessage(message));
 
 			return c.text("Message sent");
 		},
