@@ -13,4 +13,8 @@ const cuidSchema = z
 	.length(length, { message: `CUIDs need to have a length of ${length}` })
 	.refine(isCuid, "Invalid CUID");
 
-export { createId, isCuid, length, cuidSchema };
+const cuidParamSchema = z.object({
+	id: cuidSchema,
+});
+
+export { createId, isCuid, length, cuidSchema, cuidParamSchema };

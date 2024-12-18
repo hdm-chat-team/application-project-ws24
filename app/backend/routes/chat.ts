@@ -1,4 +1,4 @@
-import { createId } from "@application-project-ws24/cuid";
+import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
