@@ -71,6 +71,7 @@ export default defineConfig({
 		alias: {
 			"@": `${__dirname}/src`,
 			"@server": `${__dirname}/../backend/`,
+			"@shared": `${__dirname}/../shared/`,
 		},
 	},
 	build: {

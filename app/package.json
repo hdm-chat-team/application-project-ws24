@@ -6,8 +6,7 @@
 		"#db/*": "./backend/db/*.ts",
 		"#env": "./env.ts",
 		"#lib/*": "./backend/lib/*.ts",
-		"#shared/*": "./shared/*.ts",
-		"#types/*": "./backend/types/*.ts"
+		"#shared/*": "./shared/*.ts"
 	},
 	"scripts": {
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
