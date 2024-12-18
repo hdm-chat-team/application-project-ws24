@@ -1,5 +1,5 @@
 import { SocketContext } from "@/context/socket-provider";
-import { parseMessage, type Message } from "@shared/message";
+import { type Message, parseMessage } from "@shared/message";
 import { useContext, useEffect, useState } from "react";
 
 export function useChat() {
