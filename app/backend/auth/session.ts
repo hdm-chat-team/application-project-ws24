@@ -80,7 +80,7 @@ export async function validateSessionToken(
 
 	const user: User = {
 		...session.user,
-		createdAt: session.user.createdAt.toISOString(),
+		createdAt: session.user.createdAt?.toISOString() ?? "",
 		updatedAt: session.user.updatedAt?.toISOString() ?? "",
 	};
 
