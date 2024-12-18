@@ -20,7 +20,7 @@
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
-		"arctic": "^2.3.2",
+		"arctic": "^2.3.3",
 		"drizzle-orm": "^0.38.2",
 		"drizzle-zod": "^0.6.0",
 		"hono": "^4.6.14",
