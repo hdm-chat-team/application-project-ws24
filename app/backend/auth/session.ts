@@ -78,7 +78,17 @@ export async function validateSessionToken(
 		fresh = true;
 	}
 
-	return { session, user: session.user, fresh };
+	const user: User = {
+		...session.user,
+		createdAt: session.user.createdAt.toISOString(),
+		updatedAt: session.user.updatedAt?.toISOString() ?? "",
+	};
+
+	return {
+		session,
+		user,
+		fresh,
+	};
 }
 
 /**
