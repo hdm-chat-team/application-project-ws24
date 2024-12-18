@@ -11,7 +11,7 @@ import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
 import { validateSessionToken } from "#auth/session";
 import type { Session, User } from "#db/schema.sql";
-import env, { DEV } from "#env";
+import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 import type { Env } from "./types";
 
@@ -139,7 +139,9 @@ export const securityMiddlewares = every(
  * - `logger()`: 		Logs request and response details.
  * - `prettyJSON()`: 	Formats JSON responses to be more readable.
  */
-export const utilityMiddlewares = every(logger(), prettyJSON());
+export const utilityMiddlewares = every(
+	...(!TEST ? [logger(), prettyJSON()] : []),
+);
 
 /**
  * Handles errors by logging them and returning an appropriate HTTP response.
