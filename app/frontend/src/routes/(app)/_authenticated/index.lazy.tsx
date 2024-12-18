@@ -13,7 +13,7 @@ export const Route = createLazyFileRoute("/(app)/_authenticated/")({
 
 function Index() {
 	const { user } = useUser();
-	const { socket } = useSocket();
+	const { readyState } = useSocket();
 
 	const { data, isPending } = useQuery({
 		queryKey: ["data"],
@@ -26,7 +26,7 @@ function Index() {
 				{isPending ? "Loading..." : data}
 			</h1>
 			<h1>You are logged in as: {user?.username} </h1>
-			<h2>Socket Status: {socket?.readyState}</h2>
+			<h2>Socket Status: {readyState}</h2>
 			<SignoutButton />
 		</div>
 	);
