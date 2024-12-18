@@ -1,19 +1,55 @@
 import api from "@/lib/api";
-import { type UseQueryResult, useQuery } from "@tanstack/react-query";
-import { type ReactNode, createContext } from "react";
+import {
+	type ReactNode,
+	createContext,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 
 export const SocketContext = createContext<
-	UseQueryResult<WebSocket, Error> | undefined
+	| {
+			socket: WebSocket | null;
+			readyState: number;
+	  }
+	| undefined
 >(undefined);
 
 export function SocketProvider({ children }: { children: ReactNode }) {
-	const query = useQuery({
-		queryKey: [api.socket.$url().pathname],
-		queryFn: async () => api.socket.$ws(),
-		staleTime: Number.POSITIVE_INFINITY,
-	});
+	const socketRef = useRef<WebSocket | null>(null);
+	const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
+
+	useEffect(() => {
+		socketRef.current = api.socket.$ws();
+
+		socketRef.current.onopen = () => {
+			console.log("connected");
+			setReadyState(WebSocket.OPEN);
+		};
+
+		socketRef.current.onmessage = (event) => {
+			console.log("message", event.data);
+		};
+
+		socketRef.current.onerror = (event) => {
+			console.error("error", event);
+		};
+
+		socketRef.current.onclose = () => {
+			console.log("disconnected");
+			setReadyState(WebSocket.CLOSED);
+		};
+
+		return () => {
+			if (socketRef.current?.readyState === WebSocket.OPEN) {
+				socketRef.current?.close();
+			}
+		};
+	}, []);
 
 	return (
-		<SocketContext.Provider value={query}>{children}</SocketContext.Provider>
+		<SocketContext.Provider value={{ socket: socketRef.current, readyState }}>
+			{children}
+		</SocketContext.Provider>
 	);
 }

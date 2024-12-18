@@ -1,28 +1,33 @@
-import { useContext, useState } from "react";
-import { ChatSocketContext } from "@/features/chat/context/chat-provider";
+import { SocketContext } from "@/context/socket-provider";
+import { parseMessage, type Message } from "@shared/message";
+import { useContext, useEffect, useState } from "react";
 
-export function useChatSocket() {
-	const context = useContext(ChatSocketContext);
+export function useChat() {
+	const context = useContext(SocketContext);
 	if (context === undefined)
-		throw new Error("useConnection must be used within a ChatSocketProvider");
-	const { data: chatSocket, ...rest } = context;
+		throw new Error("useConnection must be used within a SocketProvider");
+	const { socket } = context;
 
-	const [messages, setMessages] = useState<string[]>([]);
+	const [messages, setMessages] = useState<Message[]>([]);
 
-	if (chatSocket) {
-		chatSocket.onopen = (event) => {
-			console.log("ChatSocket client opened", event);
-		};
+	useEffect(() => {
+		if (socket) {
+			socket.onmessage = (event) => {
+				try {
+					const message: Message = parseMessage(event.data);
+					if (message?.id) {
+						setMessages((prevMessages) => [...prevMessages, message]);
+					}
+				} catch (error) {
+					console.error("Failed to parse message:", error);
+				}
+			};
 
-		chatSocket.onmessage = (event) => {
-			console.log("ChatSocket client received message", event);
-			setMessages((prevMessages) => [...prevMessages, event.data]);
-		};
+			return () => {
+				socket.onmessage = null;
+			};
+		}
+	}, [socket]);
 
-		chatSocket.onclose = (event) => {
-			console.log("ChatSocket client closed", event);
-		};
-	}
-
-	return { messages, chatSocket, ...rest };
+	return { messages, context };
 }
