@@ -29,13 +29,6 @@ describe("/api/auth", () => {
 		test.todo("with auth returns user data", async () => {
 			const res = await auth.$get();
 			expect(res.ok).toBeTrue();
-			const data = await res.json();
-			expect(data).toEqual({
-				id: "test-user",
-				githubId: "1234",
-				username: "Test User",
-				email: "test@example.com",
-			});
 		});
 	});
 });

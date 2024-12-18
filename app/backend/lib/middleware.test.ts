@@ -70,13 +70,14 @@ describe("middleware integration", () => {
 		});
 
 		test("should handle valid auth sessions", async () => {
+			const testDate = new Date();
 			const testUser: User = {
 				id: "test-id",
 				email: "test@mail.de",
 				githubId: "1234",
 				username: "test",
-				createdAt: "",
-				updatedAt: "",
+				createdAt: testDate,
+				updatedAt: null,
 			};
 			const testSession: Session = {
 				token: "test-session",
@@ -99,7 +100,20 @@ describe("middleware integration", () => {
 				session: Session | null;
 			};
 			expect(res.status).toBe(200);
-			expect(json.user).toEqual(testUser);
+
+			// Compare without direct date comparison
+			const receivedUser = json.user;
+
+			expect(receivedUser).toBeTruthy();
+			expect(receivedUser?.id).toBe(testUser.id);
+			expect(receivedUser?.email).toBe(testUser.email);
+			expect(receivedUser?.githubId).toBe(testUser.githubId);
+			expect(receivedUser?.username).toBe(testUser.username);
+			expect(new Date(receivedUser?.createdAt as Date).getTime()).toBe(
+				testDate.getTime(),
+			);
+			expect(receivedUser?.updatedAt).toBe(testUser.updatedAt);
+
 			expect(json.session).toEqual({
 				...testSession,
 				// @ts-ignore
@@ -112,8 +126,8 @@ describe("middleware integration", () => {
 				email: "test@mail.de",
 				githubId: "1234",
 				username: "test",
-				createdAt: "",
-				updatedAt: "",
+				createdAt: new Date(),
+				updatedAt: new Date(),
 			};
 			const testSession: Session = {
 				token: "test-session",
