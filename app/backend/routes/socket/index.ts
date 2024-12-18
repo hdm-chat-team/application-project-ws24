@@ -1,5 +1,6 @@
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
+import type { User } from "#db/schema.sql";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 
@@ -12,17 +13,17 @@ export const socketRouter = createRouter().get(
 		return {
 			onOpen: (_, ws) => {
 				const socket = ws.raw as ServerWebSocket;
-				const { id } = c.get("user");
+				const { id, username } = c.get("user") as User;
 
 				socket.subscribe(id);
-				console.log("Client connected");
+				console.log(`${username} connected`);
 			},
 			onClose: (_, ws) => {
 				const socket = ws.raw as ServerWebSocket;
-				const { id } = c.get("user");
+				const { id, username } = c.get("user") as User;
 
 				socket.unsubscribe(id);
-				console.log("Client disconnected");
+				console.log(`${username} disconnected`);
 			},
 		};
 	}),
