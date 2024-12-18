@@ -30,6 +30,7 @@ export default function MessageForm() {
 			onSubmit: messageFormSchema,
 		},
 	});
+
 	return (
 		<form
 			className="flex"
