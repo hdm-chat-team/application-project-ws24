@@ -1,11 +1,11 @@
-import { createId, isCuid, length } from "@application-project-ws24/cuid";
+import { createId } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
-import { z } from "zod";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 import { getServer } from "#lib/utils";
+import { cuidParamSchema, messageFormSchema } from "./chat.schemas";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
@@ -49,16 +49,8 @@ export const chatRouter = createRouter()
 	)
 	.post(
 		"/:topic",
-		zValidator(
-			"param",
-			z.object({ topic: z.string().length(length).refine(isCuid) }),
-		),
-		zValidator(
-			"form",
-			z.object({
-				content: z.string().min(1),
-			}),
-		),
+		zValidator("param", cuidParamSchema),
+		zValidator("form", messageFormSchema),
 		protectedRoute,
 		async (c) => {
 			const { content } = c.req.valid("form");
