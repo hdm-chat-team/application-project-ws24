@@ -1,6 +1,6 @@
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
-import type { User } from "#db/schema.sql";
+import type { User } from "#db/users";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 

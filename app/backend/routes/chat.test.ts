@@ -3,8 +3,8 @@ import { createId } from "@application-project-ws24/cuid";
 import type { Env } from "hono";
 import { createMiddleware } from "hono/factory";
 import { testClient } from "hono/testing";
-import type { Session } from "#db/schema/session.sql";
-import type { User } from "#db/schema/user.sql";
+import type { Session } from "#db/sessions";
+import type { User } from "#db/users";
 import { createApi } from "#lib/factory";
 import { chatRouter } from "./chat";
 

@@ -1,8 +1,6 @@
 import { relations } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
-import { userTable } from "./user.sql";
+import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG } from "./utils";
 
 // * Session
@@ -22,7 +20,3 @@ export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
 		references: [userTable.id],
 	}),
 }));
-
-export const insertSessionSchema = createInsertSchema(sessionTable);
-export const selectSessionSchema = createSelectSchema(sessionTable);
-export type Session = z.infer<typeof selectSessionSchema>;
