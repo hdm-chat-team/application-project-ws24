@@ -1,16 +1,17 @@
-import { createId, length } from "@application-project-ws24/cuid";
+import { createId, LENGTH } from "@application-project-ws24/cuid";
 import { relations } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// * Common Fields
-const id = varchar({ length }).primaryKey().$default(createId);
+const ID_SIZE_CONFIG = { length: LENGTH };
 
-const timestamps = {
-	createdAt: timestamp().notNull().defaultNow(),
-	updatedAt: timestamp(),
-};
+// * Common Fields
+const id = varchar(ID_SIZE_CONFIG).primaryKey().$default(createId);
+
+const createdAt = timestamp().notNull().defaultNow();
+const updatedAt = timestamp();
+const timestamps = { createdAt, updatedAt };
 
 // * User
 export const userTable = pgTable("users", {
@@ -41,7 +42,7 @@ export type User = z.infer<typeof selectUserSchema>;
 export const userProfileTable = pgTable("user_profiles", {
 	id,
 	...timestamps,
-	userId: varchar({ length })
+	userId: varchar(ID_SIZE_CONFIG)
 		.notNull()
 		.references(() => userTable.id),
 	displayName: varchar({ length: 255 }),
@@ -59,14 +60,47 @@ export const userProfileTableRelations = relations(
 	}),
 );
 
-export const insertUserProfileSchema = createInsertSchema(userProfileTable);
+export const insertUserProfileSchema = createInsertSchema(
+	userProfileTable,
+).omit({
+	createdAt: true,
+});
 export const selectUserProfileSchema = createSelectSchema(userProfileTable);
 export type UserProfile = z.infer<typeof selectUserProfileSchema>;
+
+export const userContactTable = pgTable("user_contacts", {
+	id,
+	createdAt,
+	userId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id),
+	contactId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id),
+});
+
+export const userContactTableRelations = relations(
+	userContactTable,
+	({ one }) => ({
+		user: one(userTable, {
+			fields: [userContactTable.userId],
+			references: [userTable.id],
+		}),
+		contact: one(userTable, {
+			fields: [userContactTable.contactId],
+			references: [userTable.id],
+		}),
+	}),
+);
+
+export const insertUserContactSchema = createInsertSchema(userContactTable);
+export const selectUserContactSchema = createSelectSchema(userContactTable);
+export type UserContact = z.infer<typeof selectUserContactSchema>;
 
 // * Session
 export const sessionTable = pgTable("sessions", {
 	token: varchar({ length: 64 }).primaryKey(),
-	userId: varchar({ length })
+	userId: varchar(ID_SIZE_CONFIG)
 		.notNull()
 		.references(() => userTable.id),
 	expiresAt: timestamp({

@@ -17,4 +17,4 @@ const cuidParamSchema = z.object({
 	id: cuidSchema,
 });
 
-export { createId, isCuid, length, cuidSchema, cuidParamSchema };
+export { createId, isCuid, length as LENGTH, cuidSchema, cuidParamSchema };
