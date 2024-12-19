@@ -1,7 +1,7 @@
-import { sessionTable } from "./session.sql";
-import { chatMemberTable } from "./chat.sql";
-import { id, ID_SIZE_CONFIG, timestamps } from "./utils";
 import { relations } from "drizzle-orm";
+import { chatMemberTable } from "./chat.sql";
+import { sessionTable } from "./session.sql";
+import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
 import { pgTable, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";

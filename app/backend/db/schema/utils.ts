@@ -1,4 +1,4 @@
-import { createId, LENGTH } from "@application-project-ws24/cuid";
+import { LENGTH, createId } from "@application-project-ws24/cuid";
 import { timestamp, varchar } from "drizzle-orm/pg-core";
 
 const ID_SIZE_CONFIG = { length: LENGTH };
