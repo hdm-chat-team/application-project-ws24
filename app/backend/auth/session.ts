@@ -3,7 +3,7 @@ import {
 	insertSession,
 	selectSessionById,
 	updateSessionExpiresAt,
-} from "#db/queries.sql";
+} from "#db/queries";
 import type { Session, User } from "#db/schema.sql";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;

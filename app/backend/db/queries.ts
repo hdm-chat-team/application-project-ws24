@@ -1,6 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import db from "./db";
-import { sessionTable, userProfileTable, userTable } from "./schema.sql";
+import { sessionTable } from "./schema/session.sql";
+import { userProfileTable, userTable } from "./schema/user.sql";
+
 
 // * Session Queries
 export const insertSession = db
