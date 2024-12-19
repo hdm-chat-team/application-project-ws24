@@ -1,5 +1,6 @@
 import { describe, expect, mock, spyOn, test } from "bun:test";
-import type { Session, User } from "#db/schema.sql";
+import type { User } from "#db/schema/user.sql";
+import type { Session } from "#db/schema/session.sql";
 import * as session from "../auth/session";
 import { createApi } from "./factory";
 import { protectedRoute } from "./middleware";

@@ -4,7 +4,8 @@ import {
 	selectSessionById,
 	updateSessionExpiresAt,
 } from "#db/queries";
-import type { Session, User } from "#db/schema.sql";
+import type { User } from "#db/schema/user.sql";
+import type { Session } from "#db/schema/session.sql";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const SESSION_DURATION = ONE_DAY * 30;

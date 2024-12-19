@@ -1,5 +1,6 @@
 import type { Env as HonoEnv } from "hono";
-import type { Session, User } from "#db/schema.sql";
+import type { User } from "#db/schema/user.sql";
+import type { Session } from "#db/schema/session.sql";
 
 export interface Env extends HonoEnv {
 	Variables: {

@@ -5,11 +5,7 @@ import { setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import {
-	insertProfile,
-	insertUser,
-	selectUserByGithubId,
-} from "#db/queries.sql";
+import { insertProfile, insertUser, selectUserByGithubId } from "#db/queries";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import { createRouter } from "#lib/factory";

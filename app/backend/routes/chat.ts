@@ -1,5 +1,6 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
+import { chatMemberTable, chatTable } from "#db/schema/chat.sql";
 import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 import { getServer } from "#lib/utils";
