@@ -1,10 +1,11 @@
+import { cuidSchema } from "@application-project-ws24/cuid";
 import { eq, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
 	createUpdateSchema,
 } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 import db from "#db";
 import { userProfileTable, userTable } from "./users.sql";
 
@@ -13,7 +14,10 @@ const selectUserSchema = createSelectSchema(userTable);
 type User = z.infer<typeof selectUserSchema>;
 
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
-const updateUserProfileSchema = createUpdateSchema(userProfileTable).omit({
+const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
+	avatarUrl: z.string().nonempty(),
+	displayName: z.string().nonempty(),
+}).omit({
 	userId: true,
 	createdAt: true,
 	id: true,
@@ -37,10 +41,40 @@ const insertProfile = db
 	.values({
 		userId: sql.placeholder("userId"),
 		displayName: sql.placeholder("displayname"),
-		avatar_url: sql.placeholder("avatar_url"),
-		html_url: sql.placeholder("html_url"),
+		avatarUrl: sql.placeholder("avatar_url"),
+		htmlUrl: sql.placeholder("html_url"),
 	})
 	.returning({ id: userProfileTable.id });
+
+const getUserProfile = db.query.userProfileTable
+	.findFirst({
+		with: { owner: true },
+		where: eq(userProfileTable.userId, sql.placeholder("id")),
+	})
+	.prepare("get_user_profile");
+
+async function updateUserProfile(
+	userId: string,
+	newValues: {
+		avatarUrl: string;
+		displayName: string;
+	},
+) {
+	const { avatarUrl, displayName } = newValues;
+	return await db
+		.insert(userProfileTable)
+		.values({
+			userId: userId,
+			displayName,
+			avatarUrl,
+		})
+		.onConflictDoUpdate({
+			target: userProfileTable.userId,
+			set: { avatarUrl, displayName },
+		})
+		.returning()
+		.then((rows) => rows[0]);
+}
 
 const selectUserByGithubId = db.query.userTable
 	.findFirst({
@@ -59,5 +93,7 @@ export {
 	insertUser,
 	insertProfile,
 	selectUserByGithubId,
+	getUserProfile,
+	updateUserProfile,
 };
 export type { User, UserProfile };

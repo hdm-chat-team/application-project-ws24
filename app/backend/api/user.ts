@@ -1,11 +1,12 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
-import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
-import db from "#db";
-import { updateUserProfileSchema } from "#db/users";
-import { userProfileTable } from "#db/users.sql";
+import {
+	getUserProfile,
+	updateUserProfile,
+	updateUserProfileSchema,
+} from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
 export const profileRouter = createRouter()
@@ -23,16 +24,16 @@ export const profileRouter = createRouter()
 		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const user = c.get("user");
-			const profile = c.req.valid("form");
+			const { avatarUrl, displayName } = c.req.valid("form");
 
-			const updatedProfile = await updateUserProfile.execute({
-				id: user.id,
-				...profile,
+			const updatedProfile = await updateUserProfile(user.id, {
+				avatarUrl,
+				displayName,
 			});
 
 			return c.json({
 				message: "profile updated!",
-				data: updatedProfile[0],
+				data: updatedProfile,
 			});
 		},
 	)
@@ -49,20 +50,3 @@ export const profileRouter = createRouter()
 			return c.json(userData);
 		},
 	);
-
-const getUserProfile = db.query.userProfileTable
-	.findFirst({
-		with: { owner: true },
-		where: eq(userProfileTable.userId, sql.placeholder("id")),
-	})
-	.prepare("get_user_profile");
-
-const updateUserProfile = db
-	.update(userProfileTable)
-	.set({
-		displayName: sql.placeholder("displayName") as unknown as string,
-		avatar_url: sql.placeholder("avatar_url") as unknown as string,
-	})
-	.where(eq(userProfileTable.userId, sql.placeholder("id")))
-	.returning()
-	.prepare("update_user_profile");

@@ -28,8 +28,8 @@ export const userProfileTable = pgTable("user_profiles", {
 		.notNull()
 		.references(() => userTable.id),
 	displayName: varchar({ length: 255 }),
-	avatar_url: varchar({ length: 255 }),
-	html_url: varchar({ length: 255 }),
+	avatarUrl: varchar({ length: 255 }),
+	htmlUrl: varchar({ length: 255 }),
 });
 
 export const userProfileTableRelations = relations(
