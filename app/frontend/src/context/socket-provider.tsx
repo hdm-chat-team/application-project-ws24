@@ -85,6 +85,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	// * Connection Management
 	const connect = useCallback(() => {
+		if (
+			socketRef.current?.readyState === WebSocket.CONNECTING ||
+			socketRef.current?.readyState === WebSocket.OPEN
+		) {
+			return;
+		}
+		console.log("🔌 Connecting to WebSocket...");
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
 		socketRef.current.onmessage = handleMessage;
