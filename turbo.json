@@ -11,6 +11,8 @@
 			"cache": false,
 			"persistent": true
 		},
+		"test": { "inputs": [".env*"] },
+		"test:watch": { "inputs": [".env*"], "persistent": true },
 		"preview": {
 			"dependsOn": ["^build", "build"],
 			"inputs": ["dist", ".env*"],

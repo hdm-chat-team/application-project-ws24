@@ -5,9 +5,12 @@
 		"check": "biome check",
 		"check:fix": "biome check --write",
 		"build": "turbo build",
-		"ui": "bun run --filter=@application-project-ws24/frontend ui",
 		"dev": "turbo dev",
-		"preview": "turbo preview"
+		"preview": "turbo preview",
+		"db": "cd app && bun db",
+		"ui": "cd app/frontend && bun ui",
+		"test": "cd app && bun run test",
+		"test:watch": "turbo test:watch"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -15,9 +18,9 @@
 		"typescript": "5.7.2"
 	},
 	"engines": {
-		"bun": ">=1.1.36"
+		"bun": ">=1.1.41"
 	},
-	"packageManager": "bun@1.1.36",
+	"packageManager": "bun@1.1.41",
 	"workspaces": ["app", "app/frontend", "packages/*"],
 	"trustedDependencies": [
 		"@biomejs/biome",
