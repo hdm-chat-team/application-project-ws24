@@ -1,4 +1,3 @@
-import { cuidSchema } from "@application-project-ws24/cuid";
 import { eq, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
@@ -83,17 +82,17 @@ const selectUserByGithubId = db.query.userTable
 	.prepare("select_user_by_github_id");
 
 export {
-	// * User schemas
-	insertUserSchema,
-	selectUserSchema,
-	insertUserProfileSchema,
-	updateUserProfileSchema,
-	selectUserProfileSchema,
+	getUserProfile,
+	insertProfile,
 	// * User queries
 	insertUser,
-	insertProfile,
+	insertUserProfileSchema,
+	// * User schemas
+	insertUserSchema,
 	selectUserByGithubId,
-	getUserProfile,
+	selectUserProfileSchema,
+	selectUserSchema,
 	updateUserProfile,
+	updateUserProfileSchema,
 };
 export type { User, UserProfile };
