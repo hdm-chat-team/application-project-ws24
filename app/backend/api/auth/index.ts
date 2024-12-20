@@ -4,6 +4,7 @@ import { createRouter } from "#lib/factory";
 import { protectedRoute } from "#lib/middleware";
 import { githubRouter } from "./github";
 import { signoutQuerySchema } from "./index.schemas";
+import { deleteCookie } from "hono/cookie";
 
 const REDIRECT_URL = "http://localhost:5173";
 
@@ -20,7 +21,9 @@ export const authRouter = createRouter()
 		async (c) => {
 			const { token } = c.get("session");
 			const { from } = c.req.valid("query");
+
 			await invalidateSession(token);
+			deleteCookie(c, "auth_session");
 			return c.redirect(from ?? REDIRECT_URL);
 		},
 	);
