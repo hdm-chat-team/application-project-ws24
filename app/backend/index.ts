@@ -1,7 +1,7 @@
 import { createBunWebSocket } from "hono/bun";
+import app from "#api/app";
 import env from "#env";
 import { setServer } from "#lib/utils";
-import app from "./app";
 
 // * Setup
 const { websocket } = createBunWebSocket();
@@ -14,5 +14,4 @@ export const server = Bun.serve({
 });
 
 setServer(server);
-
 console.log(`Server is running at ${server.url}`);
