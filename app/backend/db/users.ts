@@ -1,5 +1,9 @@
 import { eq, sql } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
 import { userProfileTable, userTable } from "./users.sql";
@@ -9,6 +13,12 @@ const selectUserSchema = createSelectSchema(userTable);
 type User = z.infer<typeof selectUserSchema>;
 
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
+const updateUserProfileSchema = createUpdateSchema(userProfileTable).omit({
+	userId: true,
+	createdAt: true,
+	id: true,
+	updatedAt: true,
+});
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
 
@@ -43,6 +53,7 @@ export {
 	insertUserSchema,
 	selectUserSchema,
 	insertUserProfileSchema,
+	updateUserProfileSchema,
 	selectUserProfileSchema,
 	// * User queries
 	insertUser,

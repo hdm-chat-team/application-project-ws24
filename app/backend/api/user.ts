@@ -1,21 +1,12 @@
+import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
-import { z } from "zod";
 import { createRouter } from "#api/factory";
 import db from "#db";
-import { selectUserProfileSchema } from "#db/users";
+import { updateUserProfileSchema } from "#db/users";
 import { userProfileTable } from "#db/users.sql";
 import { protectedRoute } from "#lib/middleware";
-
-const GUIDParamSchema = z.object({
-	id: z.string(),
-});
-
-const profileEditSchema = selectUserProfileSchema.pick({
-	displayName: true,
-	avatar_url: true,
-});
 
 export const profileRouter = createRouter()
 	.get("/me", protectedRoute, async (c) => {
@@ -29,7 +20,7 @@ export const profileRouter = createRouter()
 	.get(
 		"/:id",
 		protectedRoute,
-		zValidator("param", GUIDParamSchema),
+		zValidator("param", cuidParamSchema),
 		async (c) => {
 			const { id } = c.req.valid("param");
 			const userData = await getUserProfile.execute({ id });
@@ -42,7 +33,7 @@ export const profileRouter = createRouter()
 	.put(
 		"/me",
 		protectedRoute,
-		zValidator("form", profileEditSchema),
+		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const user = c.get("user");
 			const profile = c.req.valid("form");
