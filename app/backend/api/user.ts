@@ -17,19 +17,6 @@ export const profileRouter = createRouter()
 		}
 		return c.json(data);
 	})
-	.get(
-		"/:id",
-		protectedRoute,
-		zValidator("param", cuidParamSchema),
-		async (c) => {
-			const { id } = c.req.valid("param");
-			const userData = await getUserProfile.execute({ id });
-			if (!userData) {
-				throw new HTTPException(404, { message: "profile not found" });
-			}
-			return c.json(userData);
-		},
-	)
 	.put(
 		"/me",
 		protectedRoute,
@@ -47,6 +34,19 @@ export const profileRouter = createRouter()
 				message: "profile updated!",
 				data: updatedProfile[0],
 			});
+		},
+	)
+	.get(
+		"/:id",
+		protectedRoute,
+		zValidator("param", cuidParamSchema),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const userData = await getUserProfile.execute({ id });
+			if (!userData) {
+				throw new HTTPException(404, { message: "profile not found" });
+			}
+			return c.json(userData);
 		},
 	);
 
@@ -66,5 +66,3 @@ const updateUserProfile = db
 	.where(eq(userProfileTable.userId, sql.placeholder("id")))
 	.returning()
 	.prepare("update_user_profile");
-
-export type ProfileRoute = typeof profileRouter;
