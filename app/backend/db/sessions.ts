@@ -13,8 +13,8 @@ const insertSession = db
 	.values({
 		token: sql.placeholder("token"),
 		userId: sql.placeholder("userId"),
-		expiresAt: sql.placeholder("expiresAt"),
 	})
+	.returning()
 	.prepare("insert_session");
 
 const selectSessionById = db.query.sessionTable
@@ -32,9 +32,10 @@ const deleteSessionByToken = db
 const updateSessionExpiresAt = db
 	.update(sessionTable)
 	.set({
-		expiresAt: sql.placeholder("expiresAt") as unknown as Date,
+		expiresAt: sql`now() + interval '30 days'`,
 	})
 	.where(eq(sessionTable.token, sql.placeholder("token")))
+	.returning({ newExpiresAt: sessionTable.expiresAt })
 	.prepare("update_session_expires_at");
 
 export {

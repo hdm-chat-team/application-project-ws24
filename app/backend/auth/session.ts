@@ -36,15 +36,16 @@ export async function createSession(
 	userId: string,
 	token: string,
 ): Promise<Session> {
-	const session = {
-		token: hashToken(token),
-		userId,
-		expiresAt: new Date(Date.now() + SESSION_DURATION),
-	};
-	await insertSession.execute(session).catch((error) => {
-		console.error("Failed to insert session:", error);
-		throw new Error("Failed to insert session");
-	});
+	const session = await insertSession
+		.execute({
+			token: hashToken(token),
+			userId,
+		})
+		.catch((error) => {
+			console.error("Failed to insert session:", error);
+			throw new Error("Failed to insert session");
+		})
+		.then((rows) => rows[0]);
 	return session;
 }
 
@@ -70,11 +71,11 @@ export async function validateSessionToken(
 	}
 
 	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
-		const newExpiresAt = new Date(Date.now() + SESSION_DURATION);
-		await updateSessionExpiresAt.execute({
-			token: sessionToken,
-			expiresAt: newExpiresAt,
-		});
+		const { newExpiresAt } = await updateSessionExpiresAt
+			.execute({
+				token: sessionToken,
+			})
+			.then((rows) => rows[0]);
 		session.expiresAt = newExpiresAt;
 		fresh = true;
 	}

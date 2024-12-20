@@ -12,7 +12,17 @@ import * as sessionManager from "./session";
 describe("session", () => {
 	let mockQueries = {
 		deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
-		insertSession: { execute: mock(() => Promise.resolve()) },
+		insertSession: {
+			execute: mock(() =>
+				Promise.resolve([
+					{
+						token: "test-token",
+						userId: "test-user-id",
+						expiresAt: new Date(),
+					},
+				]),
+			),
+		},
 		selectSessionById: {
 			execute: mock(() =>
 				Promise.resolve({
@@ -23,14 +33,32 @@ describe("session", () => {
 				}),
 			),
 		},
-		updateSessionExpiresAt: { execute: mock(() => Promise.resolve()) },
+		updateSessionExpiresAt: {
+			execute: mock(() =>
+				Promise.resolve([
+					{
+						newExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+					},
+				]),
+			),
+		},
 	};
 
 	beforeEach(() => {
 		// Reset mocks before each test
 		mockQueries = {
 			deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
-			insertSession: { execute: mock(() => Promise.resolve()) },
+			insertSession: {
+				execute: mock(() =>
+					Promise.resolve([
+						{
+							token: "test-token",
+							userId: "test-user-id",
+							expiresAt: new Date(),
+						},
+					]),
+				),
+			},
 			selectSessionById: {
 				execute: mock(() =>
 					Promise.resolve({
@@ -41,7 +69,15 @@ describe("session", () => {
 					}),
 				),
 			},
-			updateSessionExpiresAt: { execute: mock(() => Promise.resolve()) },
+			updateSessionExpiresAt: {
+				execute: mock(() =>
+					Promise.resolve([
+						{
+							newExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+						},
+					]),
+				),
+			},
 		};
 
 		mock.module("#db/sessions", () => mockQueries);
@@ -68,7 +104,15 @@ describe("session", () => {
 			const userId = "test-user-id";
 			const token = "test-token";
 
-			mockQueries.insertSession.execute = mock(() => Promise.resolve());
+			mockQueries.insertSession.execute = mock(() =>
+				Promise.resolve([
+					{
+						token: "test-token",
+						userId: "test-user-id",
+						expiresAt: new Date(),
+					},
+				]),
+			);
 			const session = await sessionManager.createSession(userId, token);
 
 			expect(session).toHaveProperty("token");
@@ -148,7 +192,11 @@ describe("session", () => {
 				Promise.resolve(mockSession),
 			);
 			mockQueries.updateSessionExpiresAt.execute = mock(() =>
-				Promise.resolve(),
+				Promise.resolve([
+					{
+						newExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+					},
+				]),
 			);
 
 			const result =
