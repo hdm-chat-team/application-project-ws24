@@ -11,8 +11,8 @@ import { protectedRoute } from "#lib/middleware";
 
 export const profileRouter = createRouter()
 	.get("/me", protectedRoute, async (c) => {
-		const user = c.get("user");
-		const data = await getUserProfile.execute({ id: user.id });
+		const { id } = c.get("user");
+		const data = await getUserProfile.execute({ id });
 		if (!data) {
 			throw new HTTPException(404, { message: "profile not found" });
 		}
@@ -29,6 +29,8 @@ export const profileRouter = createRouter()
 			const updatedProfile = await updateUserProfile(user.id, {
 				avatarUrl,
 				displayName,
+			}).catch((error) => {
+				throw new HTTPException(400, { message: error.message });
 			});
 
 			return c.json({

@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { createId } from "@application-project-ws24/cuid";
 import { testClient } from "hono/testing";
 import { createApi } from "#api/factory";
-import { chatRouter } from "./chat";
+import { chatRouter } from ".";
 
 const { chat } = testClient(createApi().route("/chat", chatRouter));
 
