@@ -1,6 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { invalidateSession } from "#auth/session";
-import { createRouter } from "#lib/factory";
+import { createRouter } from "#api/factory";
 import { protectedRoute } from "#lib/middleware";
 import { githubRouter } from "./github";
 import { signoutQuerySchema } from "./index.schemas";

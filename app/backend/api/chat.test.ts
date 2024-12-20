@@ -1,4 +1,4 @@
-import { createApi } from "#lib/factory";
+import { createApi } from "#api/factory";
 import { createId } from "@application-project-ws24/cuid";
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";

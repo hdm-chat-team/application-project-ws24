@@ -14,7 +14,7 @@ import type { User } from "#db/users";
 import type { Session } from "#db/sessions";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
-import type { Env } from "#lib/types";
+import type { Env } from "#api/types";
 
 const origin = DEV
 	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
@@ -54,13 +54,14 @@ const limiter = rateLimiter({
  * - session: Session object or null
  */
 const authMiddleware = createMiddleware<Env>(async (c, next) => {
-	const sessionId = getCookie(c, "auth_session") ?? null;
-	if (!sessionId) {
+	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
+	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
 		return next();
 	}
-	const { session, user, fresh } = await validateSessionToken(sessionId);
+	const { session, user, fresh } =
+		await validateSessionToken(sessionCookieToken);
 
 	if (session && fresh) {
 		setCookie(c, "auth_session", session.token, {

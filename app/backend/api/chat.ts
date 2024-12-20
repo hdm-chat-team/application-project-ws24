@@ -1,6 +1,6 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
-import { createRouter } from "#lib/factory";
+import { createRouter } from "#api/factory";
 import { protectedRoute } from "#lib/middleware";
 import { getServer } from "#lib/utils";
 import {

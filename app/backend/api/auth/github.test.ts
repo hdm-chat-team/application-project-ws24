@@ -1,6 +1,6 @@
 import { describe, expect, mock, test } from "bun:test";
 import { testClient } from "hono/testing";
-import { createRouter } from "#lib/factory";
+import { createRouter } from "#api/factory";
 import { githubRouter } from "./github";
 
 const MOCK_STATE = crypto.randomUUID();

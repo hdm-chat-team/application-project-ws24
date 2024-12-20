@@ -8,8 +8,8 @@ import { createSession, generateSessionToken } from "#auth/session";
 import { insertProfile, insertUser, selectUserByGithubId } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
-import { createRouter } from "#lib/factory";
-import type { Env, GitHubUser } from "#lib/types";
+import { createRouter } from "#api/factory";
+import type { Env, GitHubUser } from "#api/types";
 import {
 	callbackCookieSchema,
 	callbackQuerySchema,

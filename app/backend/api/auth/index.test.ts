@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";
-import { createRouter } from "#lib/factory";
+import { createRouter } from "#api/factory";
 import { authRouter } from ".";
 
 const { auth } = testClient(createRouter().route("/auth", authRouter));

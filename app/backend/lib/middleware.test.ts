@@ -2,7 +2,7 @@ import { describe, expect, mock, spyOn, test } from "bun:test";
 import type { User } from "#db/users";
 import type { Session } from "#db/sessions";
 import * as session from "../auth/session";
-import { createApi } from "#lib/factory";
+import { createApi } from "#api/factory";
 import { protectedRoute } from "./middleware";
 
 mock.module("#auth/session", () => ({
