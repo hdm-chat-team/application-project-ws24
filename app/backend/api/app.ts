@@ -3,6 +3,7 @@ import { createApi, createRouter } from "#api/factory";
 import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
 import { socketRouter } from "./socket";
+import profileRouter from "./user";
 
 // * API
 const apiRouter = createApi();
@@ -12,6 +13,7 @@ const apiRoutes = apiRouter
 	.route("/auth", authRouter)
 	.route("/socket", socketRouter)
 	.route("/chat", chatRouter)
+	.route("/profile", profileRouter)
 	.get("/", (c) => {
 		return c.text("Connected!");
 	});
