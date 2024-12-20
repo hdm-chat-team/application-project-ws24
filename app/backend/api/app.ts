@@ -3,7 +3,7 @@ import { createApi, createRouter } from "#api/factory";
 import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
 import { socketRouter } from "./socket";
-import profileRouter from "./user";
+import { profileRouter } from "./user";
 
 // * API
 const apiRouter = createApi();

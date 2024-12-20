@@ -17,7 +17,7 @@ const profileEditSchema = selectUserProfileSchema.pick({
 	avatar_url: true,
 });
 
-const profileRouter = createRouter()
+export const profileRouter = createRouter()
 	.get("/me", protectedRoute, async (c) => {
 		const user = c.get("user");
 		const data = await getUserProfile.execute({ id: user.id });
@@ -26,7 +26,6 @@ const profileRouter = createRouter()
 		}
 		return c.json(data);
 	})
-
 	.get(
 		"/:id",
 		protectedRoute,
@@ -40,7 +39,6 @@ const profileRouter = createRouter()
 			return c.json(userData);
 		},
 	)
-
 	.put(
 		"/me",
 		protectedRoute,
@@ -78,5 +76,4 @@ const updateUserProfile = db
 	.returning()
 	.prepare("update_user_profile");
 
-export default profileRouter;
 export type ProfileRoute = typeof profileRouter;
