@@ -1,8 +1,8 @@
 import { serveStatic } from "hono/bun";
 import { createApi, createRouter } from "#lib/factory";
-import { authRouter } from "./routes/auth";
-import { chatRouter } from "./routes/chat";
-import { socketRouter } from "./routes/socket";
+import { authRouter } from "./auth";
+import { chatRouter } from "./chat";
+import { socketRouter } from "./socket";
 
 // * API
 const apiRouter = createApi();

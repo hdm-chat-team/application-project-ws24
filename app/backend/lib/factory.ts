@@ -1,6 +1,6 @@
 import { Hono } from "hono";
-import { onError } from "./middleware";
-import { securityMiddlewares, utilityMiddlewares } from "./middleware";
+import { onError } from "#lib/middleware";
+import { securityMiddlewares, utilityMiddlewares } from "#lib/middleware";
 import type { Env } from "./types";
 
 export function createRouter() {

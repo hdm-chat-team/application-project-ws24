@@ -14,7 +14,7 @@ import type { User } from "#db/users";
 import type { Session } from "#db/sessions";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
-import type { Env } from "./types";
+import type { Env } from "#lib/types";
 
 const origin = DEV
 	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
