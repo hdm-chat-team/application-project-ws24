@@ -7,7 +7,6 @@ export function useChat() {
 	const context = useContext(SocketContext);
 	if (context === undefined)
 		throw new Error("useConnection must be used within a SocketProvider");
-
 	const { addEventListener, removeEventListener } = context;
 
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -18,25 +17,21 @@ export function useChat() {
 	}, []);
 
 	const handleMessage = useCallback(async (event: Event) => {
-		try {
-			const messageEvent = event as MessageEvent;
-			const message: Message = parseMessage(messageEvent.data);
-			if (message?.id) {
-				setMessages((prevMessages) => [...prevMessages, message]);
-				await db.messages.add(message);
-			}
-		} catch (error) {
-			console.error("Failed to parse message:", error);
+		const messageEvent = event as MessageEvent;
+		const message: Message = parseMessage(messageEvent.data);
+		if (message?.id) {
+			setMessages((prevMessages) => [...prevMessages, message]);
+			await db.messages.add(message);
 		}
 	}, []);
 
 	useEffect(() => {
-		addEventListener("open", handleOpen);
-		addEventListener("message", handleMessage);
+		addEventListener("OPEN", handleOpen);
+		addEventListener("MESSAGE", handleMessage);
 
 		return () => {
-			removeEventListener("open", handleOpen);
-			removeEventListener("message", handleMessage);
+			removeEventListener("OPEN", handleOpen);
+			removeEventListener("MESSAGE", handleMessage);
 		};
 	}, [addEventListener, removeEventListener, handleOpen, handleMessage]);
 

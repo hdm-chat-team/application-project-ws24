@@ -12,17 +12,25 @@ const RECONNECTION_ATTEMPTS = 5;
 const MAX_RECONNECTION_DELAY = 10000;
 const INITIAL_RECONNECTION_DELAY = 1000;
 
+const WebSocketEvents = {
+	OPEN: "open",
+	MESSAGE: "message",
+	ERROR: "error",
+	CLOSE: "close",
+} as const;
+
+type WebSocketEventName = keyof typeof WebSocketEvents;
 type SocketEventHandler = (event: Event) => void;
 
 type SocketContextType = {
 	socket: WebSocket | null;
 	readyState: number;
 	addEventListener: (
-		event: keyof WebSocketEventMap,
+		event: WebSocketEventName,
 		handler: SocketEventHandler,
 	) => void;
 	removeEventListener: (
-		event: keyof WebSocketEventMap,
+		event: WebSocketEventName,
 		handler: SocketEventHandler,
 	) => void;
 };
@@ -75,7 +83,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		}
 	}, []);
 
-	// Connection Management
+	// * Connection Management
 	const connect = useCallback(() => {
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
@@ -85,7 +93,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	}, [handleOpen, handleMessage, handleError, handleClose]);
 
 	const addEventListener = useCallback(
-		(event: string, handler: SocketEventHandler) => {
+		(event: WebSocketEventName, handler: SocketEventHandler) => {
 			if (socketRef.current) {
 				socketRef.current.addEventListener(event, handler);
 			}
@@ -94,7 +102,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	);
 
 	const removeEventListener = useCallback(
-		(event: string, handler: SocketEventHandler) => {
+		(event: WebSocketEventName, handler: SocketEventHandler) => {
 			if (socketRef.current) {
 				socketRef.current.removeEventListener(event, handler);
 			}
@@ -107,7 +115,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		connect();
 		return () => {
 			if (socketRef.current?.readyState === WebSocket.OPEN) {
-				socketRef.current?.close();
+				socketRef.current.close();
 			}
 			clearTimeout(reconnectTimeoutRef.current);
 		};
