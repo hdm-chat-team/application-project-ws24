@@ -9,12 +9,12 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
+import type { Env } from "#api/types";
 import { validateSessionToken } from "#auth/session";
-import type { User } from "#db/users";
 import type { Session } from "#db/sessions";
+import type { User } from "#db/users";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
-import type { Env } from "#api/types";
 
 const origin = DEV
 	? ["http://localhost:5173", `http://localhost:${env.PORT}`]

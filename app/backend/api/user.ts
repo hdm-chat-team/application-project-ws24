@@ -2,10 +2,10 @@ import { zValidator } from "@hono/zod-validator";
 import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+import { createRouter } from "#api/factory";
 import db from "#db";
 import { selectUserProfileSchema } from "#db/users";
 import { userProfileTable } from "#db/users.sql";
-import { createRouter } from "#api/factory";
 import { protectedRoute } from "#lib/middleware";
 
 const GUIDParamSchema = z.object({

@@ -1,12 +1,12 @@
-import type { User, UserProfile } from "#db/users";
-import { selectUserProfileSchema } from "#db/users";
-import { protectedRoute } from "#lib/middleware";
-import type { Env } from "#api/types";
-import { zValidator } from "@hono/zod-validator";
 import { describe, expect, mock, test } from "bun:test";
+import { zValidator } from "@hono/zod-validator";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { z } from "zod";
+import type { Env } from "#api/types";
+import type { User, UserProfile } from "#db/users";
+import { selectUserProfileSchema } from "#db/users";
+import { protectedRoute } from "#lib/middleware";
 
 const GUIDParamSchema = z.object({
 	id: z

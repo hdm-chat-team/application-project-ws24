@@ -1,7 +1,7 @@
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
-import type { User } from "#db/users";
 import { createRouter } from "#api/factory";
+import type { User } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
 const { upgradeWebSocket } = createBunWebSocket();

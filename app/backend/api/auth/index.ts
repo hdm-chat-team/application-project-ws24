@@ -1,10 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
-import { invalidateSession } from "#auth/session";
+import { deleteCookie } from "hono/cookie";
 import { createRouter } from "#api/factory";
+import { invalidateSession } from "#auth/session";
 import { protectedRoute } from "#lib/middleware";
 import { githubRouter } from "./github";
 import { signoutQuerySchema } from "./index.schemas";
-import { deleteCookie } from "hono/cookie";
 
 const REDIRECT_URL = "http://localhost:5173";
 
