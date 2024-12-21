@@ -1,6 +1,6 @@
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserCircle } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area"; // shadcn scroll area
-import { Badge } from "@/components/ui/badge"; // shadcn badge
 
 interface User {
 	id: string;
@@ -36,10 +36,14 @@ const Sidebar: React.FC<SidebarProps> = ({ users, onSelectUser }) => {
 								<div className="flex-1">
 									<div className="flex justify-between">
 										<span className="font-medium">{user.name}</span>
-										<span className="text-gray-500 text-xs">{user.timestamp}</span>
+										<span className="text-gray-500 text-xs">
+											{user.timestamp}
+										</span>
 									</div>
-									<div className="flex justify-between items-center">
-										<p className="truncate text-gray-400 text-sm">{user.message}</p>
+									<div className="flex items-center justify-between">
+										<p className="truncate text-gray-400 text-sm">
+											{user.message}
+										</p>
 										{user.unreadCount && (
 											<Badge variant="destructive" className="text-xs">
 												{user.unreadCount}

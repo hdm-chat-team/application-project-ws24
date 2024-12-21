@@ -1,4 +1,4 @@
-import React from "react";
+import type React from "react";
 
 interface IChatNav {
 	username: string;
@@ -7,7 +7,7 @@ interface IChatNav {
 
 const ChatNav: React.FC<IChatNav> = ({ username, profilePicture }) => {
 	return (
-		<div className="flex items-center gap-4 p-4 bg-gray-800 text-white border-b border-gray-700">
+		<div className="flex items-center gap-4 border-gray-700 border-b bg-gray-800 p-4 text-white">
 			{profilePicture ? (
 				<img
 					src={profilePicture}
@@ -17,7 +17,7 @@ const ChatNav: React.FC<IChatNav> = ({ username, profilePicture }) => {
 			) : (
 				<div className="h-10 w-10 rounded-full bg-gray-400" />
 			)}
-			<span className="text-lg font-medium">{username}</span>
+			<span className="font-medium text-lg">{username}</span>
 		</div>
 	);
 };
