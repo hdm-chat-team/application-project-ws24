@@ -1,4 +1,4 @@
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/(app)/_authenticated")({
 	component: () => (
 		<SocketProvider>
 			<Outlet />
-			<Toaster />
+			<Toaster closeButton richColors />
 		</SocketProvider>
 	),
 });
