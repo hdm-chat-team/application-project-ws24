@@ -11,7 +11,7 @@ import {
 
 const TopNav = () => {
 	return (
-		<div className="flex items-center justify-between bg-red-600 px-4 py-3 text-white shadow-md">
+		<div className="flex items-center justify-between bg-red-600 dark:bg-slate-900 px-4 py-3 text-white shadow-md">
 			<div className="flex items-center space-x-2">
 				<img src={Logo} alt="Logo" className="h-1 w-10 sm:h-8 sm:w-8" />
 				<span className="truncate font-semibold text-sm sm:text-lg">

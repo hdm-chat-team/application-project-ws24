@@ -1,3 +1,4 @@
+import ChatNav from "@/components/nav/chat-nav";
 import { Button } from "../ui/button";
 
 interface Message {
@@ -13,6 +14,8 @@ interface ChatContentProps {
 	handleSubmit: (e: React.FormEvent) => void;
 	inputMessage: string;
 	setInputMessage: React.Dispatch<React.SetStateAction<string>>;
+	username: string;
+	profilePicture?: string;
 }
 
 const ChatContent: React.FC<ChatContentProps> = ({
@@ -21,9 +24,12 @@ const ChatContent: React.FC<ChatContentProps> = ({
 	handleSubmit,
 	inputMessage,
 	setInputMessage,
+	username,
+	profilePicture,
 }) => {
 	return (
-		<div className="flex h-[90%] w-3/4 flex-col bg-gray-100">
+		<div className="flex h-full w-3/4 flex-col bg-gray-100 dark:bg-slate-500 dark:text-white">
+			<ChatNav username={username} profilePicture={profilePicture} />
 			<div className="flex-1 space-y-4 overflow-y-auto p-4">
 				{messages.map((msg) => (
 					<div

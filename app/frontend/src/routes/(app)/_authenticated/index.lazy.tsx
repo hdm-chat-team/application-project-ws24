@@ -17,7 +17,12 @@ function Index() {
 	>([]);
 	const socketRef = useRef<WebSocket | null>(null);
 	const [inputMessage, setInputMessage] = useState("");
-	const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+	const [selectedUser, setSelectedUser] = useState<{
+		id: string;
+		username: string;
+		profilePicture?: string;
+	} | null>(null);
 
 	useEffect(() => {
 		const socket = api.chat.$ws();
@@ -46,7 +51,14 @@ function Index() {
 	}, []);
 
 	const handleSelectUser = (id: string) => {
-		setSelectedUser(id);
+		const user = users.find((user) => user.id === id);
+		if (user) {
+			setSelectedUser({
+				id: user.id,
+				username: user.name,
+				profilePicture: user.profilePicture, // Assume profilePicture exists in `users` data
+			});
+		}
 		setMessages([
 			{
 				id: "m1",
@@ -107,12 +119,14 @@ function Index() {
 						handleSubmit={handleSubmit}
 						inputMessage={inputMessage}
 						setInputMessage={setInputMessage}
+						username={selectedUser.username}
+						profilePicture={selectedUser.profilePicture}
 					/>
 				)}
 			</div>
-			<h1 className="text-3xl text-blue-300">
+			{/*<h1 className="text-3xl text-blue-300">
 				{isPending ? "Loading..." : data}
-			</h1>
+			</h1>*/}
 		</div>
 	);
 }

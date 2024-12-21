@@ -1,4 +1,6 @@
 import { UserCircle } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area"; // shadcn scroll area
+import { Badge } from "@/components/ui/badge"; // shadcn badge
 
 interface User {
 	id: string;
@@ -15,37 +17,41 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ users, onSelectUser }) => {
 	return (
-		<div className="h-full w-1/4 border-gray-700 border-r bg-gray-900 text-white">
-			<ul className="space-y-2">
-				{users.map((user) => (
-					<li
-						key={user.id}
-						onClick={() => onSelectUser(user.id)}
-						onKeyUp={(e) => {
-							if (e.key === "Enter" || e.key === " ") {
-								onSelectUser(user.id);
-							}
-						}}
-						className="flex cursor-pointer items-center gap-4 px-4 py-2 hover:bg-gray-700"
-					>
-						<UserCircle className="h-8 w-8 text-gray-400" />
-						<div className="flex-1">
-							<div className="flex justify-between">
-								<span className="font-medium">{user.name}</span>
-								<span className="text-gray-500 text-xs">{user.timestamp}</span>
-							</div>
-							<div className="flex justify-between">
-								<p className="truncate text-gray-400 text-sm">{user.message}</p>
-								{user.unreadCount && (
-									<span className="rounded-full bg-red-500 px-2 py-0.5 text-white text-xs">
-										{user.unreadCount}
-									</span>
-								)}
-							</div>
-						</div>
-					</li>
-				))}
-			</ul>
+		<div className="h-full w-1/4 border-r bg-gray-900 text-white">
+			<ScrollArea className="h-full">
+				<ul className="space-y-2 p-4">
+					{users.map((user) => (
+						<li key={user.id} className="rounded-md hover:bg-gray-800">
+							<button
+								type="button" // Explicitly set the button type to avoid unintended form submission behavior
+								onClick={() => onSelectUser(user.id)}
+								onKeyUp={(e) => {
+									if (e.key === "Enter" || e.key === " ") {
+										onSelectUser(user.id);
+									}
+								}}
+								className="flex w-full items-center gap-4 p-2 text-left focus:outline-none focus:ring-2 focus:ring-gray-600"
+							>
+								<UserCircle className="h-8 w-8 text-gray-400" />
+								<div className="flex-1">
+									<div className="flex justify-between">
+										<span className="font-medium">{user.name}</span>
+										<span className="text-gray-500 text-xs">{user.timestamp}</span>
+									</div>
+									<div className="flex justify-between items-center">
+										<p className="truncate text-gray-400 text-sm">{user.message}</p>
+										{user.unreadCount && (
+											<Badge variant="destructive" className="text-xs">
+												{user.unreadCount}
+											</Badge>
+										)}
+									</div>
+								</div>
+							</button>
+						</li>
+					))}
+				</ul>
+			</ScrollArea>
 		</div>
 	);
 };
