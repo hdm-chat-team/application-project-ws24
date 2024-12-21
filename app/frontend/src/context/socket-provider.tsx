@@ -1,4 +1,5 @@
 import api from "@/lib/api";
+import type { Message } from "@shared/message";
 import {
 	type ReactNode,
 	createContext,
@@ -22,18 +23,23 @@ const WebSocketEvents = {
 type WebSocketEventName =
 	(typeof WebSocketEvents)[keyof typeof WebSocketEvents];
 
-type SocketEventHandler = (event: Event) => void;
+type SocketEventMap = {
+	[WebSocketEvents.MESSAGE]: MessageEvent;
+	[WebSocketEvents.CLOSE]: CloseEvent;
+	[WebSocketEvents.ERROR]: Event;
+	[WebSocketEvents.OPEN]: Event;
+};
 
 type SocketContextType = {
 	socket: WebSocket | null;
 	readyState: number;
-	addEventListener: (
-		event: WebSocketEventName,
-		handler: SocketEventHandler,
+	addEventListener: <K extends WebSocketEventName>(
+		event: K,
+		handler: (event: SocketEventMap[K]) => void,
 	) => void;
-	removeEventListener: (
-		event: WebSocketEventName,
-		handler: SocketEventHandler,
+	removeEventListener: <K extends WebSocketEventName>(
+		event: K,
+		handler: (event: SocketEventMap[K]) => void,
 	) => void;
 };
 
@@ -50,22 +56,22 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	// * Event Handlers
 	const handleOpen = useCallback(() => {
-		toast("✅ WebSocket connected");
+		toast.success("WebSocket connected");
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
 	}, []);
 
 	const handleMessage = useCallback((event: MessageEvent) => {
-		const data = JSON.parse(event.data);
-		toast("📨 WebSocket message", data);
+		const data = JSON.parse(event.data) as Message;
+		toast.info("WebSocket message", { description: data.body });
 	}, []);
 
-	const handleError = useCallback((event: Event) => {
-		console.error("❌ WebSocket error", event);
+	const handleError = useCallback(() => {
+		toast.error("WebSocket error");
 	}, []);
 
 	const handleClose = useCallback(() => {
-		toast("🔌 WebSocket disconnected");
+		toast.warning("🔌 WebSocket disconnected");
 		setReadyState(WebSocket.CLOSED);
 
 		if (reconnectAttemptRef.current < RECONNECTION_ATTEMPTS) {
@@ -73,7 +79,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 				INITIAL_RECONNECTION_DELAY * 2 ** reconnectAttemptRef.current,
 				MAX_RECONNECTION_DELAY,
 			);
-			toast(`🔄 Attempting to reconnect in ${timeout}ms...`);
+			toast(`🔄 Attempting to reconnect in ${timeout / 1000} seconds...`);
 			reconnectTimeoutRef.current = setTimeout(() => {
 				reconnectAttemptRef.current += 1;
 				connect();
@@ -89,7 +95,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		) {
 			return;
 		}
-		toast("🔌 Connecting to WebSocket...");
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
 		socketRef.current.onmessage = handleMessage;
@@ -98,18 +103,24 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	}, [handleOpen, handleMessage, handleError, handleClose]);
 
 	const addEventListener = useCallback(
-		(event: WebSocketEventName, handler: SocketEventHandler) => {
+		<K extends WebSocketEventName>(
+			event: K,
+			handler: (event: SocketEventMap[K]) => void,
+		) => {
 			if (socketRef.current) {
-				socketRef.current.addEventListener(event, handler);
+				socketRef.current.addEventListener(event, handler as EventListener);
 			}
 		},
 		[],
 	);
 
 	const removeEventListener = useCallback(
-		(event: WebSocketEventName, handler: SocketEventHandler) => {
+		<K extends WebSocketEventName>(
+			event: K,
+			handler: (event: SocketEventMap[K]) => void,
+		) => {
 			if (socketRef.current) {
-				socketRef.current.removeEventListener(event, handler);
+				socketRef.current.removeEventListener(event, handler as EventListener);
 			}
 		},
 		[],

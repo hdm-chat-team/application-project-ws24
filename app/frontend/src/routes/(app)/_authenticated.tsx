@@ -1,7 +1,7 @@
-import { Toaster } from "sonner";
 import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 
 // * Layout for authenticated routes
 export const Route = createFileRoute("/(app)/_authenticated")({

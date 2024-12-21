@@ -18,9 +18,8 @@ export function useChat() {
 		}
 	}, [data, isSuccess]);
 
-	const handleMessage = useCallback(async (event: Event) => {
-		const messageEvent = event as MessageEvent;
-		const message: Message = parseMessage(messageEvent.data);
+	const handleMessage = useCallback(async (event: MessageEvent) => {
+		const message: Message = parseMessage(event.data);
 		if (message?.id) {
 			setMessages((prevMessages) => [...prevMessages, message]);
 			await db.messages.add(message);
