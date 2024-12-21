@@ -7,6 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { toast } from "sonner";
 
 const RECONNECTION_ATTEMPTS = 5;
 const MAX_RECONNECTION_DELAY = 10000;
@@ -49,14 +50,14 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	// * Event Handlers
 	const handleOpen = useCallback(() => {
-		console.log("✅ WebSocket connected");
+		toast("✅ WebSocket connected");
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
 	}, []);
 
 	const handleMessage = useCallback((event: MessageEvent) => {
 		const data = JSON.parse(event.data);
-		console.log("📨 WebSocket message", data);
+		toast("📨 WebSocket message", data);
 	}, []);
 
 	const handleError = useCallback((event: Event) => {
@@ -64,7 +65,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const handleClose = useCallback(() => {
-		console.log("🔌 WebSocket disconnected");
+		toast("🔌 WebSocket disconnected");
 		setReadyState(WebSocket.CLOSED);
 
 		if (reconnectAttemptRef.current < RECONNECTION_ATTEMPTS) {
@@ -72,7 +73,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 				INITIAL_RECONNECTION_DELAY * 2 ** reconnectAttemptRef.current,
 				MAX_RECONNECTION_DELAY,
 			);
-			console.log(`🔄 Attempting to reconnect in ${timeout}ms...`);
+			toast(`🔄 Attempting to reconnect in ${timeout}ms...`);
 			reconnectTimeoutRef.current = setTimeout(() => {
 				reconnectAttemptRef.current += 1;
 				connect();
@@ -88,7 +89,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		) {
 			return;
 		}
-		console.log("🔌 Connecting to WebSocket...");
+		toast("🔌 Connecting to WebSocket...");
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
 		socketRef.current.onmessage = handleMessage;
