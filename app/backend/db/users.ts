@@ -5,6 +5,7 @@ import {
 	createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
+import type { GitHubUser } from "#api/types";
 import db from "#db";
 import { userProfileTable, userTable } from "./users.sql";
 
@@ -34,6 +35,50 @@ const insertUser = db
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
+
+async function insertUserWithProfile(githubUser: GitHubUser) {
+	const {
+		id,
+		login: username,
+		name: displayName,
+		email,
+		avatar_url: avatarUrl,
+		html_url: htmlUrl,
+	} = githubUser;
+	const githubId = id.toString();
+	return db.transaction(async (tx) => {
+		const [user] = await tx
+			.insert(userTable)
+			.values({
+				githubId,
+				username,
+				email: email ?? "",
+			})
+			.onConflictDoNothing()
+			.returning();
+
+		await tx
+			.insert(userProfileTable)
+			.values({
+				userId: user.id,
+				displayName,
+				avatarUrl,
+				htmlUrl,
+			})
+			.onConflictDoUpdate({
+				target: userProfileTable.userId,
+				set: { displayName, avatarUrl, htmlUrl },
+			});
+
+		return user;
+	});
+}
+
+const selectUserByGithubId = db.query.userTable
+	.findFirst({
+		where: eq(userTable.githubId, sql.placeholder("githubId")),
+	})
+	.prepare("select_user_by_github_id");
 
 const insertProfile = db
 	.insert(userProfileTable)
@@ -75,12 +120,6 @@ async function updateUserProfile(
 		.then((rows) => rows[0]);
 }
 
-const selectUserByGithubId = db.query.userTable
-	.findFirst({
-		where: eq(userTable.githubId, sql.placeholder("githubId")),
-	})
-	.prepare("select_user_by_github_id");
-
 export {
 	// * User schemas
 	insertUserSchema,
@@ -94,5 +133,6 @@ export {
 	insertUser,
 	insertUserProfileSchema,
 	updateUserProfile,
+	insertUserWithProfile,
 };
 export type { User, UserProfile };

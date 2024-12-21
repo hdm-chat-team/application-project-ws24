@@ -7,7 +7,7 @@ import { createRouter } from "#api/factory";
 import type { Env, GitHubUser } from "#api/types";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import { insertProfile, insertUser, selectUserByGithubId } from "#db/users";
+import { insertUserWithProfile } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
 import {
@@ -71,7 +71,12 @@ export const githubRouter = createRouter()
 			});
 			const githubUser = (await githubResponse.json()) as GitHubUser;
 
-			const user = await handleDbUser(githubUser);
+			const user = await insertUserWithProfile(githubUser).catch((error) => {
+				console.error("Error inserting user:", error);
+				throw new HTTPException(500, {
+					message: "Error creating user",
+				});
+			});
 
 			await createAndSetSessionCookie(c, user.id);
 			return c.redirect(oauth_redirect_to || REDIRECT_URL);
@@ -85,37 +90,4 @@ async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
 		...cookieConfig,
 		expires: session.expiresAt,
 	});
-}
-
-async function handleDbUser(githubUser: GitHubUser) {
-	const existingUser = await selectUserByGithubId
-		.execute({ githubId: githubUser.id.toString() })
-		.catch((error) => {
-			console.error("Database query error:", error);
-			throw new HTTPException(500, {
-				message: "Database query failed",
-				cause: "database_error",
-			});
-		});
-
-	if (existingUser) {
-		return existingUser;
-	}
-
-	const user = await insertUser
-		.execute({
-			githubId: githubUser.id.toString(),
-			username: githubUser.login,
-			email: githubUser.email,
-		})
-		.then((rows) => rows[0]);
-
-	await insertProfile.execute({
-		userId: user.id,
-		displayname: githubUser.name,
-		avatar_url: githubUser.avatar_url,
-		html_url: githubUser.html_url,
-	});
-
-	return user;
 }
