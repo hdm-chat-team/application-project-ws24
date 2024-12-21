@@ -8,7 +8,7 @@
 		"build": "bunx --bun vite build",
 		"preview": "vite preview",
 		"gen-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
-		"ui": "bunx shadcn@latest"
+		"ui": "bunx --bun shadcn@latest"
 	},
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
