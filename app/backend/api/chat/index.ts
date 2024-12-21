@@ -17,9 +17,9 @@ export const chatRouter = createRouter().post(
 	async (c) => {
 		const { body } = c.req.valid("form");
 		const { id: topic } = c.req.valid("param");
-		const { id: userId } = c.get("user");
+		const { id: authorId } = c.get("user");
 
-		const message = createMessage(userId, body);
+		const message = createMessage(authorId, body);
 		getServer().publish(topic, stringifyMessage(message));
 
 		return c.text("Message sent");
