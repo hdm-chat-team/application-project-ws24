@@ -11,20 +11,14 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
 import { createFileRoute } from "@tanstack/react-router";
-
-type SignInSearch = {
-	from: string;
-};
+import { z } from "zod";
 
 export const Route = createFileRoute("/(auth)/signin")({
 	component: SignIn,
 	ssr: true,
-	validateSearch: (search: Record<string, unknown>): SignInSearch => {
-		const { from } = search;
-		return {
-			from: (from as string) || "",
-		};
-	},
+	validateSearch: z.object({
+		from: z.string().url().default(`${window.location.origin}/`),
+	}),
 });
 
 function SignIn() {
