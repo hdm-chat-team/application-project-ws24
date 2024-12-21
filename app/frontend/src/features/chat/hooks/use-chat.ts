@@ -1,18 +1,13 @@
-import { SocketContext } from "@/context/socket-provider";
 import { db } from "@/features/db";
 import { messagesQuery } from "@/features/db/queries";
+import { useSocket } from "@/hooks";
 import { type Message, parseMessage } from "@shared/message";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useChat() {
-	const context = useContext(SocketContext);
-	if (context === undefined)
-		throw new Error("useChat must be used within a SocketProvider");
-	const { addEventListener, removeEventListener } = context;
-
+	const { addEventListener, removeEventListener, ...context } = useSocket();
 	const [messages, setMessages] = useState<Message[]>([]);
-
 	const { data, isSuccess } = useQuery(messagesQuery);
 
 	// * Event Handlers
@@ -43,5 +38,5 @@ export function useChat() {
 		};
 	}, [addEventListener, removeEventListener, handleOpen, handleMessage]);
 
-	return { messages, context };
+	return { messages, ...context };
 }

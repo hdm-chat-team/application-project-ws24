@@ -7,8 +7,7 @@ export const Route = createFileRoute("/(app)/_authenticated/chat")({
 });
 
 function Chat() {
-	const { messages, context } = useChat();
-	const { readyState } = context;
+	const { messages, readyState } = useChat();
 
 	return (
 		<>
