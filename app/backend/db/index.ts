@@ -9,3 +9,4 @@ const db = drizzle(env.DATABASE_URL, {
 });
 
 export default db;
+export { db };

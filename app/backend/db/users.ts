@@ -82,17 +82,17 @@ const selectUserByGithubId = db.query.userTable
 	.prepare("select_user_by_github_id");
 
 export {
-	getUserProfile,
-	insertProfile,
-	// * User queries
-	insertUser,
-	insertUserProfileSchema,
 	// * User schemas
 	insertUserSchema,
 	selectUserByGithubId,
 	selectUserProfileSchema,
 	selectUserSchema,
-	updateUserProfile,
 	updateUserProfileSchema,
+	// * User queries
+	getUserProfile,
+	insertProfile,
+	insertUser,
+	insertUserProfileSchema,
+	updateUserProfile,
 };
 export type { User, UserProfile };

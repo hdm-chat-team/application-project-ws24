@@ -4,7 +4,6 @@ import { timestamp, varchar } from "drizzle-orm/pg-core";
 const ID_SIZE_CONFIG = { length: LENGTH };
 
 // * Common Fields
-
 const id = varchar(ID_SIZE_CONFIG).primaryKey().$default(createId);
 
 const createdAt = timestamp().notNull().defaultNow();
