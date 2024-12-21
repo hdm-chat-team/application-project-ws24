@@ -54,8 +54,13 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 				username,
 				email: email ?? "",
 			})
-			.onConflictDoNothing()
+			.onConflictDoUpdate({
+				target: userTable.githubId,
+				set: { username, email: email ?? "" },
+			})
 			.returning();
+
+		if (!user) throw new Error("Failed to insert or get existing user");
 
 		await tx
 			.insert(userProfileTable)
