@@ -18,12 +18,12 @@
 		"@tanstack/react-form": "^0.40.4",
 		"@tanstack/react-query": "^5.62.8",
 		"@tanstack/react-query-devtools": "^5.62.8",
-		"@tanstack/react-router": "^1.91.2",
+		"@tanstack/react-router": "^1.91.3",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
 		"dexie": "^4.0.10",
 		"hono": "^4.6.14",
-		"lucide-react": "^0.468.0",
+		"lucide-react": "^0.469.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"tailwind-merge": "^2.5.5",
@@ -32,9 +32,9 @@
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@tanstack/router-devtools": "^1.91.2",
+		"@tanstack/router-devtools": "^1.91.3",
 		"@tanstack/router-plugin": "^1.91.1",
-		"@types/react": "^18.3.17",
+		"@types/react": "^18.3.18",
 		"@types/react-dom": "^18.3.5",
 		"@vite-pwa/assets-generator": "^0.2.6",
 		"@vitejs/plugin-react-swc": "^3.7.2",
@@ -43,7 +43,7 @@
 		"postcss": "^8.4.49",
 		"rollup-plugin-visualizer": "^5.12.0",
 		"tailwindcss": "^3.4.17",
-		"vite": "^6.0.3",
+		"vite": "^6.0.5",
 		"vite-plugin-pwa": "^0.21.1"
 	}
 }
