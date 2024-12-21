@@ -10,6 +10,7 @@ export default function MessageForm() {
 	const { user } = useUser();
 
 	const postMessageMutation = useMutation({
+		mutationKey: ["postMessage"],
 		mutationFn: async (body: string) => {
 			if (!user) {
 				return;

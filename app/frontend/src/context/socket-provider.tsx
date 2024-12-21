@@ -18,8 +18,9 @@ const WebSocketEvents = {
 	ERROR: "error",
 	CLOSE: "close",
 } as const;
+type WebSocketEventName =
+	(typeof WebSocketEvents)[keyof typeof WebSocketEvents];
 
-type WebSocketEventName = keyof typeof WebSocketEvents;
 type SocketEventHandler = (event: Event) => void;
 
 type SocketContextType = {
@@ -33,10 +34,6 @@ type SocketContextType = {
 		event: WebSocketEventName,
 		handler: SocketEventHandler,
 	) => void;
-};
-
-type SocketMessage = {
-	[key: string]: unknown;
 };
 
 export const SocketContext = createContext<SocketContextType | undefined>(
@@ -58,7 +55,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const handleMessage = useCallback((event: MessageEvent) => {
-		const data = JSON.parse(event.data) as SocketMessage;
+		const data = JSON.parse(event.data);
 		console.log("📨 WebSocket message", data);
 	}, []);
 
