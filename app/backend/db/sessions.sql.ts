@@ -8,7 +8,7 @@ export const sessionTable = pgTable("sessions", {
 	token: varchar({ length: 64 }).primaryKey(),
 	userId: varchar(ID_SIZE_CONFIG)
 		.notNull()
-		.references(() => userTable.id),
+		.references(() => userTable.id, { onDelete: "cascade" }),
 	expiresAt: timestamp({
 		withTimezone: true,
 	})

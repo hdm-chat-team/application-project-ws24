@@ -19,6 +19,7 @@ export const userTableRelations = relations(userTable, ({ one, many }) => ({
 		relationName: "profile",
 	}),
 	sessions: many(sessionTable),
+	chat: many(chatMemberTable),
 }));
 
 export const userProfileTable = pgTable("user_profiles", {
@@ -26,7 +27,8 @@ export const userProfileTable = pgTable("user_profiles", {
 	...timestamps,
 	userId: varchar(ID_SIZE_CONFIG)
 		.notNull()
-		.references(() => userTable.id),
+			.references(() => userTable.id, { onDelete: "cascade" })
+			.unique(),
 	displayName: varchar({ length: 255 }),
 	avatarUrl: varchar({ length: 255 }),
 	htmlUrl: varchar({ length: 255 }),
