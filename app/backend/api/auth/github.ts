@@ -7,6 +7,7 @@ import { createRouter } from "#api/factory";
 import type { Env, GitHubUser } from "#api/types";
 import { github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
+import { insertSelfChat } from "#db/chats";
 import { insertUserWithProfile } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
@@ -75,6 +76,13 @@ export const githubRouter = createRouter()
 				console.error("Error inserting user:", error);
 				throw new HTTPException(500, {
 					message: "Error creating user",
+				});
+			});
+
+			await insertSelfChat(user).catch((error) => {
+				console.error("Error inserting chat:", error);
+				throw new HTTPException(500, {
+					message: "Error creating chat",
 				});
 			});
 
