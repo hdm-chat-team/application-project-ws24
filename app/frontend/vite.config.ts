@@ -77,5 +77,13 @@ export default defineConfig({
 	build: {
 		outDir: "../dist/client",
 		emptyOutDir: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					zod: ["zod"],
+					vendor: ["react", "react-dom"],
+				},
+			},
+		},
 	},
 });
