@@ -4,6 +4,8 @@ import api from "@/lib/api";
 
 const PROFILE_QUERY_KEY = ["profile"];
 
+// * Hook to fetch profile
+
 export function useProfile() {
 	return useQuery<UserProfile>({
 		queryKey: PROFILE_QUERY_KEY,
@@ -21,6 +23,8 @@ export function useProfile() {
 		retry: false,
 	});
 }
+
+// * Hook to update profile
 
 export function useUpdateProfile() {
 	const queryClient = useQueryClient();

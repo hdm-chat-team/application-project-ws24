@@ -11,6 +11,7 @@ export const Route = createFileRoute("/(profile)/profile")({
 function ProfilePage() {
 	const [isEditing, setIsEditing] = useState(false);
 	const [newDisplayName, setNewDisplayName] = useState("");
+	const [showSuccess, setShowSuccess] = useState(false);
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
 	if (isLoading) return <div>Loading Profile...</div>;
@@ -23,6 +24,10 @@ function ProfilePage() {
 				onSuccess: () => {
 					setIsEditing(false);
 					setNewDisplayName("");
+					setShowSuccess(true);
+					setTimeout(() => {
+						setShowSuccess(false);
+					}, 3000);
 				},
 				onError: (error) => {
 					console.error("Error updating profile:", error);
@@ -33,6 +38,7 @@ function ProfilePage() {
 	return (
 		<div>
 			<h1>Profile</h1>
+			{showSuccess && <div> ✅Profile updated successfully✅ </div>}
 			<div>
 				{profile.avatar_url && (
 					<img
