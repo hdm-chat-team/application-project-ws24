@@ -10,15 +10,11 @@ export function useProfile() {
 	return useQuery<UserProfile>({
 		queryKey: PROFILE_QUERY_KEY,
 		queryFn: async () => {
-			try {
-				const response = await api.profile.me.$get();
-				if (!response.ok) {
-					throw new Error("Profile could not be loaded");
-				}
-				return response.json();
-			} catch (error) {
-				throw new Error("Network or server error while loading profile");
+			const response = await api.profile.me.$get();
+			if (!response.ok) {
+				throw new Error("Failed to fetch profile");
 			}
+			return response.json();
 		},
 		retry: false,
 	});
@@ -34,20 +30,20 @@ export function useUpdateProfile() {
 			const response = await api.profile.me.$put({
 				form: {
 					displayName: newName,
-					avatar_url: profile?.avatar_url ?? "",
+					avatar_url: profile?.avatar_url ?? "", // optional, not needed rn but could be useful in the future
 				},
 			});
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.message || "Failed to update profile");
+				const error = await response.json();
+				throw new Error(error.message);
 			}
 			return response.json();
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
 		},
-		onError: (error) => {
-			console.error("Error updating profile:", error);
+		onError: (error: Error) => {
+			console.error("Error updating profile:", error.message);
 		},
 	});
 }
