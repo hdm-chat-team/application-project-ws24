@@ -9,6 +9,7 @@
 		"preview": "turbo preview",
 		"db": "cd app && bun db",
 		"ui": "cd app/frontend && bun ui",
+		"assets": "turbo assets",
 		"test": "bun --env-file=./app/.env test",
 		"test:watch": "turbo test:watch"
 	},
