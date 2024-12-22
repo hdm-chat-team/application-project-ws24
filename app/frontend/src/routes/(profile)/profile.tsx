@@ -20,21 +20,25 @@ function ProfilePage() {
 	if (!profile) return <div>No profile found</div>;
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		if (newDisplayName.trim()) {
-			updateProfile.mutate(newDisplayName, {
-				onSuccess: () => {
-					setIsEditing(false);
-					setNewDisplayName("");
-					setShowSuccess(true);
-					setTimeout(() => {
-						setShowSuccess(false);
-					}, 3000);
-				},
-				onError: (error) => {
-					console.error("Error updating profile:", error);
-				},
-			});
+		const trimmedName = newDisplayName.trim();
+
+		if (trimmedName.length < 2) {
+			alert("Name should be at least 2 characters long");
+			return;
 		}
+		updateProfile.mutate(trimmedName, {
+			onSuccess: () => {
+				setIsEditing(false);
+				setNewDisplayName("");
+				setShowSuccess(true);
+				setTimeout(() => {
+					setShowSuccess(false);
+				}, 3000);
+			},
+			onError: (error) => {
+				console.error("Error updating profile:", error);
+			},
+		});
 	};
 	return (
 		<div>
