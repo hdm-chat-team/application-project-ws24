@@ -35,7 +35,7 @@ export async function createSession(
 	userId: string,
 	token: string,
 ): Promise<Session> {
-	const session = await insertSession
+	const [session] = await insertSession
 		.execute({
 			token: hashToken(token),
 			userId,
@@ -43,8 +43,7 @@ export async function createSession(
 		.catch((error) => {
 			console.error("Failed to insert session:", error);
 			throw new Error("Failed to insert session");
-		})
-		.then((rows) => rows[0]);
+		});
 	return session;
 }
 

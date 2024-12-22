@@ -2,7 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
-import { SESSION_DURATION_DAYS, sessionTable } from "./sessions.sql";
+import { sessionTable } from "./sessions.sql";
 
 const insertSessionSchema = createInsertSchema(sessionTable);
 const selectSessionSchema = createSelectSchema(sessionTable);
@@ -32,7 +32,7 @@ const deleteSessionByToken = db
 const updateSessionExpiresAt = db
 	.update(sessionTable)
 	.set({
-		expiresAt: sql`now() + interval '${SESSION_DURATION_DAYS} days'`,
+		expiresAt: sql`now() + interval '30 days'`,
 	})
 	.where(eq(sessionTable.token, sql.placeholder("token")))
 	.returning({ newExpiresAt: sessionTable.expiresAt })
