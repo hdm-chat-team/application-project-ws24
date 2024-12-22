@@ -31,7 +31,6 @@ export function useUpdateProfile() {
 	return useMutation({
 		mutationFn: async (newName: string) => {
 			const profile = queryClient.getQueryData<UserProfile>(PROFILE_QUERY_KEY);
-
 			const response = await api.profile.me.$put({
 				form: {
 					displayName: newName,
