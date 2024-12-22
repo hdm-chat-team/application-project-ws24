@@ -4,5 +4,6 @@
 		// Hono JSX
 		"jsx": "react-jsx",
 		"jsxImportSource": "hono/jsx"
-	}
+	},
+	"include": ["backend/**/*.ts", "shared/**/*.ts"]
 }
