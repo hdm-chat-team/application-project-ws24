@@ -22,7 +22,6 @@ export const chatMemberTable = pgTable(
 		userId: varchar(ID_SIZE_CONFIG)
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
-		...timestamps,
 	},
 	(table) => [
 		{
