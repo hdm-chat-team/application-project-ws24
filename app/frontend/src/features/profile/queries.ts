@@ -30,7 +30,7 @@ export function useUpdateProfile() {
 			const response = await api.profile.me.$put({
 				form: {
 					displayName: newName,
-					avatar_url: profile?.avatar_url ?? "", // optional, not needed rn but could be useful in the future
+					avatar_url: profile?.avatar_url ?? "", //  not needed rn, not commented out because its needed from the backend
 				},
 			});
 			if (!response.ok) {
