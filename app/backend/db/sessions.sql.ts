@@ -1,8 +1,9 @@
 import { relations, sql } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
-import { SESSION_DURATION_DAYS } from "#auth/session";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG } from "./utils";
+
+export const SESSION_DURATION_DAYS = 30;
 
 // * Session
 export const sessionTable = pgTable("sessions", {

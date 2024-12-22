@@ -10,8 +10,6 @@ import type { User } from "#db/users";
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const REFRESH_THRESHOLD = ONE_DAY * 15;
 
-export const SESSION_DURATION_DAYS = 30;
-
 function hashToken(token: string): string {
 	const hasher = new Bun.CryptoHasher("sha256", Buffer.from("base64"));
 	return hasher.update(token).digest("base64");

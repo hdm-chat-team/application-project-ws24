@@ -1,9 +1,8 @@
 import { eq, sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
-import { SESSION_DURATION_DAYS } from "#auth/session";
 import db from "#db";
-import { sessionTable } from "./sessions.sql";
+import { SESSION_DURATION_DAYS, sessionTable } from "./sessions.sql";
 
 const insertSessionSchema = createInsertSchema(sessionTable);
 const selectSessionSchema = createSelectSchema(sessionTable);
@@ -42,11 +41,11 @@ const updateSessionExpiresAt = db
 export {
 	// * Session schemas
 	insertSessionSchema,
+	selectSessionById,
 	selectSessionSchema,
+	updateSessionExpiresAt,
 	// * Session queries
 	insertSession,
-	selectSessionById,
 	deleteSessionByToken,
-	updateSessionExpiresAt,
 };
 export type { Session };
