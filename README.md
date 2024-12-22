@@ -22,18 +22,17 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 - `/app`: a monorepo-style app
   - `/backend`: a 🔥 [Hono](https://hono.dev) server providing api routes and serving the frontend
+    - 🔐 Cookie based authentication using the [lucia-auth](https://lucia-auth.com/) guide.
+    - 🔌 [Websockets](https://bun.sh/docs/api/websockets) for real time features.
   - `/frontend`: a ⚡ [Vite](https://vite.dev) SPA using
-    - ⚛️ [React](https://react.dev) for reactivity
-    - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes
-    - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
+    - ⚛️ [React](https://react.dev) as the frontend framework.
+    - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes.
+    - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server.state on the client
 
 ### 📦 Packages
 
+- `/cuid`: package for generating and validating [CUID2](https://github.com/paralleldrive/cuid2) ids on the server and client.
 - `/tsconfig`: shared typescript configuration
-- `/auth`: utility function package to manage users and sessions
-  - following the 🔐 [lucia-auth](https://lucia-auth.com/) tutorial
-- `/database`: package for handling db schema and access
-  - using 💧 [Drizzle ORM](https://orm.drizzle.team/) with [PostgreSQL](https://www.postgresql.org/) on the server
 
 ## 🧰 Utilities
 
@@ -42,7 +41,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
   - use `bun check` to lint/check formatting
   - use `bun check:fix` to fix most linting errors and apply formatting
 - [PWA-assets generator](https://vite-pwa-org.netlify.app/assets-generator)
-  - use `bun gen-pwa-assets` in the `/frontend` package to generate PWA assets from `logo.svg`
+  - use `bun assets`  to generate PWA assets from `public/logo.svg`
 
 ## 💡 Contributing
 
@@ -56,12 +55,14 @@ We use issue branches and Pull requests to organize changes.
 So far we are simply using Bun's integrated test runner:
 
 ```zsh
-bun test
+bun run test
 ```
+
+Make sure to include `run`, otherwise environment variables won't be set.
 
 Test files are all named `*.test.ts`
 
-### 🚧 Build
+### 👷‍♂️ Build
 
 To build all apps and packages, run the following command in the root of the project:
 
