@@ -85,8 +85,8 @@ describe("session", () => {
 
 	beforeAll(() => {
 		// Mock the console.error method
-		spyOn(console, "error").mockImplementation((text: string, error: Error) => {
-			console.info(text, error.toString());
+		spyOn(console, "error").mockImplementation((error) => {
+			console.log("    Expected error:", "\x1b[31m%s\x1b[0m", error);
 		});
 	});
 
