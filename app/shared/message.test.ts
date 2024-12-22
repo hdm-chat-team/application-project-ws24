@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { createId } from "@application-project-ws24/cuid";
+import { createId, cuidSchema } from "@application-project-ws24/cuid";
 import {
 	type Message,
 	createMessage,
@@ -12,13 +12,15 @@ import {
 describe("Message module", () => {
 	describe("createMessage", () => {
 		test("creates valid message", () => {
-			const authorId = "author123";
+			const chatId = createId();
+			const authorId = createId();
 			const body = "Hello, world!";
-			const message = createMessage(authorId, body);
 
-			expect(message.authorId).toBe(authorId);
+			const message = createMessage(chatId, authorId, body);
+
+			expect(cuidSchema.safeParse(message.authorId).success).toBeTrue();
+			expect(cuidSchema.safeParse(message.id).success).toBeTrue();
 			expect(message.body).toBe(body);
-			expect(message.id).toBeDefined();
 			expect(message.createdAt).toBeInstanceOf(Date);
 		});
 	});
@@ -27,6 +29,7 @@ describe("Message module", () => {
 		test("validates correct message", () => {
 			const validMessage: Message = {
 				id: createId(),
+				chatId: createId(),
 				authorId: createId(),
 				body: "Test message",
 				createdAt: new Date(),
@@ -61,7 +64,8 @@ describe("Message module", () => {
 	describe("serialization", () => {
 		test("stringifyMessage and parseMessage roundtrip", () => {
 			const authorId = createId();
-			const originalMessage = createMessage(authorId, "Test message");
+			const chatId = createId();
+			const originalMessage = createMessage(chatId, authorId, "Test message");
 			const stringified = stringifyMessage(originalMessage);
 			const parsed = parseMessage(stringified);
 
