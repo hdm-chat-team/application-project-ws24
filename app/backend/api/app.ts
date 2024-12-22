@@ -13,7 +13,7 @@ const apiRoutes = apiRouter
 	.route("/auth", authRouter)
 	.route("/socket", socketRouter)
 	.route("/chat", chatRouter)
-	.route("/profile", profileRouter)
+	.route("/user", profileRouter)
 	.get("/", (c) => {
 		return c.text("Connected!");
 	});

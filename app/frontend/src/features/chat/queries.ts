@@ -2,9 +2,9 @@ import api from "@/lib/api";
 import { queryOptions } from "@tanstack/react-query";
 
 export const userChatsQueryOptions = queryOptions({
-	queryKey: [api.profile.chats.$url().pathname],
+	queryKey: [api.user.chats.$url().pathname],
 	queryFn: async () => {
-		const response = await api.profile.chats.$get();
+		const response = await api.user.chats.$get();
 		if (!response.ok) return [];
 		const chats = (await response.json()).chats.map((chat) => ({
 			...chat,

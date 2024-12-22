@@ -3,24 +3,24 @@ import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
 import {
-	getUserProfile,
 	selectUserChats,
+	selectUserProfile,
 	updateUserProfile,
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
 export const profileRouter = createRouter()
-	.get("/me", protectedRoute, async (c) => {
+	.get("/profile", protectedRoute, async (c) => {
 		const { id } = c.get("user");
-		const data = await getUserProfile.execute({ id });
+		const data = await selectUserProfile.execute({ id });
 		if (!data) {
 			throw new HTTPException(404, { message: "profile not found" });
 		}
 		return c.json(data);
 	})
 	.put(
-		"/me",
+		"/profile",
 		protectedRoute,
 		zValidator("form", updateUserProfileSchema),
 		async (c) => {
@@ -53,7 +53,7 @@ export const profileRouter = createRouter()
 		zValidator("param", cuidParamSchema),
 		async (c) => {
 			const { id } = c.req.valid("param");
-			const userData = await getUserProfile.execute({ id });
+			const userData = await selectUserProfile.execute({ id });
 			if (!userData) {
 				throw new HTTPException(404, { message: "profile not found" });
 			}

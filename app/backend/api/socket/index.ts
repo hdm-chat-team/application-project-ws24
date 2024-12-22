@@ -26,9 +26,7 @@ export const socketRouter = createRouter().get(
 					socket.subscribe(chatId);
 				}
 
-				console.log(
-					`${username} connected to ${userChats.length} chats`,
-				);
+				console.log(`${username} connected to ${userChats.length} chats`);
 			},
 			onClose: (_, ws) => {
 				const socket = ws.raw as ServerWebSocket;

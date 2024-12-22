@@ -8,7 +8,7 @@ import { useCallback, useEffect } from "react";
 export function useChat(chatId: string) {
 	const queryClient = useQueryClient();
 	const { addEventListener, removeEventListener, ...context } = useSocket();
-	
+
 	const {
 		data: messages,
 		isLoading,
