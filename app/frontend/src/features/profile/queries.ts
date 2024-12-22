@@ -1,0 +1,46 @@
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import type { UserProfile } from "@server/db/schema.sql";
+import api from "@/lib/api";
+
+const PROFILE_QUERY_KEY = ["profile"];
+
+export function useProfile() {
+	return useQuery<UserProfile>({
+		queryKey: PROFILE_QUERY_KEY,
+		queryFn: async () => {
+			const response = await api.me.me.$get();
+			if (!response.ok) {
+				throw new Error("Failed to fetch profile");
+			}
+			return response.json();
+		},
+		retry: false,
+	});
+}
+
+export function useUpdateProfile() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (newName: string) => {
+			const profile = queryClient.getQueryData<UserProfile>(PROFILE_QUERY_KEY);
+
+			const response = await api.me.me.$put({
+				form: {
+					displayName: newName,
+					avatar_url: profile?.avatar_url ?? "",
+				},
+			});
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.message || "Failed to update profile");
+			}
+			return response.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: PROFILE_QUERY_KEY });
+		},
+		onError: (error) => {
+			console.error("Error updating profile:", error);
+		},
+	});
+}
