@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
@@ -24,7 +24,12 @@ export const chatMemberTable = pgTable(
 			.references(() => userTable.id, { onDelete: "cascade" }),
 		...timestamps,
 	},
-	(table) => [{ pk: primaryKey({ columns: [table.chatId, table.userId] }) }],
+	(table) => [
+		{
+			pk: primaryKey({ columns: [table.chatId, table.userId] }),
+			chatMemberIdIndex: index().on(table.userId),
+		},
+	],
 );
 
 export const chatMemberRelations = relations(chatMemberTable, ({ one }) => ({
