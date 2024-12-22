@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { SESSION_DURATION_DAYS } from "#auth/session";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG } from "./utils";
 
@@ -13,7 +14,7 @@ export const sessionTable = pgTable("sessions", {
 		withTimezone: true,
 	})
 		.notNull()
-		.$default(() => sql`now() + interval '30 days'`),
+		.$default(() => sql`now() + interval '${SESSION_DURATION_DAYS} days'`),
 });
 
 export const sessionTableRelations = relations(sessionTable, ({ one }) => ({
