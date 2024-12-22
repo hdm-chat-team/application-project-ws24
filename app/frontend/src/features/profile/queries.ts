@@ -8,11 +8,15 @@ export function useProfile() {
 	return useQuery<UserProfile>({
 		queryKey: PROFILE_QUERY_KEY,
 		queryFn: async () => {
-			const response = await api.profile.me.$get();
-			if (!response.ok) {
-				throw new Error("Failed to fetch profile");
+			try {
+				const response = await api.profile.me.$get();
+				if (!response.ok) {
+					throw new Error("Profile could not be loaded");
+				}
+				return response.json();
+			} catch (error) {
+				throw new Error("Network or server error while loading profile");
 			}
-			return response.json();
 		},
 		retry: false,
 	});

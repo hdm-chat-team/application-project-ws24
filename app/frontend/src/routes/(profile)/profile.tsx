@@ -13,8 +13,8 @@ function ProfilePage() {
 	const [newDisplayName, setNewDisplayName] = useState("");
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
-	if (isLoading) return <div>Loading...</div>;
-	if (error) return <div>Error: {error.message}</div>;
+	if (isLoading) return <div>Loading Profile...</div>;
+	if (error) return <div>Failed to load profile: {error.message}</div>;
 	if (!profile) return <div>No profile found</div>;
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
