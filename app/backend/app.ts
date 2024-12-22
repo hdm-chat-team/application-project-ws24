@@ -11,7 +11,7 @@ const apiRoutes = apiRouter
 	.basePath("/api")
 	.route("/auth", authRouter)
 	.route("/chat", chatRouter)
-	.route("/profile", profileRouter)
+	.route("/me", profileRouter)
 	.get("/", (c) => {
 		return c.text("Hello Hono!");
 	});
