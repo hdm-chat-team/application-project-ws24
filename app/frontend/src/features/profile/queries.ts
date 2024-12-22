@@ -1,6 +1,6 @@
-import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { UserProfile } from "@server/db/schema.sql";
 import api from "@/lib/api";
+import type { UserProfile } from "@server/db/schema.sql";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const PROFILE_QUERY_KEY = ["profile"];
 
