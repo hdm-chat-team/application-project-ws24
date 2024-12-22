@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "bunx --bun vite",
 		"build": "bunx --bun vite build",
-		"preview": "vite preview",
+		"preview": "bunx --bun vite preview",
 		"gen-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.svg",
 		"ui": "bunx --bun shadcn@latest"
 	},
