@@ -2,8 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useProfile, useUpdateProfile } from "../../features/profile/queries";
 
-// TODO: maybe split into more components like a ProfileForm component
-// TODO: add a profile image editing / upload
+// TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
 export const Route = createFileRoute("/(profile)/profile")({
 	component: ProfilePage,
