@@ -1,5 +1,5 @@
 {
-	"name": "@application-project-ws24/app",
+	"name": "@application-project-ws24/backend",
 	"module": "backend/index.js",
 	"imports": {
 		"#api/*": "./backend/api/*.ts",
