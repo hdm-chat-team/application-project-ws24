@@ -5,7 +5,7 @@ import {
 	createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import type { GitHubUser } from "#api/types";
+import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { userProfileTable, userTable } from "./users.sql";
 

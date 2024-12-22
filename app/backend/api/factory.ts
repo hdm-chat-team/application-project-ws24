@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { Env } from "#api/types";
+import type { Env } from "#api/context";
 import { onError } from "#lib/middleware";
 import { securityMiddlewares, utilityMiddlewares } from "#lib/middleware";
 

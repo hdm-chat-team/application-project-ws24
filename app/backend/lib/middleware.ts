@@ -9,7 +9,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
-import type { Env } from "#api/types";
+import type { Env } from "#api/context";
 import { validateSessionToken } from "#auth/session";
 import type { Session } from "#db/sessions";
 import type { User } from "#db/users";
