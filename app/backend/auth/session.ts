@@ -57,21 +57,21 @@ type SessionValidationResult =
  * @returns {Promise<SessionValidationResult>} Object containing the session and user if valid, null values if invalid.
  */
 export async function validateSessionToken(
-	token: string,
+	sessionToken: string,
 ): Promise<SessionValidationResult> {
-	const sessionToken = hashToken(token);
-	const session = await selectSessionById.execute({ token: sessionToken });
+	const token = hashToken(sessionToken);
+	const session = await selectSessionById.execute({ token });
 	let fresh = false;
 
 	if (!session || Date.now() >= session.expiresAt.getTime()) {
-		await deleteSessionByToken.execute({ token: sessionToken });
+		await deleteSessionByToken.execute({ token });
 		return { session: null, user: null, fresh };
 	}
 
 	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
 		const { newExpiresAt } = await updateSessionExpiresAt
 			.execute({
-				token: sessionToken,
+				token,
 			})
 			.then((rows) => rows[0]);
 		session.expiresAt = newExpiresAt;

@@ -95,12 +95,12 @@ const insertProfile = db
 	})
 	.returning({ id: userProfileTable.id });
 
-const getUserProfile = db.query.userProfileTable
+const selectUserProfile = db.query.userProfileTable
 	.findFirst({
 		with: { owner: true },
 		where: eq(userProfileTable.userId, sql.placeholder("id")),
 	})
-	.prepare("get_user_profile");
+	.prepare("select_user_profile");
 
 async function updateUserProfile(
 	userId: string,
@@ -145,7 +145,7 @@ export {
 	selectUserSchema,
 	updateUserProfileSchema,
 	// * User queries
-	getUserProfile,
+	selectUserProfile,
 	insertProfile,
 	insertUser,
 	insertUserProfileSchema,
