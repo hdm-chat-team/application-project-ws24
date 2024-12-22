@@ -2,6 +2,7 @@ import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
+import db from "#db";
 import {
 	getUserProfile,
 	updateUserProfile,
@@ -39,6 +40,21 @@ export const profileRouter = createRouter()
 			});
 		},
 	)
+	.get("/chats", protectedRoute, async (c) => {
+		const { id } = c.get("user");
+
+		const chats = await db.query.chatMemberTable
+			.findMany({
+				columns: {},
+				where: (chatMemberTable, { eq }) => eq(chatMemberTable.userId, id),
+				with: {
+					chat: {},
+				},
+			})
+			.then((rows) => rows.map(({ chat }) => chat));
+
+		return c.json({ chats });
+	})
 	.get(
 		"/:id",
 		protectedRoute,

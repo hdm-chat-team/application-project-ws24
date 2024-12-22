@@ -1,6 +1,6 @@
-import db from "#db";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
+import db from "#db";
 import { chatMemberTable, chatTable } from "./chats.sql";
 import type { User } from "./users";
 
