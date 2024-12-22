@@ -11,9 +11,9 @@ function ProfilePage() {
 	const [newDisplayName, setNewDisplayName] = useState("");
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
-	if (isLoading) return <div>Laden...</div>;
-	if (error) return <div>Fehler: {error.message}</div>;
-	if (!profile) return <div>Kein Profil gefunden</div>;
+	if (isLoading) return <div>Loading...</div>;
+	if (error) return <div>Error: {error.message}</div>;
+	if (!profile) return <div>No profile found</div>;
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (newDisplayName.trim()) {
@@ -22,17 +22,20 @@ function ProfilePage() {
 					setIsEditing(false);
 					setNewDisplayName("");
 				},
+				onError: (error) => {
+					console.error("Error updating profile:", error);
+				},
 			});
 		}
 	};
 	return (
 		<div>
-			<h1>Profil</h1>
+			<h1>Profile</h1>
 			<div>
 				{profile.avatar_url && (
 					<img
 						src={profile.avatar_url}
-						alt={profile.displayName || "Profilbild"}
+						alt={profile.displayName || "Profile image"}
 					/>
 				)}
 				<div>
@@ -40,7 +43,7 @@ function ProfilePage() {
 						<form onSubmit={handleSubmit}>
 							<div>
 								<label>
-									Anzeigename:
+									Display name:
 									<input
 										type="text"
 										value={newDisplayName}
@@ -52,16 +55,16 @@ function ProfilePage() {
 							</div>
 							<div>
 								<button type="submit" disabled={updateProfile.isPending}>
-									{updateProfile.isPending ? "Speichern..." : "Speichern"}
+									{updateProfile.isPending ? "Saving..." : "Save"}
 								</button>
 								<button type="button" onClick={() => setIsEditing(false)}>
-									Abbrechen
+									Cancel
 								</button>
 							</div>
 						</form>
 					) : (
 						<>
-							<p>Anzeigename: {profile.displayName}</p>
+							<p>Display name: {profile.displayName}</p>
 							<button
 								type="button"
 								onClick={() => {
@@ -69,7 +72,7 @@ function ProfilePage() {
 									setIsEditing(true);
 								}}
 							>
-								Profil bearbeiten
+								Edit profile
 							</button>
 						</>
 					)}
