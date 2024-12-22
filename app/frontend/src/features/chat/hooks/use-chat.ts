@@ -1,41 +1,47 @@
 import { db } from "@/features/db";
-import { messagesQuery } from "@/features/db/queries";
+import { messagesByChatIdQueryOptions } from "@/features/db/queries";
 import { useSocket } from "@/hooks";
 import { type Message, parseMessage } from "@shared/message";
-import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
 
-export function useChat() {
+export function useChat(chatId: string) {
+	const queryClient = useQueryClient();
 	const { addEventListener, removeEventListener, ...context } = useSocket();
-	const [messages, setMessages] = useState<Message[]>([]);
-	const { data, isSuccess } = useQuery(messagesQuery);
+	
+	const {
+		data: messages,
+		isLoading,
+		...query
+	} = useQuery(messagesByChatIdQueryOptions(chatId));
 
-	// * Event Handlers
-	const handleOpen = useCallback(async () => {
-		if (isSuccess) {
-			const storedMessages = data as Message[];
-			setMessages(storedMessages);
-		}
-	}, [data, isSuccess]);
-
-	const handleMessage = useCallback(async (event: MessageEvent) => {
-		const message: Message = parseMessage(event.data);
-		if (message?.id) {
-			setMessages((prevMessages) => [...prevMessages, message]);
+	const mutation = useMutation({
+		mutationKey: ["saveMessage"],
+		mutationFn: async (message: Message) => {
 			await db.messages.add(message);
-		}
-	}, []);
+		},
+		onSuccess: () =>
+			queryClient.invalidateQueries({ queryKey: ["db/messages-by-chat"] }),
+	});
 
-	// * Component Lifecycle
+	const handleMessage = useCallback(
+		async (event: MessageEvent) => {
+			const message: Message = parseMessage(event.data);
+
+			if (message?.chatId === chatId) {
+				queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
+				await mutation.mutateAsync(message);
+			}
+		},
+		[chatId, mutation.mutateAsync, queryClient],
+	);
+
 	useEffect(() => {
-		addEventListener("open", handleOpen);
 		addEventListener("message", handleMessage);
-
 		return () => {
-			removeEventListener("open", handleOpen);
 			removeEventListener("message", handleMessage);
 		};
-	}, [addEventListener, removeEventListener, handleOpen, handleMessage]);
+	}, [addEventListener, removeEventListener, handleMessage]);
 
-	return { messages, ...context };
+	return { messages, isLoading, ...context, query };
 }

@@ -6,7 +6,7 @@ import { messageFormSchema } from "@shared/message";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 
-export default function MessageForm() {
+export default function MessageForm({ chatId }: { chatId: string }) {
 	const { user } = useUser();
 
 	const postMessageMutation = useMutation({
@@ -16,7 +16,7 @@ export default function MessageForm() {
 				return;
 			}
 			const res = await api.chat[":id"].$post({
-				param: { id: user.id },
+				param: { id: chatId },
 				form: { body },
 			});
 			if (!res.ok) {

@@ -4,6 +4,7 @@ import { z } from "zod";
 const messageSchema = z.object({
 	id: cuidSchema,
 	authorId: cuidSchema,
+	chatId: cuidSchema,
 	body: z.string().min(1),
 	createdAt: z.date(),
 });
@@ -12,13 +13,18 @@ const messageFormSchema = messageSchema.pick({ body: true });
 
 type Message = z.infer<typeof messageSchema>;
 
-function createMessage(authorId: string, body: string): Message {
-	return {
+function createMessage(
+	chatId: string,
+	authorId: string,
+	body: string,
+): Message {
+	return messageSchema.parse({
 		id: createId(),
 		createdAt: new Date(),
 		body,
 		authorId,
-	};
+		chatId,
+	});
 }
 
 function stringifyMessage(message: Message): string {

@@ -1,30 +1,30 @@
-import MessageForm from "@/features/chat/components/message-form";
-import { useChat } from "@/features/chat/hooks/use-chat";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
+import { userChatsQueryOptions } from "@/features/chat/queries";
+import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat")({
+	loader: async ({ context: { queryClient } }) =>
+		await queryClient.ensureQueryData(userChatsQueryOptions),
 	component: () => <Chat />,
 });
 
 function Chat() {
-	const { messages, readyState } = useChat();
-
+	const chats = Route.useLoaderData();
 	return (
-		<>
-			<h1>Chat</h1>
-			<Link to="/">start page</Link>
-			<div>
-				<h2>Chat Messages</h2>
-				<h2>Chat Socket Status: {readyState}</h2>
-				<ul>
-					{messages.map((message) => (
-						<li key={message.id}>
-							{message.authorId}: {message.body}
-						</li>
-					))}
-				</ul>
-				<MessageForm />
-			</div>
-		</>
+		<div>
+			{chats.map((chat) => (
+				<>
+					<div className="flex" key={chat.id}>
+						<span>{chat.name}</span>
+						<Button variant="link" asChild>
+							<Link to="/chat/$id" params={{ id: chat.id }}>
+								Open Chat
+							</Link>
+						</Button>
+					</div>
+				</>
+			))}
+			<Outlet />
+		</div>
 	);
 }

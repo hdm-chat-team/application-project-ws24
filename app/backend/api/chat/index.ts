@@ -16,11 +16,11 @@ export const chatRouter = createRouter().post(
 	protectedRoute,
 	async (c) => {
 		const { body } = c.req.valid("form");
-		const { id: topic } = c.req.valid("param");
+		const { id: chatId } = c.req.valid("param");
 		const { id: authorId } = c.get("user");
 
-		const message = createMessage(authorId, body);
-		getServer().publish(topic, stringifyMessage(message));
+		const message = createMessage(chatId, authorId, body);
+		getServer().publish(chatId, stringifyMessage(message));
 
 		return c.text("Message sent");
 	},

@@ -1,5 +1,8 @@
+import { userChatsQueryOptions } from "@/features/chat/queries";
+import { db } from "@/features/db";
 import api from "@/lib/api";
 import type { Message } from "@shared/message";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	type ReactNode,
 	createContext,
@@ -48,6 +51,8 @@ export const SocketContext = createContext<SocketContextType | undefined>(
 );
 
 export function SocketProvider({ children }: { children: ReactNode }) {
+	const queryClient = useQueryClient();
+
 	const socketRef = useRef<WebSocket | null>(null);
 	const reconnectAttemptRef = useRef(0);
 	const reconnectTimeoutRef = useRef<NodeJS.Timer>();
@@ -55,11 +60,16 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
 
 	// * Event Handlers
-	const handleOpen = useCallback(() => {
+	const handleOpen = useCallback(async () => {
 		toast.success("WebSocket connected");
+
+		// * Fetch user chats and store them in IndexedDB
+		const data = await queryClient.fetchQuery(userChatsQueryOptions);
+		await db.chats.bulkPut(data);
+
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
-	}, []);
+	}, [queryClient]);
 
 	const handleMessage = useCallback((event: MessageEvent) => {
 		const data = JSON.parse(event.data) as Message;
