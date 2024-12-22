@@ -8,7 +8,7 @@ export function useProfile() {
 	return useQuery<UserProfile>({
 		queryKey: PROFILE_QUERY_KEY,
 		queryFn: async () => {
-			const response = await api.me.me.$get();
+			const response = await api.profile.me.$get();
 			if (!response.ok) {
 				throw new Error("Failed to fetch profile");
 			}
@@ -24,7 +24,7 @@ export function useUpdateProfile() {
 		mutationFn: async (newName: string) => {
 			const profile = queryClient.getQueryData<UserProfile>(PROFILE_QUERY_KEY);
 
-			const response = await api.me.me.$put({
+			const response = await api.profile.me.$put({
 				form: {
 					displayName: newName,
 					avatar_url: profile?.avatar_url ?? "",

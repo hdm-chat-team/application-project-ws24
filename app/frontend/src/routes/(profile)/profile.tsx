@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useProfile, useUpdateProfile } from "../../features/profile/queries";
 
+// TODO: maybe split into more components like a ProfileForm component
+
 export const Route = createFileRoute("/(profile)/profile")({
 	component: ProfilePage,
 });
