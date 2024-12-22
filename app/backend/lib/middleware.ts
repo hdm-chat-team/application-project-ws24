@@ -9,10 +9,8 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
-import type { Env } from "#api/context";
+import type { Context, ProtectedContext } from "#api/context";
 import { validateSessionToken } from "#auth/session";
-import type { Session } from "#db/sessions";
-import type { User } from "#db/users";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
@@ -53,7 +51,7 @@ const limiter = rateLimiter({
  * - user: User object or null
  * - session: Session object or null
  */
-const authMiddleware = createMiddleware<Env>(async (c, next) => {
+const authMiddleware = createMiddleware<Context>(async (c, next) => {
 	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
 	if (!sessionCookieToken) {
 		c.set("user", null);
@@ -93,24 +91,22 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
  *   // Handle protected route...
  * });
  */
-export const protectedRoute = createMiddleware<
-	Env & {
-		Variables: { user: User; session: Session };
-	}
->(async (c, next) => {
-	const session = c.get("session");
-	const user = c.get("user");
+export const protectedRoute = createMiddleware<ProtectedContext>(
+	async (c, next) => {
+		const session = c.get("session");
+		const user = c.get("user");
 
-	if (!session || !user)
-		throw new HTTPException(401, {
-			message: "Unauthorized",
-			cause: "Missing session or user",
-		});
+		if (!session || !user)
+			throw new HTTPException(401, {
+				message: "Unauthorized",
+				cause: "Missing session or user",
+			});
 
-	c.set("user", user);
-	c.set("session", session);
-	return next();
-});
+		c.set("user", user);
+		c.set("session", session);
+		return next();
+	},
+);
 
 /**
  * Combines multiple middleware functions into a single middleware.
