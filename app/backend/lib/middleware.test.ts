@@ -71,7 +71,7 @@ describe("middleware integration", () => {
 		});
 
 		test("should handle valid auth sessions", async () => {
-			const testDate = new Date();
+			const testDate = new Date().toISOString();
 			const testUser: User = {
 				id: "test-id",
 				email: "test@mail.de",
@@ -110,9 +110,7 @@ describe("middleware integration", () => {
 			expect(receivedUser?.email).toBe(testUser.email);
 			expect(receivedUser?.githubId).toBe(testUser.githubId);
 			expect(receivedUser?.username).toBe(testUser.username);
-			expect(new Date(receivedUser?.createdAt as Date).getTime()).toBe(
-				testDate.getTime(),
-			);
+			expect(receivedUser?.createdAt).toBe(testDate);
 			expect(receivedUser?.updatedAt).toBe(testUser.updatedAt);
 
 			expect(json.session).toEqual({
@@ -127,8 +125,8 @@ describe("middleware integration", () => {
 				email: "test@mail.de",
 				githubId: "1234",
 				username: "test",
-				createdAt: new Date(),
-				updatedAt: new Date(),
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 			};
 			const testSession: Session = {
 				token: "test-session",

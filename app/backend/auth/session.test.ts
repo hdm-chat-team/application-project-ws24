@@ -145,8 +145,8 @@ describe("session", () => {
 					githubId: "test-github-id",
 					username: "test-user",
 					email: "test@example.com",
-					createdAt: new Date(),
-					updatedAt: new Date(),
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
 				},
 			};
 

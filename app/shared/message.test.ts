@@ -21,7 +21,8 @@ describe("Message module", () => {
 			expect(cuidSchema.safeParse(message.authorId).success).toBeTrue();
 			expect(cuidSchema.safeParse(message.id).success).toBeTrue();
 			expect(message.body).toBe(body);
-			expect(message.createdAt).toBeInstanceOf(Date);
+			expect(typeof message.createdAt).toBe("string");
+			expect(() => new Date(message.createdAt)).not.toThrow();
 		});
 	});
 
@@ -32,7 +33,7 @@ describe("Message module", () => {
 				chatId: createId(),
 				authorId: createId(),
 				body: "Test message",
-				createdAt: new Date(),
+				createdAt: new Date().toISOString(),
 			};
 
 			const result = messageSchema.safeParse(validMessage);
@@ -44,7 +45,7 @@ describe("Message module", () => {
 				id: createId(),
 				authorId: createId(),
 				body: "", // empty body should fail
-				createdAt: new Date(),
+				createdAt: new Date().toISOString(), // Fix: convert Date to string
 			};
 
 			const result = messageSchema.safeParse(invalidMessage);
@@ -69,7 +70,8 @@ describe("Message module", () => {
 			const stringified = stringifyMessage(originalMessage);
 			const parsed = parseMessage(stringified);
 
-			expect(parsed).toEqual(originalMessage);
+			// Compare the objects after converting to JSON to handle Date comparison
+			expect(JSON.stringify(parsed)).toBe(JSON.stringify(originalMessage));
 		});
 
 		describe("parseMessage", () => {

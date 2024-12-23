@@ -6,7 +6,7 @@ const messageSchema = z.object({
 	authorId: cuidSchema,
 	chatId: cuidSchema,
 	body: z.string().min(1),
-	createdAt: z.date(),
+	createdAt: z.string().datetime(),
 });
 
 const messageFormSchema = messageSchema.pick({ body: true });
@@ -20,7 +20,7 @@ function createMessage(
 ): Message {
 	return messageSchema.parse({
 		id: createId(),
-		createdAt: new Date(),
+		createdAt: new Date().toISOString(),
 		body,
 		authorId,
 		chatId,
@@ -28,18 +28,11 @@ function createMessage(
 }
 
 function stringifyMessage(message: Message): string {
-	return JSON.stringify({
-		...message,
-		createdAt: message.createdAt.toISOString(),
-	});
+	return JSON.stringify(message);
 }
 
 function parseMessage(json: string): Message {
-	const parsed = JSON.parse(json);
-	const message = {
-		...parsed,
-		createdAt: new Date(parsed.createdAt),
-	};
+	const message = JSON.parse(json);
 	return messageSchema.parse(message);
 }
 

@@ -7,14 +7,8 @@ export const authQueryOptions = queryOptions<User | null>({
 	queryFn: async () => {
 		const response = await api.auth.$get();
 		if (!response.ok) return null;
-		const data = await response.json();
-		return data === null
-			? null
-			: {
-					...data,
-					createdAt: new Date(data.createdAt),
-					updatedAt: data.updatedAt ? new Date(data.updatedAt) : null,
-				};
+
+		return (await response.json()).data;
 	},
 	staleTime: Number.POSITIVE_INFINITY,
 });
