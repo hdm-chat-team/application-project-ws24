@@ -9,16 +9,21 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { authQueryOptions } from "@/features/auth";
 import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
 export const Route = createFileRoute("/(auth)/signin")({
-	component: SignIn,
 	ssr: true,
 	validateSearch: z.object({
 		from: z.string().url().default(`${window.location.origin}/`),
 	}),
+	beforeLoad: async ({ context: { queryClient } }) => {
+		if (await queryClient.ensureQueryData(authQueryOptions))
+			throw redirect({ to: "/" });
+	},
+	component: SignIn,
 });
 
 function SignIn() {
