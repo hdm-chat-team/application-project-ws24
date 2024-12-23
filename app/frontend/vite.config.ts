@@ -18,7 +18,7 @@ export default defineConfig({
 			},
 			registerType: "autoUpdate",
 			devOptions: {
-				enabled: true,
+				enabled: false, // ? set true to enable PWA in development
 			},
 			includeAssets: ["favicon.ico", "apple-touch-icon.png"],
 			manifest: {
