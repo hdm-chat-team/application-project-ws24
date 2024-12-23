@@ -12,7 +12,7 @@ export const authRouter = createRouter()
 	.route("/github", githubRouter)
 	.get("/", protectedRoute, async (c) => {
 		const user = c.get("user");
-		return c.json(user);
+		return c.json({ data: user });
 	})
 	.get(
 		"/signout",

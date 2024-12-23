@@ -4,6 +4,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 export const authQueryOptions = queryOptions<User | null>({
 	queryKey: [api.auth.$url().pathname],
+	initialData: null,
 	queryFn: async () => {
 		const response = await api.auth.$get();
 		if (!response.ok) return null;

@@ -45,7 +45,7 @@ export const profileRouter = createRouter()
 
 		const chats = await selectUserChats(id);
 
-		return c.json({ chats });
+		return c.json({ data: chats });
 	})
 	.get(
 		"/:id",
@@ -57,6 +57,6 @@ export const profileRouter = createRouter()
 			if (!userData) {
 				throw new HTTPException(404, { message: "profile not found" });
 			}
-			return c.json(userData);
+			return c.json({ data: userData });
 		},
 	);

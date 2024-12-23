@@ -112,6 +112,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		socketRef.current.onclose = handleClose;
 	}, [handleOpen, handleMessage, handleError, handleClose]);
 
+	// * Event Listener Management
 	const addEventListener = useCallback(
 		<K extends WebSocketEventName>(
 			event: K,
