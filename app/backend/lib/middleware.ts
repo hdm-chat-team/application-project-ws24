@@ -1,5 +1,3 @@
-import { rateLimiter } from "hono-rate-limiter";
-import { getConnInfo } from "hono/bun";
 import { every } from "hono/combine";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { cors } from "hono/cors";
@@ -17,26 +15,6 @@ import cookieConfig from "#lib/cookie";
 const origin = DEV
 	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
 	: [`http://localhost:${env.PORT}`];
-
-/**
- * Middleware for rate limiting requests.
- *
- * This middleware uses a rate limiter to restrict the number of requests
- * that can be made within a specified time window.
- *
- */
-const limiter = rateLimiter({
-	windowMs: 10 * 1000,
-	limit: 20,
-	keyGenerator: (c) => {
-		try {
-			const connInfo = getConnInfo(c);
-			return connInfo?.remote.address || "unknown";
-		} catch {
-			return "unknown";
-		}
-	},
-});
 
 /**
  * Middleware to handle authentication state by validating session tokens.
@@ -126,7 +104,6 @@ export const securityMiddlewares = every(
 	}),
 	csrf({ origin }),
 	authMiddleware,
-	limiter,
 );
 
 /**
