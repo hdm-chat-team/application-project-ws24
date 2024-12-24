@@ -47,3 +47,19 @@ export function useUpdateProfile() {
 		},
 	});
 }
+
+// * Hook to fetch user profile
+
+export function useUserProfile(userId: string) {
+	return useQuery<UserProfile>({
+		queryKey: ["userProfile", userId],
+		queryFn: async () => {
+			const response = await api.profile.me.$get();
+			if (!response.ok) {
+				throw new Error("Failed to fetch user profile");
+			}
+			return response.json();
+		},
+		retry: false,
+	});
+}
