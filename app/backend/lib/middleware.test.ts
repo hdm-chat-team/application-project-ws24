@@ -179,8 +179,8 @@ describe("middleware integration", () => {
 	describe("limiter", () => {
 		test("should handle rate limiting", async () => {
 			// Make multiple requests in quick succession
-			const promises = Array(10)
-				.fill(0)
+			const promises = Array(69) // *  Nice
+				.fill(null)
 				.map(() => app.request("/test"));
 			const responses = await Promise.all(promises);
 
