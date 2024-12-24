@@ -1,3 +1,4 @@
+import { eq, sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
@@ -8,10 +9,17 @@ const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
 type Chat = z.infer<typeof selectChatSchema>;
 
+const selectChatIdsByUserId = db.query.chatMemberTable
+	.findMany({
+		columns: { chatId: true },
+		where: eq(chatMemberTable.userId, sql.placeholder("id")),
+	})
+	.prepare("select_chat_ids_by_user_id");
+
 function insertSelfChat(user: User) {
 	return db.transaction(async (tx) => {
 		const existingChat = await tx.query.chatTable.findFirst({
-			where: (chatTable, { eq }) => eq(chatTable.name, user.username),
+			where: eq(chatTable.name, user.username),
 		});
 
 		if (!existingChat) {
@@ -33,6 +41,8 @@ export {
 	// * Chat schemas
 	insertChatSchema,
 	selectChatSchema,
+	// * Chat queries
+	selectChatIdsByUserId,
 	// * Chat functions
 	insertSelfChat,
 };

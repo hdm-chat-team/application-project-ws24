@@ -1,7 +1,7 @@
 import type { ServerWebSocket } from "bun";
 import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#api/factory";
-import db from "#db";
+import { selectChatIdsByUserId } from "#db/chats";
 import { protectedRoute } from "#lib/middleware";
 
 const { upgradeWebSocket } = createBunWebSocket();
@@ -11,11 +11,7 @@ export const socketRouter = createRouter().get(
 	protectedRoute,
 	upgradeWebSocket(async (c) => {
 		const { id, username } = c.get("user");
-
-		const userChats = await db.query.chatMemberTable.findMany({
-			columns: { chatId: true },
-			where: (chatMemberTable, { eq }) => eq(chatMemberTable.userId, id),
-		});
+		const userChats = await selectChatIdsByUserId.execute({ id });
 		return {
 			onOpen: async (_, ws) => {
 				const socket = ws.raw as ServerWebSocket;
