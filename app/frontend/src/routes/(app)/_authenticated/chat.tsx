@@ -12,18 +12,20 @@ function Chat() {
 	const chats = Route.useLoaderData();
 	return (
 		<div>
-			{chats.map((chat) => (
-				<>
-					<div className="flex" key={chat.id}>
-						<span>{chat.name}</span>
-						<Button variant="link" asChild>
-							<Link to="/chat/$id" params={{ id: chat.id }}>
-								Open Chat
-							</Link>
-						</Button>
-					</div>
-				</>
-			))}
+			<ul>
+				{chats.map((chat) => (
+					<li key={chat.id}>
+						<div className="flex">
+							<span>{chat.name}</span>
+							<Button variant="link" asChild>
+								<Link to="/chat/$id" params={{ id: chat.id }}>
+									Open Chat
+								</Link>
+							</Button>
+						</div>
+					</li>
+				))}
+			</ul>
 			<Outlet />
 		</div>
 	);
