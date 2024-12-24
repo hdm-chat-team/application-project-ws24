@@ -49,6 +49,7 @@ export function useUpdateProfile() {
 }
 
 // * Hook to fetch user profile
+// * @param userId - The ID of the user whose profile to fetch
 
 export function useUserProfile(userId: string) {
 	return useQuery<UserProfile>({
