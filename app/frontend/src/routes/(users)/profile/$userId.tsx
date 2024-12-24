@@ -1,16 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useUserProfile } from "@/features/profile/queries";
 
-declare module "@tanstack/react-router" {
-	interface FileRoutesByPath {
-		"/profile/$userId": {
-			params: {
-				userId: string;
-			};
-		};
-	}
-}
-
 export const Route = createFileRoute("/(users)/profile/$userId")({
 	component: UserProfilePage,
 });

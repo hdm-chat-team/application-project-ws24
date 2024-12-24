@@ -22,6 +22,13 @@ declare module "@tanstack/react-router" {
 	interface Register {
 		router: typeof router;
 	}
+	interface FileRoutesByPath {
+		"/profile/$userId": {
+			params: {
+				userId: string;
+			};
+		};
+	}
 }
 
 export function RouterProvider() {
