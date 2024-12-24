@@ -51,6 +51,8 @@ export function useUpdateProfile() {
 // * Hook to fetch user profile
 // * @param userId - The ID of the user whose profile to fetch
 
+// FIXME: Add username support like api.profile["@:username"].$get() for a better user experience
+
 export function useUserProfile(userId: string) {
 	return useQuery<UserProfile>({
 		queryKey: ["userProfile", userId],
