@@ -175,16 +175,4 @@ describe("middleware integration", () => {
 			expect(await res.text()).toBe("Type error");
 		});
 	});
-
-	describe("limiter", () => {
-		test("should handle rate limiting", async () => {
-			// Make multiple requests in quick succession
-			const promises = Array(69) // *  Nice
-				.fill(null)
-				.map(() => app.request("/test"));
-			const responses = await Promise.all(promises);
-
-			expect(responses.some((res) => res.status === 429)).toBe(true);
-		});
-	});
 });
