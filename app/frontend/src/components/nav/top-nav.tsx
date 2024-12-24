@@ -1,4 +1,4 @@
-import Logo from "@/assets/hdm-logo-clipart-lg.png";
+import Logo from "@assets/hdm-logo-clipart-lg.png";
 import { LogOut, Settings, User } from "lucide-react";
 import { ModeToggle } from "../mode-toggle";
 import {

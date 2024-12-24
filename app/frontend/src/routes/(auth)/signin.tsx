@@ -1,4 +1,4 @@
-import Logo from "@/assets/hdm-logo-clipart-lg.png";
+import Logo from "@assets/hdm-logo-clipart-lg.png";
 import { Button } from "@/components/ui/button";
 import {
 	Card,

@@ -70,6 +70,7 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": `${__dirname}/src`,
+			"@assets": `${__dirname}/assets/`,
 			"@server": `${__dirname}/../backend/`,
 			"@shared": `${__dirname}/../shared/`,
 		},
