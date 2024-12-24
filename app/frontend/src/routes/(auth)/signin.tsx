@@ -17,7 +17,7 @@ import { z } from "zod";
 export const Route = createFileRoute("/(auth)/signin")({
 	ssr: true,
 	validateSearch: z.object({
-		from: z.string().url().default(`${window.location.origin}/`),
+		from: z.string().url().nullish(),
 	}),
 	beforeLoad: async ({ context: { queryClient } }) => {
 		if (await queryClient.ensureQueryData(authQueryOptions))
@@ -67,7 +67,7 @@ function SignIn() {
 					<CardFooter className="flex w-full flex-col">
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
-							<GithubSignInButton from={from} />
+							<GithubSignInButton from={from ?? ""} />
 						</div>
 					</CardFooter>
 				</div>

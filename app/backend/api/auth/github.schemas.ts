@@ -23,5 +23,5 @@ export const callbackQuerySchema = z.object({
 });
 
 export const githubQuerySchema = z.object({
-	from: z.string().url().nullable(),
+	from: z.string().url().nullish(),
 });
