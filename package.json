@@ -2,16 +2,17 @@
 	"name": "application-project-ws24",
 	"private": true,
 	"scripts": {
-		"check": "biome check",
+		"biome": "biome check",
+		"check": "turbo run check biome",
 		"check:fix": "biome check --write",
-		"build": "turbo build",
-		"dev": "turbo dev",
-		"preview": "turbo preview",
+		"build": "turbo run build",
+		"dev": "turbo run dev",
+		"preview": "turbo run preview",
 		"db": "cd app && bun db",
 		"ui": "cd app/frontend && bun ui",
-		"assets": "turbo assets",
+		"assets": "turbo run assets",
 		"test": "bun --env-file=./app/.env test",
-		"test:watch": "turbo test:watch"
+		"test:watch": "turbo run test:watch"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",

@@ -4,10 +4,11 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "bunx --bun vite",
-		"build": "bunx --bun vite build",
-		"preview": "bunx --bun vite preview",
 		"assets": "bun --bun pwa-assets-generator --preset minimal-2023 public/logo.svg",
+		"build": "bunx --bun vite build",
+		"check": "bun tsc",
+		"dev": "bunx --bun vite",
+		"preview": "bunx --bun vite preview",
 		"ui": "bunx --bun shadcn@latest"
 	},
 	"dependencies": {
