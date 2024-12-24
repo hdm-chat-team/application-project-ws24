@@ -1,26 +1,31 @@
 {
-	"name": "@application-project-ws24/app",
-	"module": "src/index.js",
+	"name": "@application-project-ws24/backend",
+	"module": "backend/index.js",
 	"imports": {
+		"#api/*": "./backend/api/*.ts",
 		"#auth/*": "./backend/auth/*.ts",
+		"#db": "./backend/db/index.ts",
 		"#db/*": "./backend/db/*.ts",
+		"#/db/schema/*": "./backend/db/schema/*.ts",
 		"#env": "./env.ts",
 		"#lib/*": "./backend/lib/*.ts",
-		"#shared/*": "./shared/*.ts",
-		"#types/*": "./backend/types/*.ts"
+		"#shared/*": "./shared/*.ts"
 	},
 	"scripts": {
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
-		"db:dev": "NODE_ENV=development bunx drizzle-kit",
+		"check": "bun tsc",
+		"db": "bunx drizzle-kit",
 		"db:prod": "NODE_ENV=production bunx drizzle-kit",
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"preview": "NODE_ENV=production bun run dist/index.js",
-		"start": "NODE_ENV=production bun run dist/index.js"
+		"start": "NODE_ENV=production bun run dist/index.js",
+		"test": "bun test --coverage",
+		"test:watch": "bun test --watch"
 	},
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
-		"arctic": "^2.3.2",
+		"arctic": "^2.3.3",
 		"drizzle-orm": "^0.38.2",
 		"drizzle-zod": "^0.6.0",
 		"hono": "^4.6.14",

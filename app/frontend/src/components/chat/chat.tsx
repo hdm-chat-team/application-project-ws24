@@ -20,7 +20,6 @@ interface ChatContentProps {
 
 const ChatContent: React.FC<ChatContentProps> = ({
 	messages,
-	onSendMessage,
 	handleSubmit,
 	inputMessage,
 	setInputMessage,

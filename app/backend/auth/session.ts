@@ -3,11 +3,11 @@ import {
 	insertSession,
 	selectSessionById,
 	updateSessionExpiresAt,
-} from "#db/queries.sql";
-import type { Session, User } from "#db/schema.sql";
+} from "#db/sessions";
+import type { Session } from "#db/sessions";
+import type { User } from "#db/users";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
-const SESSION_DURATION = ONE_DAY * 30;
 const REFRESH_THRESHOLD = ONE_DAY * 15;
 
 function hashToken(token: string): string {
@@ -35,15 +35,15 @@ export async function createSession(
 	userId: string,
 	token: string,
 ): Promise<Session> {
-	const session = {
-		token: hashToken(token),
-		userId,
-		expiresAt: new Date(Date.now() + SESSION_DURATION),
-	};
-	await insertSession.execute(session).catch((error) => {
-		console.error("Failed to insert session:", error);
-		throw new Error("Failed to insert session");
-	});
+	const [session] = await insertSession
+		.execute({
+			token: hashToken(token),
+			userId,
+		})
+		.catch((error) => {
+			console.error("Failed to insert session:", error);
+			throw new Error("Failed to insert session");
+		});
 	return session;
 }
 
@@ -57,28 +57,34 @@ type SessionValidationResult =
  * @returns {Promise<SessionValidationResult>} Object containing the session and user if valid, null values if invalid.
  */
 export async function validateSessionToken(
-	token: string,
+	sessionToken: string,
 ): Promise<SessionValidationResult> {
-	const sessionToken = hashToken(token);
-	const session = await selectSessionById.execute({ token: sessionToken });
+	const token = hashToken(sessionToken);
+	const session = await selectSessionById.execute({ token });
 	let fresh = false;
 
 	if (!session || Date.now() >= session.expiresAt.getTime()) {
-		await deleteSessionByToken.execute({ token: sessionToken });
+		await deleteSessionByToken.execute({ token });
 		return { session: null, user: null, fresh };
 	}
 
 	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
-		const newExpiresAt = new Date(Date.now() + SESSION_DURATION);
-		await updateSessionExpiresAt.execute({
-			token: sessionToken,
-			expiresAt: newExpiresAt,
-		});
+		const { newExpiresAt } = await updateSessionExpiresAt
+			.execute({
+				token,
+			})
+			.then((rows) => rows[0]);
 		session.expiresAt = newExpiresAt;
 		fresh = true;
 	}
 
-	return { session, user: session.user, fresh };
+	const user = session.user;
+
+	return {
+		session,
+		user,
+		fresh,
+	};
 }
 
 /**

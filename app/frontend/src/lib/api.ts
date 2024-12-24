@@ -1,4 +1,4 @@
-import type { ApiType } from "@server/app";
+import type { ApiType } from "@server/api/app";
 import { hc } from "hono/client";
 
 const { DEV } = import.meta.env;

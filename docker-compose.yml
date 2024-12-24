@@ -3,7 +3,7 @@ services:
     container_name: app
     build: .
     env_file:
-      - .env
+      - ./app/.env
     environment:
       DATABASE_URL: postgres://application-project-team:postgres@db:5432/server-db
     ports:

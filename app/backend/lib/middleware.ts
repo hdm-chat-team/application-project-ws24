@@ -8,13 +8,11 @@ import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
-import { requestId } from "hono/request-id";
 import type { HTTPResponseError } from "hono/types";
+import type { Context, ProtectedContext } from "#api/context";
 import { validateSessionToken } from "#auth/session";
-import type { Session, User } from "#db/schema.sql";
-import env, { DEV } from "#env";
+import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
-import type { Env } from "./types";
 
 const origin = DEV
 	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
@@ -29,7 +27,7 @@ const origin = DEV
  */
 const limiter = rateLimiter({
 	windowMs: 10 * 1000,
-	limit: 10,
+	limit: 20,
 	keyGenerator: (c) => {
 		try {
 			const connInfo = getConnInfo(c);
@@ -53,17 +51,18 @@ const limiter = rateLimiter({
  * - user: User object or null
  * - session: Session object or null
  */
-const authMiddleware = createMiddleware<Env>(async (c, next) => {
-	const sessionId = getCookie(c, "auth_session") ?? null;
-	if (!sessionId) {
+const authMiddleware = createMiddleware<Context>(async (c, next) => {
+	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
+	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
 		return next();
 	}
-	const { session, user, fresh } = await validateSessionToken(sessionId);
+	const { session, user, fresh } =
+		await validateSessionToken(sessionCookieToken);
 
 	if (session && fresh) {
-		setCookie(c, "auth_session", session.id, {
+		setCookie(c, "auth_session", session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
@@ -92,24 +91,22 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
  *   // Handle protected route...
  * });
  */
-export const protectedRoute = createMiddleware<
-	Env & {
-		Variables: { user: User; session: Session };
-	}
->(async (c, next) => {
-	const session = c.get("session");
-	const user = c.get("user");
+export const protectedRoute = createMiddleware<ProtectedContext>(
+	async (c, next) => {
+		const session = c.get("session");
+		const user = c.get("user");
 
-	if (!session || !user)
-		throw new HTTPException(401, {
-			message: "Unauthorized",
-			cause: "Missing session or user",
-		});
+		if (!session || !user)
+			throw new HTTPException(401, {
+				message: "Unauthorized",
+				cause: "Missing session or user",
+			});
 
-	c.set("user", user);
-	c.set("session", session);
-	return next();
-});
+		c.set("user", user);
+		c.set("session", session);
+		return next();
+	},
+);
 
 /**
  * Combines multiple middleware functions into a single middleware.
@@ -137,11 +134,12 @@ export const securityMiddlewares = every(
  *
  * @description
  * This middleware includes:
- * - `requestId()`: 	Adds a unique request ID to each incoming request.
  * - `logger()`: 		Logs request and response details.
  * - `prettyJSON()`: 	Formats JSON responses to be more readable.
  */
-export const utilityMiddlewares = every(requestId(), logger(), prettyJSON());
+export const utilityMiddlewares = every(
+	...(!TEST ? [logger(), prettyJSON()] : []),
+);
 
 /**
  * Handles errors by logging them and returning an appropriate HTTP response.
@@ -150,11 +148,15 @@ export const utilityMiddlewares = every(requestId(), logger(), prettyJSON());
  * @returns A `Response` object with a status code and message based on the error type.
  */
 export async function onError(error: Error | HTTPResponseError) {
-	console.error(error);
-	return !(error instanceof HTTPException)
-		? new Response(error.message, {
-				status: 500,
-				statusText: `Internal error: ${error.cause}`,
-			})
-		: error.getResponse();
+	let response: Response;
+	if (!(error instanceof HTTPException)) {
+		console.error(error);
+		response = new Response(error.message, {
+			status: 500,
+			statusText: `Internal error: ${error.cause}`,
+		});
+	} else {
+		response = error.getResponse();
+	}
+	return response;
 }
