@@ -9,6 +9,9 @@ function UserProfilePage() {
 	const { userId } = Route.useParams() as { userId: string };
 	const { data: profile, isLoading, error } = useUserProfile(userId);
 
+	console.log("Route Params:", { userId });
+	console.log("API Response:", { profile, isLoading, error });
+
 	if (isLoading) return <div>Loading Profile...</div>;
 	if (error) return <div>Failed to load profile: {error.message}</div>;
 	if (!profile) return <div>No profile found</div>;
