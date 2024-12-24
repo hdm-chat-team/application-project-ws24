@@ -27,7 +27,7 @@ const origin = DEV
  */
 const limiter = rateLimiter({
 	windowMs: 10 * 1000,
-	limit: 10,
+	limit: 20,
 	keyGenerator: (c) => {
 		try {
 			const connInfo = getConnInfo(c);
