@@ -51,7 +51,7 @@ export function useUpdateProfile() {
 // * Hook to fetch user profile
 
 export function useUserProfile(userId: string) {
-	return useQuery<UserProfile>({
+	return useQuery({
 		queryKey: ["userProfile", userId],
 		queryFn: async () => {
 			const response = await api.profile.me.$get();
