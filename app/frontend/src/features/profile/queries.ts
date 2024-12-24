@@ -51,10 +51,10 @@ export function useUpdateProfile() {
 // * Hook to fetch user profile
 
 export function useUserProfile(userId: string) {
-	return useQuery({
+	return useQuery<UserProfile>({
 		queryKey: ["userProfile", userId],
 		queryFn: async () => {
-			const response = await api.profile.me.$get();
+			const response = await api.profile[":id"].$get({ param: { id: userId } });
 			if (!response.ok) {
 				throw new Error("Failed to fetch user profile");
 			}
