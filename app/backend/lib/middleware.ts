@@ -13,8 +13,8 @@ import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
 const origin = DEV
-	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
-	: [`http://localhost:${env.PORT}`];
+	? [env.APP_URL, `http://localhost:${env.PORT}`]
+	: [env.APP_URL];
 
 /**
  * Middleware to handle authentication state by validating session tokens.
@@ -39,14 +39,13 @@ const authMiddleware = createMiddleware<Context>(async (c, next) => {
 	const { session, user, fresh } =
 		await validateSessionToken(sessionCookieToken);
 
-	if (session && fresh) {
+	if (!session) {
+		deleteCookie(c, "auth_session");
+	} else if (fresh) {
 		setCookie(c, "auth_session", session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
-	}
-	if (!session) {
-		deleteCookie(c, "auth_session");
 	}
 
 	c.set("user", user);

@@ -3,6 +3,9 @@ import { z } from "zod";
 const nodeEnvironments = ["development", "production", "test"] as const;
 
 export const EnvSchema = z.object({
+	// * Domain
+	APP_URL: z.string().url().default("http://localhost:5173"),
+
 	// * General
 	NODE_ENV: z.enum(nodeEnvironments).default("development"),
 	PORT: z
