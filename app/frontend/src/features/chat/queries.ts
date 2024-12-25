@@ -1,3 +1,4 @@
+import { db } from "@/features/db";
 import api from "@/lib/api";
 import type { Chat } from "@server/db/chats";
 import { queryOptions } from "@tanstack/react-query";
@@ -11,3 +12,12 @@ export const userChatsQueryOptions = queryOptions<Chat[]>({
 		return (await response.json()).data;
 	},
 });
+
+export const messagesByChatIdQueryOptions = (chatId: string) =>
+	queryOptions({
+		queryKey: ["db/messages-by-chat", chatId],
+		initialData: [],
+		queryFn: async () => {
+			return await db.messages.where("chatId").equals(chatId).toArray();
+		},
+	});
