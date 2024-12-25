@@ -18,7 +18,7 @@ export default defineConfig({
 			},
 			registerType: "autoUpdate",
 			devOptions: {
-				enabled: true,
+				enabled: false, // ? set true to enable PWA in development
 			},
 			includeAssets: ["favicon.ico", "apple-touch-icon.png"],
 			manifest: {
@@ -70,11 +70,21 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"@": `${__dirname}/src`,
+			"@assets": `${__dirname}/assets/`,
 			"@server": `${__dirname}/../backend/`,
+			"@shared": `${__dirname}/../shared/`,
 		},
 	},
 	build: {
 		outDir: "../dist/client",
 		emptyOutDir: true,
+		rollupOptions: {
+			output: {
+				manualChunks: {
+					zod: ["zod"],
+					vendor: ["react", "react-dom"],
+				},
+			},
+		},
 	},
 });

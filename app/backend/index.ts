@@ -1,16 +1,17 @@
 import { createBunWebSocket } from "hono/bun";
+import app from "#api/app";
 import env from "#env";
-import type { ChatSocket } from "#lib/types";
-import app from "./app";
+import { setServer } from "#lib/utils";
 
 // * Setup
-const { websocket } = createBunWebSocket<ChatSocket>();
+const { websocket } = createBunWebSocket();
 
 // * Server start up
-const server = Bun.serve({
+export const server = Bun.serve({
 	port: env.PORT,
 	fetch: app.fetch,
 	websocket,
 });
 
+setServer(server);
 console.log(`Server is running at ${server.url}`);
