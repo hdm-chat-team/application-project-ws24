@@ -13,8 +13,8 @@ import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
 const origin = DEV
-	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
-	: [`http://localhost:${env.PORT}`];
+	? [env.APP_URL, `http://localhost:${env.PORT}`]
+	: [env.APP_URL];
 
 /**
  * Middleware to handle authentication state by validating session tokens.
