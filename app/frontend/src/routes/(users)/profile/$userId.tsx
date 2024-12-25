@@ -16,11 +16,20 @@ export const Route = createFileRoute("/(users)/profile/$userId")({
 });
 
 function UserProfilePage() {
-	const { userId } = Route.useParams() as { userId: string };
-	const { data: profile, isLoading, error } = useUserProfile(userId);
+	const { userId } = Route.useParams();
 
-	console.log("Route Params:", { userId });
-	console.log("API Response:", { profile, isLoading, error });
+	console.log("Trying to load profile for:", {
+		requestedUserId: userId,
+	});
+
+	const { data: response, isLoading, error } = useUserProfile(userId);
+
+	const profile = response?.data;
+
+	console.log("Loaded profile:", {
+		response,
+		profile,
+	});
 
 	if (isLoading) return <div>Loading Profile...</div>;
 	if (error) return <div>Failed to load profile: {error.message}</div>;
@@ -29,17 +38,18 @@ function UserProfilePage() {
 	return (
 		<div>
 			<h1>User Profile</h1>
-			<div>
-				{profile.avatarUrl && (
-					<img
-						src={profile.avatarUrl}
-						alt={profile.displayName || "Profile picture"}
-					/>
-				)}
-				<div>
-					<p>Display name: {profile.displayName}</p>
-				</div>
-			</div>
+			{profile.avatarUrl && (
+				<img
+					src={profile.avatarUrl}
+					alt={profile.displayName || "Profile picture"}
+				/>
+			)}
+			<p>Display name: {profile.displayName}</p>
+			{profile.htmlUrl && (
+				<a href={profile.htmlUrl} target="_blank" rel="noopener noreferrer">
+					View on GitHub
+				</a>
+			)}
 		</div>
 	);
 }

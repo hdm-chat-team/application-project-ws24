@@ -28,8 +28,9 @@ export const userProfileQueryOptions = (userId: string) => ({
 		const response = await api.user[":id"].$get({
 			param: { id: userId },
 		});
+
 		if (!response.ok) throw new Error("Failed to fetch user profile");
-		return response.json().then((res) => res.data);
+		return response.json();
 	},
 });
 
