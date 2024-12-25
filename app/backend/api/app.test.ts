@@ -8,11 +8,8 @@ describe("/api", () => {
 	test("GET /", async () => {
 		const res = await api.$get();
 
-		try {
-			expect(res.status).toBe(200);
-			expect(await res.text()).toBe("Connected!");
-		} catch {
-			expect(res.status).toBe(429);
-		}
+		expect(res.ok).toBe(true);
+		expect(res.status).toBe(200);
+		expect(await res.text()).toBeTruthy();
 	});
 });

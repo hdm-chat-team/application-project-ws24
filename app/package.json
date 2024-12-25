@@ -6,7 +6,6 @@
 		"#auth/*": "./backend/auth/*.ts",
 		"#db": "./backend/db/index.ts",
 		"#db/*": "./backend/db/*.ts",
-		"#/db/schema/*": "./backend/db/schema/*.ts",
 		"#env": "./env.ts",
 		"#lib/*": "./backend/lib/*.ts",
 		"#shared/*": "./shared/*.ts"
@@ -15,7 +14,7 @@
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
 		"check": "bun tsc",
 		"db": "bunx drizzle-kit",
-		"db:prod": "NODE_ENV=production bunx drizzle-kit",
+		"db:prod": "bun --env-file=.env.production drizzle-kit",
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"preview": "NODE_ENV=production bun run dist/index.js",
 		"start": "NODE_ENV=production bun run dist/index.js",
@@ -29,7 +28,6 @@
 		"drizzle-orm": "^0.38.2",
 		"drizzle-zod": "^0.6.0",
 		"hono": "^4.6.14",
-		"hono-rate-limiter": "^0.4.2",
 		"pg": "^8.13.1",
 		"zod": "^3.24.1"
 	},
