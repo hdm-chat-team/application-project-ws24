@@ -98,7 +98,7 @@ export const protectedRoute = createMiddleware<ProtectedContext>(
 export const securityMiddlewares = every(
 	cors({
 		origin,
-		credentials: true,
+		credentials: DEV,
 		maxAge: DEV ? undefined : 3600,
 	}),
 	csrf({ origin }),
