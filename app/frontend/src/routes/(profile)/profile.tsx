@@ -5,6 +5,7 @@ import {
 	useProfile,
 	useUpdateProfile,
 } from "../../features/profile/queries";
+import TopNav from "@/components/nav/top-nav";
 
 // TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
@@ -52,6 +53,7 @@ function ProfilePage() {
 	};
 	return (
 		<div>
+			<TopNav />
 			<h1>Profile</h1>
 			{showSuccess && <div> ✅Profile updated successfully✅ </div>}
 			<div>

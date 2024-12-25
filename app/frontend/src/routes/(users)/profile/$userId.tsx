@@ -1,3 +1,5 @@
+import TopNav from "@/components/nav/top-nav";
+
 import {
 	useUserProfile,
 	userProfileQueryOptions,
@@ -37,6 +39,7 @@ function UserProfilePage() {
 
 	return (
 		<div>
+			<TopNav />
 			<h1>User Profile</h1>
 			{profile.avatarUrl && (
 				<img
