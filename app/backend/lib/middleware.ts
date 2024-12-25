@@ -13,7 +13,7 @@ import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
 const origin = DEV
-	? [env.APP_URL, `http://localhost:${env.PORT}`]
+	? [env.APP_URL, `http://localhost:${env.PORT}`, "http://localhost:5173"]
 	: [env.APP_URL];
 
 /**
