@@ -1,7 +1,17 @@
+import {
+	useUserProfile,
+	userProfileQueryOptions,
+} from "@/features/profile/queries";
 import { createFileRoute } from "@tanstack/react-router";
-import { useUserProfile } from "@/features/profile/queries";
 
 export const Route = createFileRoute("/(users)/profile/$userId")({
+	loader: ({ context: { queryClient }, params: { userId } }) => {
+		return queryClient
+			.ensureQueryData(userProfileQueryOptions(userId))
+			.catch((error) => {
+				console.error("Failed to load profile:", error);
+			});
+	},
 	component: UserProfilePage,
 });
 
@@ -20,9 +30,9 @@ function UserProfilePage() {
 		<div>
 			<h1>User Profile</h1>
 			<div>
-				{profile.avatar_url && (
+				{profile.avatarUrl && (
 					<img
-						src={profile.avatar_url}
+						src={profile.avatarUrl}
 						alt={profile.displayName || "Profile picture"}
 					/>
 				)}
