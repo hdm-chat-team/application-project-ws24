@@ -3,7 +3,7 @@ import { type OAuth2Tokens, generateState } from "arctic";
 import type { Context as HonoContext } from "hono";
 import { setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
-import type { Context } from "#api/context";
+import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
@@ -89,10 +89,7 @@ export const githubRouter = createRouter()
 		},
 	);
 
-async function createAndSetSessionCookie(
-	c: HonoContext<Context>,
-	userId: string,
-) {
+async function createAndSetSessionCookie(c: HonoContext<Env>, userId: string) {
 	const token = generateSessionToken();
 	const session = await createSession(userId, token);
 	setCookie(c, "auth_session", token, {

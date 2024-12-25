@@ -7,7 +7,7 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
-import type { Context, ProtectedContext } from "#api/context";
+import type { Env, ProtectedEnv } from "#api/app.env";
 import { validateSessionToken } from "#auth/session";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
@@ -29,7 +29,7 @@ const origin = DEV
  * - user: User object or null
  * - session: Session object or null
  */
-const authMiddleware = createMiddleware<Context>(async (c, next) => {
+const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
 	if (!sessionCookieToken) {
 		c.set("user", null);
@@ -68,7 +68,7 @@ const authMiddleware = createMiddleware<Context>(async (c, next) => {
  *   // Handle protected route...
  * });
  */
-export const protectedRoute = createMiddleware<ProtectedContext>(
+export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
 		const session = c.get("session");
 		const user = c.get("user");
