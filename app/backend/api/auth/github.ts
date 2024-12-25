@@ -18,9 +18,7 @@ import {
 } from "./github.schemas";
 
 const OAUTH_API_URL = "https://api.github.com/user";
-const REDIRECT_URL = DEV
-	? "http://localhost:5173"
-	: `http://localhost:${env.PORT}`;
+const REDIRECT_URL = DEV ? "http://localhost:5173" : env.APP_URL;
 
 const TEN_MINUTES = 60 * 10;
 
