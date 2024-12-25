@@ -1,10 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useProfile, useUpdateProfile } from "../../features/profile/queries";
+import {
+	profileQueryOptions,
+	useProfile,
+	useUpdateProfile,
+} from "../../features/profile/queries";
 
 // TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
 export const Route = createFileRoute("/(profile)/profile")({
+	loader: ({ context: { queryClient } }) => {
+		return queryClient.ensureQueryData(profileQueryOptions).catch((error) => {
+			console.error("Failed to load profile:", error);
+		});
+	},
 	component: ProfilePage,
 });
 
@@ -14,9 +23,11 @@ function ProfilePage() {
 	const [showSuccess, setShowSuccess] = useState(false);
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
+
 	if (isLoading) return <div>Loading Profile...</div>;
 	if (error) return <div>Failed to load profile: {error.message}</div>;
 	if (!profile) return <div>No profile found</div>;
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		const trimmedName = newDisplayName.trim();
@@ -44,9 +55,9 @@ function ProfilePage() {
 			<h1>Profile</h1>
 			{showSuccess && <div> ✅Profile updated successfully✅ </div>}
 			<div>
-				{profile.avatar_url && (
+				{profile.avatarUrl && (
 					<img
-						src={profile.avatar_url}
+						src={profile.avatarUrl}
 						alt={profile.displayName || "Profile image"}
 					/>
 				)}
@@ -77,6 +88,15 @@ function ProfilePage() {
 					) : (
 						<>
 							<p>Display name: {profile.displayName}</p>
+							{profile.htmlUrl && (
+								<a
+									href={profile.htmlUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									View on GitHub
+								</a>
+							)}
 							<button
 								type="button"
 								onClick={() => {
