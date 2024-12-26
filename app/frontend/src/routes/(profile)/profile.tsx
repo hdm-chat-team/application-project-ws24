@@ -22,7 +22,6 @@ export const Route = createFileRoute("/(profile)/profile")({
 
 function ProfilePage() {
 	const [isEditing, setIsEditing] = useState(false);
-	const [showSuccess, setShowSuccess] = useState(false);
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
 
@@ -39,8 +38,6 @@ function ProfilePage() {
 		updateProfile.mutate(newDisplayName, {
 			onSuccess: () => {
 				setIsEditing(false);
-				setShowSuccess(true);
-				setTimeout(() => setShowSuccess(false), 3000);
 			},
 			onError: (error) => {
 				console.error("Error updating profile:", error);
@@ -50,28 +47,19 @@ function ProfilePage() {
 	return (
 		<div>
 			<TopNav />
-			<main>
-				{showSuccess && (
-					<div>
-						<p>
-							<span>✓</span>
-							Profile updated successfully
-						</p>
-					</div>
-				)}
-
-				<ProfileCard
-					profile={profile}
-					isOwnProfile={true}
-					onEdit={() => setIsEditing(true)}
-				/>
-
-				{isEditing && (
+			<main className="container mx-auto max-w-3xl p-4">
+				{isEditing ? (
 					<EditProfileForm
 						initialName={profile.displayName || ""}
 						onSubmit={handleSubmit}
 						onCancel={() => setIsEditing(false)}
 						isLoading={updateProfile.isPending}
+					/>
+				) : (
+					<ProfileCard
+						profile={profile}
+						isOwnProfile={true}
+						onEdit={() => setIsEditing(true)}
 					/>
 				)}
 			</main>
