@@ -69,7 +69,7 @@ export function ProfileCard({
 				{isOwnProfile && onEdit && (
 					<>
 						<Separator className="my-4" />
-						<div className="flex justify-end">
+						<div className="flex justify-start">
 							<Button onClick={onEdit} variant="outline" size="sm">
 								Edit Profile
 							</Button>
