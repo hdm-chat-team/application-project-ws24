@@ -1,4 +1,16 @@
+import { Button } from "@/components/ui/button";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
+import { Input } from "../ui/input";
 
 // * Ensure type safety
 
@@ -23,31 +35,50 @@ export function EditProfileForm({
 	};
 
 	return (
-		<div>
-			<form onSubmit={handleSubmit}>
-				<div>
-					<label>
-						Display Name
-						<input
-							type="text"
-							value={name}
-							onChange={(e) => setName(e.target.value)}
-							required
-							minLength={2}
-							placeholder="Enter your display name"
-						/>
-					</label>
-				</div>
+		<Card>
+			<CardHeader>
+				<CardTitle>Edit Profile</CardTitle>
+				<CardDescription>
+					Make changes to your profile information.
+				</CardDescription>
+			</CardHeader>
 
-				<div>
-					<button type="submit" disabled={isLoading}>
-						{isLoading ? "Saving..." : "Save Changes"}
-					</button>
-					<button type="button" onClick={onCancel}>
+			<form onSubmit={handleSubmit}>
+				<CardContent>
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="displayName">Display Name</Label>
+							<Input
+								id="displayName"
+								type="text"
+								value={name}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+									setName(e.target.value)
+								}
+								required
+								minLength={2}
+								placeholder="Enter your display name"
+							/>
+						</div>
+
+						<Separator />
+					</div>
+				</CardContent>
+
+				<CardFooter className="flex justify-end space-x-2">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onCancel}
+						disabled={isLoading}
+					>
 						Cancel
-					</button>
-				</div>
+					</Button>
+					<Button type="submit" disabled={isLoading}>
+						{isLoading ? "Saving..." : "Save Changes"}
+					</Button>
+				</CardFooter>
 			</form>
-		</div>
+		</Card>
 	);
 }

@@ -31,11 +31,6 @@ function UserProfilePage() {
 		<div>
 			<TopNav />
 			<main>
-				<div>
-					<h1>User Profile</h1>
-					<p>{userId} Profile</p>
-				</div>
-
 				<ProfileCard profile={profile} isOwnProfile={false} />
 			</main>
 		</div>

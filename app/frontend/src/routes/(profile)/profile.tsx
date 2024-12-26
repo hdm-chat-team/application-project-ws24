@@ -51,10 +51,6 @@ function ProfilePage() {
 		<div>
 			<TopNav />
 			<main>
-				<div>
-					<h1>My Profile</h1>
-				</div>
-
 				{showSuccess && (
 					<div>
 						<p>
