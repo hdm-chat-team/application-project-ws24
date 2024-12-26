@@ -33,7 +33,6 @@ dev-dist
 
 # code gen
 routeTree.gen.ts
-drizzle/
 
 # Debug
 npm-debug.log*

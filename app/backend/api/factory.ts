@@ -1,10 +1,10 @@
 import { Hono } from "hono";
-import type { Context } from "#api/context";
+import type { Env } from "#api/app.env";
 import { onError } from "#lib/middleware";
 import { securityMiddlewares, utilityMiddlewares } from "#lib/middleware";
 
 export function createRouter() {
-	return new Hono<Context>({
+	return new Hono<Env>({
 		strict: false,
 	});
 }

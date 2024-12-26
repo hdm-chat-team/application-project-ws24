@@ -1,28 +1,18 @@
-import { db } from "@/features/db";
-import { messagesByChatIdQueryOptions } from "@/features/db/queries";
+import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
 import { useSocket } from "@/hooks";
 import { type Message, parseMessage } from "@shared/message";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
+import { useSaveMessage } from "./use-save-message";
 
 export function useChat(chatId: string) {
+	const { addEventListener, removeEventListener } = useSocket();
+
 	const queryClient = useQueryClient();
-	const { addEventListener, removeEventListener, ...context } = useSocket();
-
-	const {
-		data: messages,
-		isLoading,
-		...query
-	} = useQuery(messagesByChatIdQueryOptions(chatId));
-
-	const mutation = useMutation({
-		mutationKey: ["saveMessage"],
-		mutationFn: async (message: Message) => {
-			await db.messages.add(message);
-		},
-		onSuccess: () =>
-			queryClient.invalidateQueries({ queryKey: ["db/messages-by-chat"] }),
-	});
+	const saveMessageMutation = useSaveMessage(chatId);
+	const { data: messages, ...query } = useQuery(
+		messagesByChatIdQueryOptions(chatId),
+	);
 
 	const handleMessage = useCallback(
 		async (event: MessageEvent) => {
@@ -30,10 +20,10 @@ export function useChat(chatId: string) {
 
 			if (message?.chatId === chatId) {
 				queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
-				await mutation.mutateAsync(message);
+				await saveMessageMutation.mutateAsync(message);
 			}
 		},
-		[chatId, mutation.mutateAsync, queryClient],
+		[chatId, saveMessageMutation.mutateAsync, queryClient],
 	);
 
 	useEffect(() => {
@@ -43,5 +33,5 @@ export function useChat(chatId: string) {
 		};
 	}, [addEventListener, removeEventListener, handleMessage]);
 
-	return { messages, isLoading, ...context, query };
+	return { messages, query };
 }

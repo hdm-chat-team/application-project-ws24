@@ -1,29 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/features/auth";
-import api from "@/lib/api";
+import { usePostMessageMutation } from "@/features/chat/hooks";
 import { messageFormSchema } from "@shared/message";
 import { useForm } from "@tanstack/react-form";
-import { useMutation } from "@tanstack/react-query";
 
 export default function MessageForm({ chatId }: { chatId: string }) {
-	const { user } = useUser();
-
-	const postMessageMutation = useMutation({
-		mutationKey: ["postMessage"],
-		mutationFn: async (body: string) => {
-			if (!user) {
-				return;
-			}
-			const res = await api.chat[":id"].$post({
-				param: { id: chatId },
-				form: { body },
-			});
-			if (!res.ok) {
-				throw new Error("Failed to send message");
-			}
-		},
-	});
+	const postMessageMutation = usePostMessageMutation(chatId);
 
 	const form = useForm({
 		defaultValues: {

@@ -1,17 +1,17 @@
-import type { Env } from "hono";
+import type { Env as E } from "hono";
 import type { Session } from "#db/sessions";
 import type { User } from "#db/users";
 
-export interface Context extends Env {
+export type Env = E & {
 	Variables: {
 		user: User | null;
 		session: Session | null;
 	};
-}
+};
 
-export interface ProtectedContext extends Env {
+export type ProtectedEnv = E & {
 	Variables: {
 		user: User;
 		session: Session;
 	};
-}
+};
