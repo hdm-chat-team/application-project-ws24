@@ -1,6 +1,11 @@
 import TopNav from "@/components/nav/top-nav";
 import { ProfileCard } from "@/components/profile/ProfileCard";
 import {
+	ProfileEmptyState,
+	ProfileErrorState,
+	ProfileLoadingState,
+} from "@/components/profile/ProfileStates";
+import {
 	useUserProfile,
 	userProfileQueryOptions,
 } from "@/features/profile/queries";
@@ -23,14 +28,14 @@ function UserProfilePage() {
 	const profile = response?.data;
 
 	// Loading states
-	if (isLoading) return <div>Loading Profile...</div>;
-	if (error) return <div>Failed to load profile: {error.message}</div>;
-	if (!profile) return <div>No profile found</div>;
+	if (isLoading) return <ProfileLoadingState />;
+	if (error) return <ProfileErrorState error={error} />;
+	if (!profile) return <ProfileEmptyState />;
 
 	return (
 		<div>
 			<TopNav />
-			<main>
+			<main className="container mx-auto max-w-3xl p-4">
 				<ProfileCard profile={profile} isOwnProfile={false} />
 			</main>
 		</div>

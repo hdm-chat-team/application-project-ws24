@@ -1,6 +1,11 @@
 import TopNav from "@/components/nav/top-nav";
 import { EditProfileForm } from "@/components/profile/EditProfileForm";
 import { ProfileCard } from "@/components/profile/ProfileCard";
+import {
+	ProfileEmptyState,
+	ProfileErrorState,
+	ProfileLoadingState,
+} from "@/components/profile/ProfileStates";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
@@ -26,9 +31,9 @@ function ProfilePage() {
 	const updateProfile = useUpdateProfile();
 
 	// Loading states
-	if (isLoading) return <div>Loading Profile...</div>;
-	if (error) return <div>Failed to load profile: {error.message}</div>;
-	if (!profile) return <div>No profile found</div>;
+	if (isLoading) return <ProfileLoadingState />;
+	if (error) return <ProfileErrorState error={error} />;
+	if (!profile) return <ProfileEmptyState />;
 
 	const handleSubmit = (newDisplayName: string) => {
 		if (newDisplayName.length < 2) {
