@@ -6,6 +6,9 @@
 		"useIgnoreFile": true,
 		"defaultBranch": "main"
 	},
+	"files": {
+		"ignore": ["**/drizzle/meta/*"]
+	},
 	"linter": {
 		"rules": {
 			"nursery": {

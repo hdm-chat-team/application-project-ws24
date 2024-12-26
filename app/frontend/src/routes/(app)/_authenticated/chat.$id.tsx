@@ -1,8 +1,6 @@
-/* import MessageForm from "@/features/chat/components/message-form";
-import { useChat } from "@/features/chat/hooks/use-chat"; */
 import MessageForm from "@/features/chat/components/message-form";
-import { useChat } from "@/features/chat/hooks/use-chat";
-import { messagesByChatIdQueryOptions } from "@/features/db/queries";
+import { useChat } from "@/features/chat/hooks";
+import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
@@ -18,7 +16,7 @@ export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
 
 function Chat() {
 	const chatId = Route.useParams().id;
-	const { messages, readyState } = useChat(chatId);
+	const { messages } = useChat(chatId);
 
 	return (
 		<>
@@ -26,7 +24,6 @@ function Chat() {
 			<Link to="/">start page</Link>
 			<div>
 				<h2>Chat Messages</h2>
-				<h2>Chat Socket Status: {readyState}</h2>
 				<ul>
 					{messages.map((message) => (
 						<li key={message.id}>

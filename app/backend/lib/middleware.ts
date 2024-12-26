@@ -7,14 +7,14 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
-import type { Context, ProtectedContext } from "#api/context";
+import type { Env, ProtectedEnv } from "#api/app.env";
 import { validateSessionToken } from "#auth/session";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
 const origin = DEV
-	? ["http://localhost:5173", `http://localhost:${env.PORT}`]
-	: [`http://localhost:${env.PORT}`];
+	? [env.APP_URL, `http://localhost:${env.PORT}`, "http://localhost:5173"]
+	: [env.APP_URL];
 
 /**
  * Middleware to handle authentication state by validating session tokens.
@@ -29,7 +29,7 @@ const origin = DEV
  * - user: User object or null
  * - session: Session object or null
  */
-const authMiddleware = createMiddleware<Context>(async (c, next) => {
+const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
 	if (!sessionCookieToken) {
 		c.set("user", null);
@@ -39,14 +39,13 @@ const authMiddleware = createMiddleware<Context>(async (c, next) => {
 	const { session, user, fresh } =
 		await validateSessionToken(sessionCookieToken);
 
-	if (session && fresh) {
+	if (!session) {
+		deleteCookie(c, "auth_session");
+	} else if (fresh) {
 		setCookie(c, "auth_session", session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
-	}
-	if (!session) {
-		deleteCookie(c, "auth_session");
 	}
 
 	c.set("user", user);
@@ -69,7 +68,7 @@ const authMiddleware = createMiddleware<Context>(async (c, next) => {
  *   // Handle protected route...
  * });
  */
-export const protectedRoute = createMiddleware<ProtectedContext>(
+export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
 		const session = c.get("session");
 		const user = c.get("user");
@@ -99,7 +98,7 @@ export const protectedRoute = createMiddleware<ProtectedContext>(
 export const securityMiddlewares = every(
 	cors({
 		origin,
-		credentials: true,
+		credentials: DEV,
 		maxAge: DEV ? undefined : 3600,
 	}),
 	csrf({ origin }),
