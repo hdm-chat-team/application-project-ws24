@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { User } from "lucide-react";
 
 // * Ensure type safety
+
 type ProfileCardProps = {
 	profile: {
 		avatarUrl?: string | null;
