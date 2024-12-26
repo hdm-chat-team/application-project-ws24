@@ -25,6 +25,7 @@ function ProfilePage() {
 	const { data: profile, isLoading, error } = useProfile();
 	const updateProfile = useUpdateProfile();
 
+	// Loading states
 	if (isLoading) return <div>Loading Profile...</div>;
 	if (error) return <div>Failed to load profile: {error.message}</div>;
 	if (!profile) return <div>No profile found</div>;
