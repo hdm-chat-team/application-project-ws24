@@ -77,13 +77,13 @@ export async function validateSessionToken(
 		result.expiresAt = newExpiresAt;
 		fresh = true;
 	}
-	const { user, ...session } = result;
-	const profile = user.profile as UserProfile;
+	const { user: userWithProfile, ...session } = result;
+	const { profile, ...user } = userWithProfile;
 
 	return {
 		session,
 		user,
-		profile,
+		profile: profile as UserProfile,
 		fresh,
 	};
 }
