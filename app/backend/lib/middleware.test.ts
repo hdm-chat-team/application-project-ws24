@@ -1,4 +1,4 @@
-import { describe, expect, mock, spyOn, test } from "bun:test";
+import { beforeAll, describe, expect, mock, spyOn, test } from "bun:test";
 import { createApi } from "#api/factory";
 import type { Session } from "#db/sessions";
 import type { User, UserProfile } from "#db/users";
@@ -39,6 +39,36 @@ const app = createApi()
 
 describe("middleware integration", () => {
 	describe("authMiddleware", () => {
+		let testDate: string;
+		let testUser: User;
+		let testProfile: UserProfile;
+		let testSession: Session;
+
+		beforeAll(() => {
+			testDate = new Date().toISOString();
+			testUser = {
+				id: "test-id",
+				email: "test@mail.de",
+				username: "test",
+				createdAt: testDate,
+				updatedAt: testDate,
+			};
+			testProfile = {
+				id: "test-id",
+				userId: "test-id",
+				avatarUrl: "test-url",
+				displayName: null,
+				htmlUrl: null,
+				createdAt: testDate,
+				updatedAt: testDate,
+			};
+			testSession = {
+				token: "test-session",
+				userId: "test-id",
+				expiresAt: new Date(Date.now() + 1000 * 60 * 60),
+			};
+		});
+
 		test("should handle requests without auth cookie", async () => {
 			const res = await app.request("/test");
 			const json = (await res.json()) as {
@@ -72,29 +102,6 @@ describe("middleware integration", () => {
 		});
 
 		test("should handle valid auth sessions", async () => {
-			const testDate = new Date().toISOString();
-			const testUser: User = {
-				id: "test-id",
-				email: "test@mail.de",
-				username: "test",
-				createdAt: testDate,
-				updatedAt: null,
-			};
-			const testProfile: UserProfile = {
-				id: "test-id",
-				userId: "test-id",
-				avatarUrl: "test-url",
-				displayName: null,
-				htmlUrl: null,
-				createdAt: testDate,
-				updatedAt: testDate,
-			};
-			const testSession: Session = {
-				token: "test-session",
-				userId: "test-id",
-				expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-			};
-
 			spyOn(session, "validateSessionToken").mockImplementation(async () => ({
 				session: testSession,
 				user: testUser,
@@ -126,29 +133,6 @@ describe("middleware integration", () => {
 			});
 		});
 		test("should refresh session when needed", async () => {
-			const testDate = new Date().toISOString();
-			const testUser: User = {
-				id: "test-id",
-				email: "test@mail.de",
-				username: "test",
-				createdAt: testDate,
-				updatedAt: testDate,
-			};
-			const testProfile: UserProfile = {
-				id: "test-id",
-				userId: "test-id",
-				avatarUrl: "test-url",
-				displayName: null,
-				htmlUrl: null,
-				createdAt: testDate,
-				updatedAt: testDate,
-			};
-			const testSession: Session = {
-				token: "test-session",
-				userId: "test-id",
-				expiresAt: new Date(Date.now() + 1000 * 60 * 60),
-			};
-
 			spyOn(session, "validateSessionToken").mockImplementation(async () => ({
 				session: testSession,
 				user: testUser,

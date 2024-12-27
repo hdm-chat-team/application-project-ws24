@@ -9,8 +9,8 @@ import {
 } from "bun:test";
 import * as sessionManager from "./session";
 
-describe("session", () => {
-	let mockQueries = {
+function createMockQueries() {
+	return {
 		deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
 		insertSession: {
 			execute: mock(() =>
@@ -43,43 +43,13 @@ describe("session", () => {
 			),
 		},
 	};
+}
+
+describe("session", () => {
+	let mockQueries = createMockQueries();
 
 	beforeEach(() => {
-		// Reset mocks before each test
-		mockQueries = {
-			deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
-			insertSession: {
-				execute: mock(() =>
-					Promise.resolve([
-						{
-							token: "test-token",
-							userId: "test-user-id",
-							expiresAt: new Date(),
-						},
-					]),
-				),
-			},
-			selectSessionByToken: {
-				execute: mock(() =>
-					Promise.resolve({
-						token: "",
-						userId: "",
-						expiresAt: new Date(),
-						user: { id: "", name: "" },
-					}),
-				),
-			},
-			updateSessionExpiresAt: {
-				execute: mock(() =>
-					Promise.resolve([
-						{
-							newExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-						},
-					]),
-				),
-			},
-		};
-
+		mockQueries = createMockQueries();
 		mock.module("#db/sessions", () => mockQueries);
 	});
 
