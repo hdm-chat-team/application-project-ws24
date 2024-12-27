@@ -10,7 +10,9 @@ import db from "#db";
 import { userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
-const selectUserSchema = createSelectSchema(userTable);
+const selectUserSchema = createSelectSchema(userTable).omit({
+	githubId: true,
+});
 type User = z.infer<typeof selectUserSchema>;
 
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
@@ -25,6 +27,12 @@ const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 });
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
+
+const userWithProfileSchema = z.object({
+	...selectUserSchema.shape,
+	profile: selectUserProfileSchema,
+});
+type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 
 const insertUser = db
 	.insert(userTable)
@@ -102,6 +110,14 @@ const selectUserProfile = db.query.userProfileTable
 	})
 	.prepare("select_user_profile");
 
+const selectUserWithProfile = db.query.userTable
+	.findFirst({
+		columns: { githubId: false },
+		with: { profile: true },
+		where: eq(userTable.id, sql.placeholder("id")),
+	})
+	.prepare("select_user_with_profile");
+
 async function updateUserProfile(
 	userId: string,
 	newValues: {
@@ -140,11 +156,13 @@ async function selectUserChats(userId: string) {
 export {
 	// * User schemas
 	insertUserSchema,
-	selectUserByGithubId,
-	selectUserProfileSchema,
 	selectUserSchema,
+	selectUserProfileSchema,
 	updateUserProfileSchema,
+	userWithProfileSchema,
 	// * User queries
+	selectUserWithProfile,
+	selectUserByGithubId,
 	selectUserProfile,
 	insertProfile,
 	insertUser,
@@ -154,4 +172,4 @@ export {
 	updateUserProfile,
 	insertUserWithProfile,
 };
-export type { User, UserProfile };
+export type { User, UserProfile, UserWithProfile };

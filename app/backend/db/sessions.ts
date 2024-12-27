@@ -17,10 +17,10 @@ const insertSession = db
 	.returning()
 	.prepare("insert_session");
 
-const selectSessionById = db.query.sessionTable
+const selectSessionByToken = db.query.sessionTable
 	.findFirst({
 		where: eq(sessionTable.token, sql.placeholder("token")),
-		with: { user: true },
+		with: { user: { columns: { githubId: false }, with: { profile: true } } },
 	})
 	.prepare("select_session_by_token");
 
@@ -41,7 +41,7 @@ const updateSessionExpiresAt = db
 export {
 	// * Session schemas
 	insertSessionSchema,
-	selectSessionById,
+	selectSessionByToken,
 	selectSessionSchema,
 	updateSessionExpiresAt,
 	// * Session queries

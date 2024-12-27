@@ -1,11 +1,11 @@
 import {
 	deleteSessionByToken,
 	insertSession,
-	selectSessionById,
+	selectSessionByToken,
 	updateSessionExpiresAt,
 } from "#db/sessions";
 import type { Session } from "#db/sessions";
-import type { User } from "#db/users";
+import type { User, UserProfile } from "#db/users";
 
 const ONE_DAY = 1000 * 60 * 60 * 24;
 const REFRESH_THRESHOLD = ONE_DAY * 15;
@@ -48,41 +48,42 @@ export async function createSession(
 }
 
 type SessionValidationResult =
-	| { session: Session; user: User; fresh: boolean }
-	| { session: null; user: null; fresh: boolean };
+	| { session: Session; user: User; profile: UserProfile; fresh: boolean }
+	| { session: null; user: null; profile: null; fresh: boolean };
 
 /**
  * Validates a session token and refreshes the session if needed.
- * @param {string} token - The session token to validate.
+ * @param {string} sessionToken - The session token to validate.
  * @returns {Promise<SessionValidationResult>} Object containing the session and user if valid, null values if invalid.
  */
 export async function validateSessionToken(
 	sessionToken: string,
 ): Promise<SessionValidationResult> {
 	const token = hashToken(sessionToken);
-	const session = await selectSessionById.execute({ token });
+	const result = await selectSessionByToken.execute({ token });
 	let fresh = false;
 
-	if (!session || Date.now() >= session.expiresAt.getTime()) {
+	if (!result || Date.now() >= result.expiresAt.getTime()) {
 		await deleteSessionByToken.execute({ token });
-		return { session: null, user: null, fresh };
+		return { session: null, user: null, profile: null, fresh };
 	}
 
-	if (Date.now() >= session.expiresAt.getTime() - REFRESH_THRESHOLD) {
+	if (Date.now() >= result.expiresAt.getTime() - REFRESH_THRESHOLD) {
 		const { newExpiresAt } = await updateSessionExpiresAt
 			.execute({
 				token,
 			})
 			.then((rows) => rows[0]);
-		session.expiresAt = newExpiresAt;
+		result.expiresAt = newExpiresAt;
 		fresh = true;
 	}
-
-	const user = session.user;
+	const { user, ...session } = result;
+	const profile = user.profile as UserProfile;
 
 	return {
 		session,
 		user,
+		profile,
 		fresh,
 	};
 }

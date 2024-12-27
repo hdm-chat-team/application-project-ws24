@@ -18,7 +18,8 @@ export function useUser() {
 	if (context === undefined)
 		throw new Error("useUser must be used within an AuthProvider");
 
-	const { data: user, ...rest } = context;
+	const { data, ...rest } = context;
+	const { user, profile } = data || {};
 
-	return { user: user || null, isSignedIn: !!user, ...rest };
+	return { user: user, profile, isSignedIn: !!user, ...rest };
 }

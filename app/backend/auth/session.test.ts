@@ -23,7 +23,7 @@ describe("session", () => {
 				]),
 			),
 		},
-		selectSessionById: {
+		selectSessionByToken: {
 			execute: mock(() =>
 				Promise.resolve({
 					token: "",
@@ -59,7 +59,7 @@ describe("session", () => {
 					]),
 				),
 			},
-			selectSessionById: {
+			selectSessionByToken: {
 				execute: mock(() =>
 					Promise.resolve({
 						token: "",
@@ -150,12 +150,13 @@ describe("session", () => {
 				},
 			};
 
-			mockQueries.selectSessionById.execute = mock(() =>
-				Promise.resolve(mockSession),
-			);
+			mockQueries.selectSessionByToken.execute = mock(() => {
+				return Promise.resolve(mockSession);
+			});
 			const result = await sessionManager.validateSessionToken("valid-token");
 
-			expect(result.session).toEqual(mockSession);
+			const { user, ...sessionWithoutUser } = mockSession;
+			expect(result.session).toEqual(sessionWithoutUser);
 			expect(result.user).toEqual(mockSession.user);
 			expect(result.fresh).toBe(false); // Should be false since expiry is far in future
 		});
@@ -170,7 +171,11 @@ describe("session", () => {
 
 			mock.module("#db/queries.sql", () => ({
 				selectSessionById: {
-					execute: mock(() => Promise.resolve(mockExpiredSession)),
+					execute: mock(({ token }) => {
+						return token === "hashed-expired-token"
+							? Promise.resolve(mockExpiredSession)
+							: Promise.resolve(null);
+					}),
 				},
 			}));
 
@@ -188,9 +193,9 @@ describe("session", () => {
 				user: { id: "test-user-id", name: "Test User" },
 			};
 
-			mockQueries.selectSessionById.execute = mock(() =>
-				Promise.resolve(mockSession),
-			);
+			mockQueries.selectSessionByToken.execute = mock(() => {
+				return Promise.resolve(mockSession);
+			});
 			mockQueries.updateSessionExpiresAt.execute = mock(() =>
 				Promise.resolve([
 					{
