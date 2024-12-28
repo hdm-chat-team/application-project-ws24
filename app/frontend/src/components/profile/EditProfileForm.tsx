@@ -9,8 +9,15 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import { Input } from "../ui/input";
+
+// * min length 2 characters
+
+const profileFormSchema = z.object({
+	displayName: z.string().min(2, "Name must be at least 2 characters"),
+});
 
 // * Ensure type safety
 
@@ -27,12 +34,18 @@ export function EditProfileForm({
 	onCancel,
 	isLoading,
 }: EditProfileFormProps) {
-	const [name, setName] = useState(initialName);
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		onSubmit(name.trim());
-	};
+	const form = useForm({
+		defaultValues: {
+			displayName: initialName,
+		},
+		onSubmit: async ({ value }) => {
+			await onSubmit(value.displayName);
+			form.reset();
+		},
+		validators: {
+			onSubmit: profileFormSchema,
+		},
+	});
 
 	return (
 		<Card>
@@ -43,24 +56,30 @@ export function EditProfileForm({
 				</CardDescription>
 			</CardHeader>
 
-			<form onSubmit={handleSubmit}>
+			<form
+				onSubmit={(e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					form.handleSubmit();
+				}}
+			>
 				<CardContent>
 					<div className="space-y-4">
-						<div className="space-y-2">
-							<Label htmlFor="displayName">Display Name</Label>
-							<Input
-								id="displayName"
-								type="text"
-								value={name}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-									setName(e.target.value)
-								}
-								required
-								minLength={2}
-								placeholder="Enter your display name"
-							/>
-						</div>
-
+						<form.Field name="displayName">
+							{(field) => (
+								<div className="space-y-2">
+									<Label htmlFor={field.name}>Display Name</Label>
+									<Input
+										id={field.name}
+										name={field.name}
+										value={field.state.value}
+										onChange={(e) => field.handleChange(e.target.value)}
+										placeholder="Enter your display name"
+										disabled={isLoading}
+									/>
+								</div>
+							)}
+						</form.Field>
 						<Separator />
 					</div>
 				</CardContent>
@@ -74,9 +93,15 @@ export function EditProfileForm({
 					>
 						Cancel
 					</Button>
-					<Button type="submit" disabled={isLoading}>
-						{isLoading ? "Saving..." : "Save Changes"}
-					</Button>
+					<form.Subscribe
+						selector={(state) => [state.canSubmit, state.isSubmitting]}
+					>
+						{([canSubmit, isSubmitting]) => (
+							<Button type="submit" disabled={!canSubmit || isLoading}>
+								{isLoading || isSubmitting ? "Saving..." : "Save Changes"}
+							</Button>
+						)}
+					</form.Subscribe>
 				</CardFooter>
 			</form>
 		</Card>
