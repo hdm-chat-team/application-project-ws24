@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import { Input } from "../../../components/ui/input";
+import { Input } from "@/components/ui/input";
 
 // * min length 2 characters
 
