@@ -6,13 +6,13 @@ import {
 	ProfileErrorState,
 	ProfileLoadingState,
 } from "@/components/profile/profile-states";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	profileQueryOptions,
 	useUpdateProfile,
 } from "../../features/profile/queries";
-import { useQuery } from "@tanstack/react-query";
 
 // TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
