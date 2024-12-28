@@ -19,7 +19,7 @@ import {
 export const Route = createFileRoute("/(app)/profile")({
 	loader: ({ context: { queryClient } }) => {
 		return queryClient.ensureQueryData(profileQueryOptions).catch((error) => {
-			console.error("Failed to load profile:", error);
+			console.error("Failed to load own profile:", error);
 		});
 	},
 	component: ProfilePage,
