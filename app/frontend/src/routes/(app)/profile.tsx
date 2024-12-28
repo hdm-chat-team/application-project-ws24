@@ -1,11 +1,11 @@
 import TopNav from "@/components/nav/top-nav";
-import { EditProfileForm } from "@/components/profile/edit-profile-form";
-import { ProfileCard } from "@/components/profile/profile-card";
+import { EditProfileForm } from "@/features/profile/components/edit-profile-form";
+import { ProfileCard } from "@/features/profile/components/profile-card";
 import {
 	ProfileEmptyState,
 	ProfileErrorState,
 	ProfileLoadingState,
-} from "@/components/profile/profile-states";
+} from "@/features/profile/components/profile-states";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";

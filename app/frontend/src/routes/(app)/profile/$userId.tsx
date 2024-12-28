@@ -1,10 +1,10 @@
 import TopNav from "@/components/nav/top-nav";
-import { ProfileCard } from "@/components/profile/profile-card";
+import { ProfileCard } from "@/features/profile/components/profile-card";
 import {
-  ProfileEmptyState,
-  ProfileErrorState,
-  ProfileLoadingState,
-} from "@/components/profile/profile-states";
+	ProfileEmptyState,
+	ProfileErrorState,
+	ProfileLoadingState,
+} from "@/features/profile/components/profile-states";
 import { userProfileQueryOptions } from "@/features/profile/queries";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
