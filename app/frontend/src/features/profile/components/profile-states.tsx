@@ -51,3 +51,17 @@ export function ProfileEmptyState() {
 		</DefaultLayout>
 	);
 }
+
+// * Invalid User State
+export function InvalidUserState() {
+	return (
+		<DefaultLayout>
+			<Card>
+				<div className="flex items-center space-x-2 text-destructive">
+					<span>⚠️</span>
+					<div>This user does not exist or the user ID is invalid.</div>
+				</div>
+			</Card>
+		</DefaultLayout>
+	);
+}
