@@ -1,12 +1,16 @@
 import api from "@/lib/api";
 import type { UserProfile } from "@server/db/users";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	queryOptions,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
 
 const PROFILE_QUERY_KEY = ["profile"];
 
 // * Query options for own profile
 
-export const profileQueryOptions = {
+export const profileQueryOptions = queryOptions<UserProfile>({
 	queryKey: PROFILE_QUERY_KEY,
 	queryFn: async () => {
 		const response = await api.user.profile.$get();
@@ -15,38 +19,30 @@ export const profileQueryOptions = {
 		}
 		return response.json();
 	},
-};
+});
 
-// * Query options for fetch user profile
+// * Query options for fetch user profile by userId
 // * @param userId - The ID of the user whose profile to fetch
 
 // FIXME: Add username support like api.profile["@:username"].$get() for a better user experience
 
-export const userProfileQueryOptions = (userId: string) => ({
-	queryKey: ["userProfile", userId],
-	queryFn: async () => {
-		const response = await api.user[":id"].$get({
-			param: { id: userId },
-		});
+export const userProfileQueryOptions = (userId: string) =>
+	queryOptions<{ data: UserProfile }>({
+		queryKey: ["userProfile", userId],
+		queryFn: async () => {
+			const response = await api.user[":id"].$get({
+				param: { id: userId },
+			});
 
-		if (!response.ok) throw new Error("Failed to fetch user profile");
-		return response.json();
-	},
-});
+			if (!response.ok) {
+				throw new Error("Failed to fetch user profile");
+			}
 
-// * Hook to fetch your own profile
+			return response.json();
+		},
+	});
 
-export function useProfile() {
-	return useQuery<UserProfile>(profileQueryOptions);
-}
-
-// * Hook to fetch user profile
-
-export function useUserProfile(userId: string) {
-	return useQuery(userProfileQueryOptions(userId));
-}
-
-// * Hook to update profile
+// * Mutation to update profile
 
 export function useUpdateProfile() {
 	const queryClient = useQueryClient();

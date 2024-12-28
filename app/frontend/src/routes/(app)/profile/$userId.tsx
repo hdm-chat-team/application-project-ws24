@@ -26,7 +26,7 @@ function UserProfilePage() {
 
 	// Loading states
 	if (isLoading) return <ProfileLoadingState />;
-	if (error) return <ProfileErrorState error={error as Error} />;
+	if (error) return <ProfileErrorState error={new Error(error.message)} />;
 	if (!data) return <ProfileEmptyState />;
 
 	return (
