@@ -1,22 +1,22 @@
 import TopNav from "@/components/nav/top-nav";
-import { EditProfileForm } from "@/components/profile/EditProfileForm";
-import { ProfileCard } from "@/components/profile/ProfileCard";
+import { EditProfileForm } from "@/components/profile/edit-profile-form";
+import { ProfileCard } from "@/components/profile/profile-card";
 import {
 	ProfileEmptyState,
 	ProfileErrorState,
 	ProfileLoadingState,
-} from "@/components/profile/ProfileStates";
+} from "@/components/profile/profile-states";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
 	profileQueryOptions,
-	useProfile,
 	useUpdateProfile,
 } from "../../features/profile/queries";
+import { useQuery } from "@tanstack/react-query";
 
 // TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
-export const Route = createFileRoute("/(profile)/profile")({
+export const Route = createFileRoute("/(app)/profile")({
 	loader: ({ context: { queryClient } }) => {
 		return queryClient.ensureQueryData(profileQueryOptions).catch((error) => {
 			console.error("Failed to load profile:", error);
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/(profile)/profile")({
 
 function ProfilePage() {
 	const [isEditing, setIsEditing] = useState(false);
-	const { data: profile, isLoading, error } = useProfile();
+	const { data: profile, isLoading, error } = useQuery(profileQueryOptions);
 	const updateProfile = useUpdateProfile();
 
 	// Loading states

@@ -23,7 +23,7 @@ declare module "@tanstack/react-router" {
 		router: typeof router;
 	}
 	interface FileRoutesByPath {
-		"/profile/$userId": {
+		"/(app)/profile/$userId": {
 			params: {
 				userId: string;
 			};
