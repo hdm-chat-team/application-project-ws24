@@ -1,5 +1,5 @@
 import TopNav from "@/components/nav/top-nav";
-import { Card } from "../ui/card";
+import { Card } from "@/components/ui/card";
 
 function DefaultLayout({ children }: { children: React.ReactNode }) {
 	return (
