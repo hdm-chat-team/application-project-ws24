@@ -12,7 +12,7 @@ import { useState } from "react";
 import {
 	profileQueryOptions,
 	useUpdateProfile,
-} from "../../features/profile/queries";
+} from "../../../features/profile/queries";
 
 // TODO: add a profile image editing / upload ( maybe a feature request for the future)
 
