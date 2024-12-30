@@ -1,0 +1,20 @@
+{
+	"name": "@application-project-ws24/cuid",
+	"module": "index.ts",
+	"type": "module",
+	"main": "./index.ts",
+	"exports": {
+		".": {
+			"import": "./index.ts",
+			"require": "./index.ts"
+		}
+	},
+	"devDependencies": {
+		"@application-project-ws24/tsconfig": "workspace:*",
+		"@types/bun": "latest"
+	},
+	"dependencies": {
+		"@paralleldrive/cuid2": "latest",
+		"zod": "^3.24.1"
+	}
+}

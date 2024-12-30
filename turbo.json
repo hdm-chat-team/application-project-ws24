@@ -2,10 +2,18 @@
 	"$schema": "https://turbo.build/schema.json",
 	"ui": "tui",
 	"tasks": {
+		"assets": { "inputs": ["public/logo.svg"], "outputs": ["public"] },
 		"build": {
 			"dependsOn": ["^build"],
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": ["dist", "../dist/client"]
+		},
+		"//#biome": {},
+		"check": {
+			"inputs": ["backend/**/*.ts", "shared/**/*.ts", "src"]
+		},
+		"check:fix": {
+			"cache": false
 		},
 		"dev": {
 			"cache": false,
@@ -17,9 +25,7 @@
 			"cache": false,
 			"persistent": true
 		},
-		"//#biome": {},
-		"//#biome:fix": {
-			"cache": false
-		}
+		"test": { "inputs": [".env*"] },
+		"test:watch": { "inputs": [".env*"], "persistent": true }
 	}
 }

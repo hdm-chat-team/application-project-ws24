@@ -1,0 +1,3 @@
+{
+	"extends": "@application-project-ws24/tsconfig/tsconfig.json"
+}

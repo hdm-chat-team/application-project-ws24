@@ -1,19 +1,16 @@
+import type { Chat } from "@server/db/chats";
+import type { Message } from "@shared/message";
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
 
-export interface Message {
-	id?: string;
-	content: string;
-	timestamp: number;
-	userId: string;
-}
-
-const messageDb = new Dexie("MessageDatabase") as Dexie & {
+const db = new Dexie("database") as Dexie & {
 	messages: EntityTable<Message, "id">;
+	chats: EntityTable<Chat, "id">;
 };
 
-messageDb.version(5).stores({
-	messages: "++id, content, timestamp, userId",
+db.version(8).stores({
+	messages: "id, body, chatId, authorId, createdAt",
+	chats: "id, name, createdAt, updatedAt",
 });
 
-export { messageDb };
+export { db };

@@ -1,16 +1,18 @@
+import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import { Toaster } from "sonner";
 
 // * Layout for authenticated routes
 export const Route = createFileRoute("/(app)/_authenticated")({
 	beforeLoad: async ({ context }) => {
-		const user = await context.queryClient.fetchQuery({
-			...authQueryOptions,
-			staleTime: Number.POSITIVE_INFINITY,
-		});
-		if (!user) {
-			throw redirect({ to: "/signin" });
-		}
+		if (!(await context.queryClient.fetchQuery(authQueryOptions)))
+			throw redirect({ to: "/signin", search: { from: location.href } });
 	},
-	component: () => <Outlet />,
+	component: () => (
+		<SocketProvider>
+			<Outlet />
+			<Toaster closeButton richColors />
+		</SocketProvider>
+	),
 });

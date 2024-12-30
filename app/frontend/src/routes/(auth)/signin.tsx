@@ -1,4 +1,3 @@
-import Logo from "@/assets/hdm-logo-clipart-lg.png";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -9,15 +8,26 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import GithubSignInButton from "@/features/auth/components/github-signin-button";
-import { createFileRoute } from "@tanstack/react-router";
+import { authQueryOptions } from "@/features/auth";
+import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
+import Logo from "@assets/hdm-logo-clipart-lg.png";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { z } from "zod";
 
 export const Route = createFileRoute("/(auth)/signin")({
-	component: SignIn,
 	ssr: true,
+	validateSearch: z.object({
+		from: z.string().url().nullish(),
+	}),
+	beforeLoad: async ({ context: { queryClient } }) => {
+		if (await queryClient.ensureQueryData(authQueryOptions))
+			throw redirect({ to: "/" });
+	},
+	component: SignIn,
 });
 
 function SignIn() {
+	const { from } = Route.useSearch();
 	return (
 		<div className="flex min-h-screen items-center justify-center">
 			<Card className="relative flex px-5">
@@ -57,7 +67,7 @@ function SignIn() {
 					<CardFooter className="flex w-full flex-col">
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
-							<GithubSignInButton />
+							<GithubSignInButton from={from ?? ""} />
 						</div>
 					</CardFooter>
 				</div>
