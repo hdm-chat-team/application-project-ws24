@@ -9,13 +9,13 @@ import { userProfileQueryOptions } from "@/features/profile/queries";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/(app)/profile/$userId")({
-	loader: ({ context: { queryClient }, params: { userId } }) => {
-		return queryClient
-			.ensureQueryData(userProfileQueryOptions(userId))
-			.catch((error: Error) => {
-				console.error("Failed to load profile:", error);
-			});
+export const Route = createFileRoute("/(app)/user/$userId")({
+	loader: async ({ context: { queryClient }, params: { userId } }) => {
+		try {
+			return await queryClient.ensureQueryData(userProfileQueryOptions(userId));
+		} catch (error) {
+			console.error("Failed to load profile:", error);
+		}
 	},
 	component: UserProfilePage,
 });

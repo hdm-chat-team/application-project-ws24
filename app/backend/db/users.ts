@@ -7,6 +7,7 @@ import {
 import { z } from "zod";
 import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
+import { chatMemberTable } from "./chats.sql";
 import { userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
@@ -17,13 +18,14 @@ type User = z.infer<typeof selectUserSchema>;
 
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
-	avatarUrl: z.string().nonempty(),
 	displayName: z.string().nonempty(),
 }).omit({
 	userId: true,
 	createdAt: true,
 	id: true,
 	updatedAt: true,
+	avatarUrl: true,
+	htmlUrl: true,
 });
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
@@ -94,22 +96,18 @@ const selectUserWithProfile = db.query.userTable
 
 async function updateUserProfile(
 	userId: string,
-	newValues: {
-		avatarUrl: string;
-		displayName: string;
-	},
+	newValues: { displayName: string },
 ) {
-	const { avatarUrl, displayName } = newValues;
+	const { displayName } = newValues;
 	return await db
 		.insert(userProfileTable)
 		.values({
 			userId: userId,
 			displayName,
-			avatarUrl,
 		})
 		.onConflictDoUpdate({
 			target: userProfileTable.userId,
-			set: { avatarUrl, displayName },
+			set: { displayName },
 		})
 		.returning()
 		.then((rows) => rows[0]);
