@@ -34,16 +34,6 @@ const userWithProfileSchema = z.object({
 });
 type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 
-const insertUser = db
-	.insert(userTable)
-	.values({
-		githubId: sql.placeholder("githubId"),
-		username: sql.placeholder("username"),
-		email: sql.placeholder("email"),
-	})
-	.returning({ id: userTable.id })
-	.prepare("insert_user");
-
 async function insertUserWithProfile(githubUser: GitHubUser) {
 	const {
 		id,
@@ -86,22 +76,6 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 		return user;
 	});
 }
-
-const selectUserByGithubId = db.query.userTable
-	.findFirst({
-		where: eq(userTable.githubId, sql.placeholder("githubId")),
-	})
-	.prepare("select_user_by_github_id");
-
-const insertProfile = db
-	.insert(userProfileTable)
-	.values({
-		userId: sql.placeholder("userId"),
-		displayName: sql.placeholder("displayname"),
-		avatarUrl: sql.placeholder("avatar_url"),
-		htmlUrl: sql.placeholder("html_url"),
-	})
-	.returning({ id: userProfileTable.id });
 
 const selectUserProfile = db.query.userProfileTable
 	.findFirst({
@@ -162,10 +136,7 @@ export {
 	userWithProfileSchema,
 	// * User queries
 	selectUserWithProfile,
-	selectUserByGithubId,
 	selectUserProfile,
-	insertProfile,
-	insertUser,
 	insertUserProfileSchema,
 	// * User functions
 	selectUserChats,
