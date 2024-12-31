@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -6,35 +5,17 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import type { UserProfile } from "@server/db/users";
 import { User } from "lucide-react";
 
 // * Ensure type safety
 
-type ProfileCardProps = {
-	profile: {
-		avatarUrl?: string | null;
-		displayName?: string | null;
-		htmlUrl?: string | null;
-	};
-	isOwnProfile?: boolean;
-	onEdit?: () => void;
-};
-
-export function ProfileCard({
-	profile,
-	isOwnProfile = false,
-	onEdit,
-}: ProfileCardProps) {
+export function ProfileCard(profile: UserProfile) {
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>Profile</CardTitle>
-				<CardDescription>
-					{isOwnProfile
-						? "Your profile information"
-						: "Users profile information"}
-				</CardDescription>
+				<CardDescription>Users profile information</CardDescription>
 			</CardHeader>
 
 			<CardContent>
@@ -66,17 +47,6 @@ export function ProfileCard({
 						)}
 					</div>
 				</div>
-
-				{isOwnProfile && onEdit && (
-					<>
-						<Separator className="my-4" />
-						<div className="flex justify-start">
-							<Button onClick={onEdit} variant="outline" size="sm">
-								Edit Profile
-							</Button>
-						</div>
-					</>
-				)}
 			</CardContent>
 		</Card>
 	);

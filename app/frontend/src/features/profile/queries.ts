@@ -3,7 +3,7 @@ import type { UserProfile } from "@server/db/users";
 import { queryOptions } from "@tanstack/react-query";
 
 export const userProfileQueryOptions = (userId: string) =>
-	queryOptions<{ data: UserProfile }>({
+	queryOptions<UserProfile>({
 		queryKey: [api.user[":id"].$url({ param: { id: userId } }).pathname],
 		queryFn: async () => {
 			const response = await api.user[":id"].$get({
@@ -14,6 +14,6 @@ export const userProfileQueryOptions = (userId: string) =>
 				throw new Error("Failed to fetch user profile");
 			}
 
-			return response.json();
+			return (await response.json()).data;
 		},
 	});

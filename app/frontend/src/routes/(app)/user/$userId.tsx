@@ -5,35 +5,23 @@ import {
 	ProfileLoadingState,
 } from "@/features/profile/components";
 import { userProfileQueryOptions } from "@/features/profile/queries";
-import { useQuery } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/user/$userId")({
 	loader: async ({ context: { queryClient }, params: { userId } }) => {
-		try {
-			return await queryClient.ensureQueryData(userProfileQueryOptions(userId));
-		} catch (error) {
-			console.error("Failed to load profile:", error);
-		}
+		const profile = await queryClient.ensureQueryData(
+			userProfileQueryOptions(userId),
+		);
+		if (!profile) throw notFound();
+		return profile;
 	},
 	component: UserProfilePage,
+	errorComponent: (error) => ProfileErrorState(error),
+	notFoundComponent: ProfileEmptyState,
 });
 
 function UserProfilePage() {
-	const { userId } = Route.useParams();
-	const { data, isLoading, error } = useQuery(userProfileQueryOptions(userId));
+	const profile = Route.useLoaderData();
 
-	// Loading states
-	if (isLoading) return <ProfileLoadingState />;
-	if (error) return <ProfileErrorState error={new Error(error.message)} />;
-	if (!data) return <ProfileEmptyState />;
-
-	return (
-		<div>
-			<TopNav />
-			<main className="container mx-auto max-w-3xl p-4">
-				<ProfileCard profile={data.data} isOwnProfile={false} />
-			</main>
-		</div>
-	);
+	return !profile ? <ProfileLoadingState /> : <ProfileCard {...profile} />;
 }
