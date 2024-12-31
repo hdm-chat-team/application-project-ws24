@@ -115,17 +115,15 @@ async function updateUserProfile(
 		.then((rows) => rows[0]);
 }
 
-async function selectUserChats(userId: string) {
-	return await db.query.chatMemberTable
-		.findMany({
-			columns: {},
-			where: (chatMemberTable, { eq }) => eq(chatMemberTable.userId, userId),
-			with: {
-				chat: {},
-			},
-		})
-		.then((rows) => rows.map(({ chat }) => chat));
-}
+const selectUserChats = db.query.chatMemberTable
+	.findMany({
+		columns: {},
+		where: eq(chatMemberTable.userId, sql.placeholder("id")),
+		with: {
+			chat: true,
+		},
+	})
+	.prepare("select_user_chats");
 
 export {
 	// * User schemas
@@ -137,9 +135,9 @@ export {
 	// * User queries
 	selectUserWithProfile,
 	selectUserProfile,
+	selectUserChats,
 	insertUserProfileSchema,
 	// * User functions
-	selectUserChats,
 	updateUserProfile,
 	insertUserWithProfile,
 };

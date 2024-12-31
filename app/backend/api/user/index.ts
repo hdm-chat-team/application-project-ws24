@@ -43,7 +43,9 @@ export const profileRouter = createRouter()
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
-		const chats = await selectUserChats(id);
+		const chats = await selectUserChats
+			.execute({ id })
+			.then((chats) => chats.map((chat) => chat.chat));
 
 		return c.json({ data: chats });
 	})
