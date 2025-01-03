@@ -37,6 +37,31 @@ function insertSelfChat(user: User) {
 	});
 }
 
+async function insertChatWithMembers(userA: User, userB: User) {
+	return db.transaction(async (tx) => {
+		/*const existingChat = await tx.query.chatTable.findFirst({
+			where: (chat) =>
+				eq(chat.name, `${userA.username}-${userB.username}`) ||
+				eq(chat.name, `${userB.username}-${userA.username}`),
+		});*/
+		const existingChat = true;
+		let newChat: { id: string }[] = [];
+		if (!existingChat) {
+			newChat = await tx
+				.insert(chatTable)
+				.values({
+					name: `${userA.id}-${userB.id}`,
+				})
+				.returning({ id: chatTable.id });
+			await tx.insert(chatMemberTable).values([
+				{ chatId: newChat[0].id, userId: userA.id },
+				{ chatId: newChat[0].id, userId: userB.id },
+			]);
+		}
+		return newChat;
+	});
+}
+
 export {
 	// * Chat schemas
 	insertChatSchema,
@@ -45,5 +70,6 @@ export {
 	selectChatIdsByUserId,
 	// * Chat functions
 	insertSelfChat,
+	insertChatWithMembers,
 };
 export type { Chat };

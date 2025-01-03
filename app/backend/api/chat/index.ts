@@ -1,27 +1,39 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { createRouter } from "#api/factory";
+import { insertChatWithMembers } from "#db/chats";
+import { selectUser } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
-import { getServer } from "#lib/utils";
-import {
-	createMessage,
-	messageFormSchema,
-	stringifyMessage,
-} from "#shared/message";
+import { messageRouter } from "./message";
 
-export const chatRouter = createRouter().post(
-	"/:id",
-	zValidator("param", cuidParamSchema),
-	zValidator("form", messageFormSchema),
-	protectedRoute,
-	async (c) => {
-		const { body } = c.req.valid("form");
-		const { id: chatId } = c.req.valid("param");
-		const { id: authorId } = c.get("user");
+const createChatSchema = z.object({
+	userId: z.string().min(1, "User Id is required"),
+});
 
-		const message = createMessage(chatId, authorId, body);
-		getServer().publish(chatId, stringifyMessage(message));
+export const chatRouter = createRouter()
+	.route("/messages", messageRouter)
+	.post(
+		"/:id",
+		zValidator("param", cuidParamSchema),
+		zValidator("json", createChatSchema),
+		protectedRoute,
+		async (c) => {
+			const { userId } = c.req.valid("json");
+			const currentUser = c.get("user");
+			const userToCreateChatWith = await selectUser.execute({
+				id: userId,
+			});
 
-		return c.text("Message sent");
-	},
-);
+			if (!userToCreateChatWith) {
+				return c.text(`User with id ${userId} does not exist`);
+			}
+
+			// Prüfen ob Chat schon existiert --> Zwei Einträge in Chat_members die die selbe chatId haben mit userIdA und userIdB
+			const result = await insertChatWithMembers(
+				currentUser,
+				userToCreateChatWith,
+			);
+			return c.json(result);
+		},
+	);

@@ -2,11 +2,11 @@ import { describe, expect, test } from "bun:test";
 import { createId } from "@application-project-ws24/cuid";
 import { testClient } from "hono/testing";
 import { createApi } from "#api/factory";
-import { chatRouter } from ".";
+import { messageRouter } from ".";
 
-const { chat } = testClient(createApi().route("/chat", chatRouter));
+const { chat } = testClient(createApi().route("/chat", messageRouter));
 
-describe("/api/chat", () => {
+describe("/api/chat/messages", () => {
 	describe("POST /:id", () => {
 		test("returns 401 when not authorized", async () => {
 			const res = chat[":id"].$post({

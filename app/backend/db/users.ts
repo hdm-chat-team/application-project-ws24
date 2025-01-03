@@ -102,6 +102,12 @@ const selectUserProfile = db.query.userProfileTable
 	})
 	.prepare("select_user_profile");
 
+const selectUser = db.query.userTable
+	.findFirst({
+		where: eq(userTable.id, sql.placeholder("id")),
+	})
+	.prepare("select_user");
+
 async function updateUserProfile(
 	userId: string,
 	newValues: {
@@ -146,6 +152,7 @@ export {
 	updateUserProfileSchema,
 	// * User queries
 	selectUserProfile,
+	selectUser,
 	insertProfile,
 	insertUser,
 	insertUserProfileSchema,
