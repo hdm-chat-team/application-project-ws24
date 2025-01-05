@@ -10,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useUser } from "@/features/auth";
+import { useUpdateProfileMutation } from "@/features/profile/hooks/use-update-profile";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
@@ -21,25 +23,16 @@ const profileFormSchema = z.object({
 
 // * Ensure type safety
 
-type EditProfileFormProps = {
-	initialName: string;
-	onSubmit: (name: string) => void;
-	onCancel: () => void;
-	isLoading?: boolean;
-};
+export function EditProfileForm() {
+	const { profile } = useUser();
+	const { mutateAsync } = useUpdateProfileMutation();
 
-export function EditProfileForm({
-	initialName,
-	onSubmit,
-	onCancel,
-	isLoading,
-}: EditProfileFormProps) {
 	const form = useForm({
 		defaultValues: {
-			displayName: initialName,
+			displayName: profile.displayName ?? "",
 		},
-		onSubmit: async ({ value }) => {
-			await onSubmit(value.displayName);
+		onSubmit: async ({ value: { displayName } }) => {
+			await mutateAsync(displayName);
 			form.reset();
 		},
 		validators: {
@@ -75,7 +68,6 @@ export function EditProfileForm({
 										value={field.state.value}
 										onChange={(e) => field.handleChange(e.target.value)}
 										placeholder="Enter your display name"
-										disabled={isLoading}
 									/>
 								</div>
 							)}
@@ -85,20 +77,12 @@ export function EditProfileForm({
 				</CardContent>
 
 				<CardFooter className="flex justify-start space-x-2">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={onCancel}
-						disabled={isLoading}
-					>
-						Cancel
-					</Button>
 					<form.Subscribe
 						selector={(state) => [state.canSubmit, state.isSubmitting]}
 					>
 						{([canSubmit, isSubmitting]) => (
-							<Button type="submit" disabled={!canSubmit || isLoading}>
-								{isLoading || isSubmitting ? "Saving..." : "Save Changes"}
+							<Button type="submit" disabled={!canSubmit}>
+								{isSubmitting ? "Saving..." : "Save Changes"}
 							</Button>
 						)}
 					</form.Subscribe>

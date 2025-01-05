@@ -1,4 +1,5 @@
 import { AuthContext } from "@/features/auth/context/auth-provider";
+import { redirect } from "@tanstack/react-router";
 import { useContext } from "react";
 
 /**
@@ -18,7 +19,10 @@ export function useUser() {
 	if (context === undefined)
 		throw new Error("useUser must be used within an AuthProvider");
 
-	const { data: user, ...rest } = context;
+	if (!context.data)
+		throw redirect({ to: "/signin", search: { from: location.href } });
 
-	return { user: user || null, isSignedIn: !!user, ...rest };
+	const { data, ...rest } = context;
+
+	return { isSignedIn: !!data, ...data, ...rest };
 }

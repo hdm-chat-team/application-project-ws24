@@ -11,24 +11,15 @@ import {
 import { protectedRoute } from "#lib/middleware";
 
 export const profileRouter = createRouter()
-	.get("/profile", protectedRoute, async (c) => {
-		const { id } = c.get("user");
-		const data = await selectUserProfile.execute({ id });
-		if (!data) {
-			throw new HTTPException(404, { message: "profile not found" });
-		}
-		return c.json(data);
-	})
 	.put(
 		"/profile",
 		protectedRoute,
-		zValidator("form", updateUserProfileSchema),
+		zValidator("form", updateUserProfileSchema.pick({ displayName: true })),
 		async (c) => {
 			const user = c.get("user");
-			const { avatarUrl, displayName } = c.req.valid("form");
+			const { displayName } = c.req.valid("form");
 
 			const updatedProfile = await updateUserProfile(user.id, {
-				avatarUrl,
 				displayName,
 			}).catch((error) => {
 				throw new HTTPException(400, { message: error.message });
@@ -43,7 +34,9 @@ export const profileRouter = createRouter()
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
-		const chats = await selectUserChats(id);
+		const chats = await selectUserChats
+			.execute({ id })
+			.then((chats) => chats.map((chat) => chat.chat));
 
 		return c.json({ data: chats });
 	})

@@ -11,8 +11,12 @@ const REDIRECT_URL = "http://localhost:5173";
 export const authRouter = createRouter()
 	.route("/github", githubRouter)
 	.get("/", protectedRoute, async (c) => {
-		const user = c.get("user");
-		return c.json({ data: user });
+		return c.json({
+			data: {
+				user: c.get("user"),
+				profile: c.get("profile"),
+			},
+		});
 	})
 	.get(
 		"/signout",
