@@ -14,8 +14,12 @@ export const messageStateEnum = pgEnum("status", [
 export const messageTable = pgTable("messages", {
 	id,
 	...timestamps,
-	chatId: varchar(ID_SIZE_CONFIG).references(() => chatTable.id),
-	authorId: varchar(ID_SIZE_CONFIG).references(() => userTable.id),
+	chatId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => chatTable.id),
+	authorId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id),
 	status: messageStateEnum().notNull(),
 	content: text().notNull(),
 });
