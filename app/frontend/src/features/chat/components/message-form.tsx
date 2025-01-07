@@ -24,6 +24,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 	return (
 		<form
 			className="flex"
+			autoComplete="off"
 			onSubmit={(event) => {
 				event.preventDefault();
 				event.stopPropagation();
