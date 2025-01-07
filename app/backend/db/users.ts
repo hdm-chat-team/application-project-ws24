@@ -25,7 +25,6 @@ const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	createdAt: true,
 	id: true,
 	updatedAt: true,
-	avatarUrl: true,
 	htmlUrl: true,
 });
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
