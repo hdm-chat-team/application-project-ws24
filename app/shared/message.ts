@@ -1,5 +1,6 @@
 import { createId, cuidSchema } from "@application-project-ws24/cuid";
 import { z } from "zod";
+import type { Message } from "#db/messages";
 
 const messageSchema = z.object({
 	id: cuidSchema,
@@ -12,8 +13,6 @@ const messageSchema = z.object({
 });
 
 const messageFormSchema = messageSchema.pick({ body: true });
-
-type Message = z.infer<typeof messageSchema>;
 
 function createMessage(
 	chatId: string,
@@ -47,4 +46,3 @@ export {
 	parseMessage,
 	stringifyMessage,
 };
-export type { Message };
