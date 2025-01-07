@@ -7,12 +7,20 @@ export function useUpdateProfileMutation() {
 	const { profile } = useUser();
 	return useMutation({
 		mutationKey: [api.user.profile.$url().pathname],
-		mutationFn: async (newName: string) => {
-			if (profile.displayName === newName) return;
+		mutationFn: async ({
+			displayName,
+			avatarUrl,
+		}: { displayName: string; avatarUrl?: string }) => {
+			if (
+				profile.displayName === displayName &&
+				profile.avatarUrl === avatarUrl
+			)
+				return;
 
 			const response = await api.user.profile.$put({
 				form: {
-					displayName: newName,
+					displayName,
+					avatarUrl,
 				},
 			});
 			if (!response.ok) {
