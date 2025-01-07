@@ -20,8 +20,8 @@ export function useChat(chatId: string) {
 			const message: Message = parseMessage(event.data);
 
 			if (message?.chatId === chatId) {
-				queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId));
 				await saveMessageMutation.mutateAsync(message);
+				queryClient.invalidateQueries({ queryKey: [chatId] });
 			}
 		},
 		[chatId, saveMessageMutation.mutateAsync, queryClient],
