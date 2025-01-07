@@ -1,5 +1,5 @@
-import { createApi, createRouter } from "#api/factory";
 import { serveStatic } from "hono/bun";
+import { createApi, createRouter } from "#api/factory";
 import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
 import { socketRouter } from "./socket";
