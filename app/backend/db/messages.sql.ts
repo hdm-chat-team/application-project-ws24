@@ -4,7 +4,7 @@ import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
-export const messageStateEnum = pgEnum("status", [
+export const messageStateEnum = pgEnum("state", [
 	"pending",
 	"sent",
 	"delivered",
@@ -20,11 +20,19 @@ export const messageTable = pgTable("messages", {
 	authorId: varchar(ID_SIZE_CONFIG)
 		.notNull()
 		.references(() => userTable.id),
-	status: messageStateEnum().notNull(),
-	content: text().notNull(),
+	state: messageStateEnum().notNull(),
+	body: text().notNull(),
 });
 
 export const messageTableRelations = relations(messageTable, ({ one }) => ({
-	chat: one(chatTable),
-	author: one(userTable),
+	chat: one(chatTable, {
+		relationName: "chat",
+		fields: [messageTable.chatId],
+		references: [chatTable.id],
+	}),
+	author: one(userTable, {
+		relationName: "author",
+		fields: [messageTable.authorId],
+		references: [userTable.id],
+	}),
 }));
