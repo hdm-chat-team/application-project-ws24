@@ -14,13 +14,14 @@ export const profileRouter = createRouter()
 	.put(
 		"/profile",
 		protectedRoute,
-		zValidator("form", updateUserProfileSchema.pick({ displayName: true })),
+		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const user = c.get("user");
-			const { displayName } = c.req.valid("form");
+			const { displayName, avatarUrl } = c.req.valid("form");
 
 			const updatedProfile = await updateUserProfile(user.id, {
 				displayName,
+				avatarUrl,
 			}).catch((error) => {
 				throw new HTTPException(400, { message: error.message });
 			});
