@@ -1,6 +1,7 @@
 import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
 import { useSocket } from "@/hooks";
-import { type Message, parseMessage } from "@shared/message";
+import type { Message } from "@server/db/messages";
+import { parseMessage } from "@shared/message";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { useSaveMessage } from "./use-save-message";

@@ -5,8 +5,10 @@ const messageSchema = z.object({
 	id: cuidSchema,
 	authorId: cuidSchema,
 	chatId: cuidSchema,
+	state: z.enum(["pending", "sent", "delivered", "read"]),
 	body: z.string().min(1),
-	createdAt: z.string().datetime(),
+	createdAt: z.string(),
+	updatedAt: z.string(),
 });
 
 const messageFormSchema = messageSchema.pick({ body: true });
@@ -21,6 +23,8 @@ function createMessage(
 	return messageSchema.parse({
 		id: createId(),
 		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		state: "pending",
 		body,
 		authorId,
 		chatId,

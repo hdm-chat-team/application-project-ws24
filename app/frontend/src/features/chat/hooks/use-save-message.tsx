@@ -1,6 +1,6 @@
 import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
 import { db } from "@/features/db";
-import type { Message } from "@shared/message";
+import type { Message } from "@server/db/messages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useSaveMessage(chatId: string) {

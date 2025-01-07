@@ -21,8 +21,8 @@ const insertMessage = db
 		updatedAt: sql.placeholder("updatedAt"),
 		chatId: sql.placeholder("chatId"),
 		authorId: sql.placeholder("authorId"),
-		status: sql.placeholder("status"),
-		content: sql.placeholder("content"),
+		state: sql.placeholder("state"),
+		body: sql.placeholder("body"),
 	})
 	.returning()
 	.prepare("insert_message");
@@ -34,12 +34,12 @@ const deleteMessage = db
 
 async function updateMessageStatus(
 	id: string,
-	status: Pick<Message, "status">["status"],
+	state: Pick<Message, "state">["state"],
 ) {
 	return await db
 		.update(messageTable)
 		.set({
-			status,
+			state,
 		})
 		.where(eq(messageTable.id, id))
 		.returning();
