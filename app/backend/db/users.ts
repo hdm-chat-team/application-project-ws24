@@ -19,6 +19,7 @@ type User = z.infer<typeof selectUserSchema>;
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	displayName: z.string().nonempty(),
+	avatarUrl: z.string().url().optional(),
 }).omit({
 	userId: true,
 	createdAt: true,
@@ -96,18 +97,19 @@ const selectUserWithProfile = db.query.userTable
 
 async function updateUserProfile(
 	userId: string,
-	newValues: { displayName: string },
+	newValues: { displayName: string; avatarUrl?: string },
 ) {
-	const { displayName } = newValues;
+	const { displayName, avatarUrl } = newValues;
 	return await db
 		.insert(userProfileTable)
 		.values({
 			userId: userId,
 			displayName,
+			avatarUrl,
 		})
 		.onConflictDoUpdate({
 			target: userProfileTable.userId,
-			set: { displayName },
+			set: { displayName, avatarUrl },
 		})
 		.returning()
 		.then((rows) => rows[0]);
