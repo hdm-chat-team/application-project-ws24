@@ -1,7 +1,6 @@
 import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
 import { useSocket } from "@/hooks";
 import type { Message } from "@server/db/messages";
-import { parseMessage } from "@shared/message";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { useSaveMessage } from "./use-save-message";
@@ -17,7 +16,7 @@ export function useChat(chatId: string) {
 
 	const handleMessage = useCallback(
 		async (event: MessageEvent) => {
-			const message: Message = parseMessage(event.data);
+			const message: Message = JSON.parse(event.data);
 
 			if (message?.chatId === chatId) {
 				await saveMessageMutation.mutateAsync(message);

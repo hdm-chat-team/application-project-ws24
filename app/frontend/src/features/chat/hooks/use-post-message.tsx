@@ -1,6 +1,7 @@
 import { useUser } from "@/features/auth";
 import api from "@/lib/api";
-import { createMessage } from "@shared/message";
+import { createId } from "@application-project-ws24/cuid";
+import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
 export function usePostMessageMutation(chatId: string) {
@@ -19,4 +20,20 @@ export function usePostMessageMutation(chatId: string) {
 			}
 		},
 	});
+}
+
+function createMessage(
+	chatId: string,
+	authorId: string,
+	body: string,
+): Message {
+	return {
+		id: createId(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		state: "pending",
+		body,
+		authorId,
+		chatId,
+	};
 }
