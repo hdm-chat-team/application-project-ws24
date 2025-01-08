@@ -1,13 +1,12 @@
 import { Hono } from "hono";
 import { createRouteHandler } from "uploadthing/server";
 import { uploadRouter } from "#lib/uploadthing";
-
-const { UPLOADTHING_TOKEN } = process.env;
+import env from "#env";
 
 const handlers = createRouteHandler({
 	router: uploadRouter,
 	config: {
-		token: UPLOADTHING_TOKEN,
+		token: env.UPLOADTHING_TOKEN,
 	},
 });
 
