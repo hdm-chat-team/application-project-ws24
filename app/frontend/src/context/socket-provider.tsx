@@ -1,7 +1,7 @@
 import { userChatsQueryOptions } from "@/features/chat/queries";
 import { db } from "@/features/db";
 import api from "@/lib/api";
-import type { Message } from "@shared/message";
+import type { Message } from "@server/db/messages";
 import { useQueryClient } from "@tanstack/react-query";
 import {
 	type ReactNode,
