@@ -6,26 +6,28 @@ import {
 } from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
-import { messageTable } from "./messages.sql";
+import { messageRecipientTable, messageTable } from "./messages.sql";
+import type { DB, Transaction } from "./types";
 
 const insertMessageSchema = createInsertSchema(messageTable);
 const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
 
-const insertMessage = db
-	.insert(messageTable)
-	.values({
-		id: sql.placeholder("id"),
-		createdAt: sql.placeholder("createdAt"),
-		updatedAt: sql.placeholder("updatedAt"),
-		chatId: sql.placeholder("chatId"),
-		authorId: sql.placeholder("authorId"),
-		state: sql.placeholder("state"),
-		body: sql.placeholder("body"),
-	})
-	.returning()
-	.prepare("insert_message");
+const insertMessage = (trx: Transaction | DB = db) =>
+	trx
+		.insert(messageTable)
+		.values({
+			id: sql.placeholder("id"),
+			createdAt: sql.placeholder("createdAt"),
+			updatedAt: sql.placeholder("updatedAt"),
+			chatId: sql.placeholder("chatId"),
+			authorId: sql.placeholder("authorId"),
+			state: sql.placeholder("state"),
+			body: sql.placeholder("body"),
+		})
+		.returning()
+		.prepare("insert_message");
 
 const deleteMessage = db
 	.delete(messageTable)
@@ -45,15 +47,30 @@ async function updateMessageStatus(
 		.returning();
 }
 
+async function insertMessageRecipients(
+	messageId: string,
+	recipientIds: string[],
+	trx: Transaction | DB = db,
+) {
+	return await trx.insert(messageRecipientTable).values(
+		recipientIds.map((recipientId) => ({
+			messageId,
+			recipientId,
+			state: "pending" as const,
+		})),
+	);
+}
+
 export {
+	deleteMessage,
+	// * Message queries
+	insertMessage,
 	// * Message schemas
 	insertMessageSchema,
 	selectMessageSchema,
 	updateMessageSchema,
-	// * Message queries
-	insertMessage,
-	deleteMessage,
 	// * Message functions
 	updateMessageStatus,
+	insertMessageRecipients,
 };
 export type { Message };
