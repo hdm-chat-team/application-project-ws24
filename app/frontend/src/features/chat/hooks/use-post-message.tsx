@@ -6,13 +6,12 @@ import { useMutation } from "@tanstack/react-query";
 export function usePostMessageMutation(chatId: string) {
 	const { user } = useUser();
 	return useMutation({
-		mutationKey: [api.chat[":id"].$url({ param: { id: chatId } }).pathname],
+		mutationKey: [api.chat.$url().pathname, chatId],
 		mutationFn: async (body: string) => {
 			if (!user) return;
 
 			const message = createMessage(chatId, user.id, body);
-			const result = await api.chat[":id"].$post({
-				param: { id: chatId },
+			const result = await api.chat.$post({
 				form: message,
 			});
 			if (!result.ok) {

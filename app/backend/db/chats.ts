@@ -3,6 +3,7 @@ import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
 import { chatMemberTable, chatTable } from "./chats.sql";
+import type { DB, Transaction } from "./types";
 import type { User } from "./users";
 
 const insertChatSchema = createInsertSchema(chatTable);
@@ -37,13 +38,25 @@ function insertSelfChat(user: User) {
 	});
 }
 
+async function selectChatWithMembersByUserId(
+	chatId: string,
+	trx: Transaction | DB = db,
+) {
+	return await trx.query.chatTable.findFirst({
+		columns: { id: true },
+		where: (chatTable, { eq }) => eq(chatTable.id, chatId),
+		with: { members: { columns: { userId: true } } },
+	});
+}
+
 export {
 	// * Chat schemas
 	insertChatSchema,
-	selectChatSchema,
-	// * Chat queries
-	selectChatIdsByUserId,
 	// * Chat functions
 	insertSelfChat,
+	// * Chat queries
+	selectChatIdsByUserId,
+	selectChatSchema,
+	selectChatWithMembersByUserId,
 };
 export type { Chat };
