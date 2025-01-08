@@ -5,10 +5,17 @@ import * as messageSchema from "./messages.sql";
 import * as sessionSchema from "./sessions.sql";
 import * as userSchema from "./users.sql";
 
+const schema = {
+	...userSchema,
+	...sessionSchema,
+	...chatSchema,
+	...messageSchema,
+};
+
 const db = drizzle(env.DATABASE_URL, {
-	schema: { ...userSchema, ...sessionSchema, ...chatSchema, ...messageSchema },
+	schema,
 	casing: "snake_case",
 });
 
 export default db;
-export { db };
+export { db, schema };
