@@ -8,7 +8,6 @@ import {
 	insertMessageRecipients,
 	insertMessageSchema,
 } from "#db/messages";
-import { messageRecipientTable } from "#db/messages.sql";
 import { protectedRoute } from "#lib/middleware";
 import { getServer } from "#lib/utils";
 
@@ -20,41 +19,38 @@ export const chatRouter = createRouter().post(
 		const message = c.req.valid("form");
 		const server = getServer();
 
-		await db.transaction(async (trx) => {
-			const chat = await selectChatWithMembersByUserId(message.chatId, trx);
+		const { insertedMessage, insertedRecipientIds } = await db.transaction(
+			async (trx) => {
+				const chat = await selectChatWithMembersByUserId(message.chatId, trx);
 
-			if (!chat) throw new HTTPException(404, { message: "Chat not found" });
-			if (!chat.members.some((member) => member.userId === message.authorId))
-				throw new HTTPException(403, { message: "Not a chat member" });
+				if (!chat) throw new HTTPException(404, { message: "Chat not found" });
+				if (!chat.members.some((member) => member.userId === message.authorId))
+					throw new HTTPException(403, { message: "Not a chat member" });
 
-			const [insertedMessage] = await insertMessage(trx).execute(message);
+				const insertedMessage = await insertMessage(
+					{ ...message, state: "sent" },
+					trx,
+				);
+				const insertedRecipientIds = await insertMessageRecipients(
+					insertedMessage.id,
+					chat.members.map((member) => member.userId),
+					trx,
+				);
+				return {
+					insertedMessage,
+					insertedRecipientIds,
+				};
+			},
+		);
 
-			const recipients = chat.members.map((member) => ({
-				messageId: insertedMessage.id,
-				recipientId: member.userId,
-				state: "pending" as const,
-			}));
-
-			await trx.insert(messageRecipientTable).values(recipients);
-
-			const deliveryResults = recipients.map((recipient) => ({
-				id: recipient.recipientId,
-				delivered:
-					server.publish(
-						recipient.recipientId,
-						JSON.stringify(insertedMessage),
-					) > 0,
-			}));
-
-			await insertMessageRecipients(
-				insertedMessage.id,
-				deliveryResults.filter((r) => r.delivered).map((r) => r.id),
-				trx,
+		for (const recipient of insertedRecipientIds)
+			server.publish(
+				recipient,
+				JSON.stringify({
+					type: "message_incoming",
+					payload: insertedMessage,
+				}),
 			);
-
-			if (!deliveryResults.some((r) => r.delivered))
-				throw new HTTPException(500, { message: "Message delivery failed" });
-		});
 
 		return c.json({ message: "Message sent" }, 201);
 	},

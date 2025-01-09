@@ -14,20 +14,15 @@ const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
 
-const insertMessage = (trx: Transaction | DB = db) =>
-	trx
+const insertMessage = async (
+	message: z.infer<typeof insertMessageSchema>,
+	trx: Transaction | DB = db,
+) =>
+	await trx
 		.insert(messageTable)
-		.values({
-			id: sql.placeholder("id"),
-			createdAt: sql.placeholder("createdAt"),
-			updatedAt: sql.placeholder("updatedAt"),
-			chatId: sql.placeholder("chatId"),
-			authorId: sql.placeholder("authorId"),
-			state: sql.placeholder("state"),
-			body: sql.placeholder("body"),
-		})
+		.values(message)
 		.returning()
-		.prepare("insert_message");
+		.then((rows) => rows[0]);
 
 const deleteMessage = db
 	.delete(messageTable)
@@ -52,13 +47,18 @@ async function insertMessageRecipients(
 	recipientIds: string[],
 	trx: Transaction | DB = db,
 ) {
-	return await trx.insert(messageRecipientTable).values(
-		recipientIds.map((recipientId) => ({
-			messageId,
-			recipientId,
-			state: "pending" as const,
-		})),
-	);
+	return await trx
+		.insert(messageRecipientTable)
+		.values(
+			recipientIds.map((recipientId) => ({
+				messageId,
+				recipientId,
+				state: "pending" as const,
+			})),
+		)
+		.returning({ recipientIds: messageRecipientTable.recipientId })
+		.then((rows) => rows.map((row) => row.recipientIds));
+}
 }
 
 export {
