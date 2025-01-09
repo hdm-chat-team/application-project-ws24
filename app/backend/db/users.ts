@@ -16,6 +16,9 @@ const selectUserSchema = createSelectSchema(userTable).omit({
 });
 type User = z.infer<typeof selectUserSchema>;
 
+const deleteUserProfileImageSchema = z.object({
+	avatarUrl: z.string().url(),
+});
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	displayName: z.string().nonempty(),
@@ -131,6 +134,7 @@ export {
 	selectUserProfileSchema,
 	updateUserProfileSchema,
 	userWithProfileSchema,
+	deleteUserProfileImageSchema,
 	// * User queries
 	selectUserWithProfile,
 	selectUserProfile,
