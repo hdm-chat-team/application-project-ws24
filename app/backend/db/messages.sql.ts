@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+	index,
 	pgEnum,
 	pgTable,
 	primaryKey,
@@ -17,18 +18,27 @@ export const messageStateEnum = pgEnum("state", [
 	"read",
 ]);
 
-export const messageTable = pgTable("messages", {
-	id,
-	...timestamps,
-	chatId: varchar(ID_SIZE_CONFIG)
-		.notNull()
-		.references(() => chatTable.id),
-	authorId: varchar(ID_SIZE_CONFIG)
-		.notNull()
-		.references(() => userTable.id),
-	state: messageStateEnum().notNull(),
-	body: text().notNull(),
-});
+export const messageTable = pgTable(
+	"messages",
+	{
+		id,
+		...timestamps,
+		chatId: varchar(ID_SIZE_CONFIG)
+			.notNull()
+			.references(() => chatTable.id),
+		authorId: varchar(ID_SIZE_CONFIG)
+			.notNull()
+			.references(() => userTable.id),
+		state: messageStateEnum().notNull(),
+		body: text().notNull(),
+	},
+	(table) => [
+		{
+			idIdx: index().on(table.id),
+			authorIdIdx: index().on(table.authorId),
+		},
+	],
+);
 
 export const messageTableRelations = relations(
 	messageTable,
@@ -62,6 +72,8 @@ export const messageRecipientTable = pgTable(
 	(table) => [
 		{
 			pk: primaryKey({ columns: [table.messageId, table.recipientId] }),
+			messageIdIdx: index().on(table.messageId),
+			recipientIdIdx: index().on(table.recipientId),
 		},
 	],
 );
