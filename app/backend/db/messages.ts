@@ -1,4 +1,4 @@
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -111,6 +111,20 @@ async function updateMessageRecipientsStates(
 		.then((rows) => rows.map((row) => row.recipientIds));
 }
 
+async function pruneMessages(trx: Transaction | DB = db) {
+	await trx
+		.delete(messageTable)
+		.where(
+			or(
+				and(
+					eq(messageTable.state, "delivered"),
+					sql`created_at < NOW() - INTERVAL '30 days'`,
+				),
+				eq(messageTable.state, "read"),
+			),
+		);
+}
+
 export {
 	// * Message queries
 	deleteMessage,
@@ -121,6 +135,7 @@ export {
 	updateMessageRecipientsStates,
 	updateMessageStatus,
 	insertMessage,
+	pruneMessages,
 	// * Message schemas
 	insertMessageSchema,
 	selectMessageSchema,
