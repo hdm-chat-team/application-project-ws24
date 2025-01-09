@@ -1,5 +1,4 @@
-import { userChatsQueryOptions } from "@/features/chat/queries";
-import { db } from "@/features/db";
+
 import api from "@/lib/api";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import {
@@ -42,8 +41,6 @@ export const SocketContext = createContext<SocketContextType | undefined>(
 );
 
 export function SocketProvider({ children }: { children: ReactNode }) {
-	const queryClient = useQueryClient();
-
 	const socketRef = useRef<WebSocket | null>(null);
 	const reconnectAttemptRef = useRef(0);
 	const reconnectTimeoutRef = useRef<NodeJS.Timer>();

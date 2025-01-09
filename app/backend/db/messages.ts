@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -6,7 +6,11 @@ import {
 } from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
-import { messageRecipientTable, messageTable } from "./messages.sql";
+import {
+	messageRecipientTable,
+	type messageStateEnum,
+	messageTable,
+} from "./messages.sql";
 import type { DB, Transaction } from "./types";
 
 const insertMessageSchema = createInsertSchema(messageTable);
@@ -32,8 +36,9 @@ const deleteMessage = db
 async function updateMessageStatus(
 	id: string,
 	state: Pick<Message, "state">["state"],
+	trx: Transaction | DB = db,
 ) {
-	return await db
+	return await trx
 		.update(messageTable)
 		.set({
 			state,
@@ -59,18 +64,66 @@ async function insertMessageRecipients(
 		.returning({ recipientIds: messageRecipientTable.recipientId })
 		.then((rows) => rows.map((row) => row.recipientIds));
 }
+
+async function selectMessageRecipientIdsByMessageId(
+	messageId: string,
+	trx: Transaction | DB = db,
+) {
+	return await trx.query.messageRecipientTable
+		.findMany({
+			columns: { recipientId: true },
+			where: eq(messageRecipientTable.messageId, messageId),
+		})
+		.then((rows) => rows.map((row) => row.recipientId));
+}
+
+async function countDeliveredRecipientsByMessageId(
+	messageId: string,
+	trx: Transaction | DB = db,
+) {
+	return await trx.$count(
+		messageRecipientTable,
+		and(
+			eq(messageRecipientTable.messageId, messageId),
+			eq(messageRecipientTable.state, "delivered"),
+		),
+	);
+}
+
+async function updateMessageRecipientsStates(
+	messageId: string,
+	recipientIds: string[],
+	state: (typeof messageStateEnum.enumValues)[number],
+	trx: Transaction | DB = db,
+) {
+	return await trx
+		.update(messageRecipientTable)
+		.set({
+			state,
+		})
+		.where(
+			and(
+				inArray(messageRecipientTable.recipientId, recipientIds),
+				eq(messageRecipientTable.messageId, messageId),
+			),
+		)
+		.returning({ recipientIds: messageRecipientTable.recipientId })
+		.then((rows) => rows.map((row) => row.recipientIds));
 }
 
 export {
-	deleteMessage,
 	// * Message queries
+	deleteMessage,
+	// * Message functions
+	selectMessageRecipientIdsByMessageId,
+	insertMessageRecipients,
+	countDeliveredRecipientsByMessageId,
+	updateMessageRecipientsStates,
+	updateMessageStatus,
 	insertMessage,
 	// * Message schemas
 	insertMessageSchema,
 	selectMessageSchema,
 	updateMessageSchema,
-	// * Message functions
-	updateMessageStatus,
-	insertMessageRecipients,
 };
 export type { Message };
