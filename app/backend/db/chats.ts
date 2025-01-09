@@ -1,9 +1,10 @@
-import { eq, sql } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import {eq, sql} from "drizzle-orm";
+import {createInsertSchema, createSelectSchema} from "drizzle-zod";
+import type {z} from "zod";
 import db from "#db";
-import { chatMemberTable, chatTable } from "./chats.sql";
-import type { User } from "./users";
+import {chatMemberTable, chatTable} from "./chats.sql";
+import type {User} from "./users";
+import {HTTPException} from "hono/http-exception";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -39,13 +40,12 @@ function insertSelfChat(user: User) {
 
 async function insertChatWithMembers(userA: User, userB: User) {
 	return db.transaction(async (tx) => {
-		/*const existingChat = await tx.query.chatTable.findFirst({
-			where: (chat) =>
-				eq(chat.name, `${userA.username}-${userB.username}`) ||
-				eq(chat.name, `${userB.username}-${userA.username}`),
-		});*/
-		const existingChat = true;
 		let newChat: { id: string }[] = [];
+		const existingChat = await tx.query.chatTable.findFirst({
+			where: (chat) =>
+				eq(chat.name, `${userA.id}-${userB.id}`) ||
+				eq(chat.name, `${userB.id}-${userA.id}`),
+		});
 		if (!existingChat) {
 			newChat = await tx
 				.insert(chatTable)
@@ -57,8 +57,10 @@ async function insertChatWithMembers(userA: User, userB: User) {
 				{ chatId: newChat[0].id, userId: userA.id },
 				{ chatId: newChat[0].id, userId: userB.id },
 			]);
+		} else {
+			throw new HTTPException(400, { message: "Chat already exists" });
 		}
-		return newChat;
+		return newChat[0];
 	});
 }
 

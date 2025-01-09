@@ -1,15 +1,15 @@
-import { every } from "hono/combine";
-import { deleteCookie, getCookie, setCookie } from "hono/cookie";
-import { cors } from "hono/cors";
-import { csrf } from "hono/csrf";
-import { createMiddleware } from "hono/factory";
-import { HTTPException } from "hono/http-exception";
-import { logger } from "hono/logger";
-import { prettyJSON } from "hono/pretty-json";
-import type { HTTPResponseError } from "hono/types";
-import type { Env, ProtectedEnv } from "#api/app.env";
-import { validateSessionToken } from "#auth/session";
-import env, { DEV, TEST } from "#env";
+import {every} from "hono/combine";
+import {deleteCookie, getCookie, setCookie} from "hono/cookie";
+import {cors} from "hono/cors";
+import {csrf} from "hono/csrf";
+import {createMiddleware} from "hono/factory";
+import {HTTPException} from "hono/http-exception";
+import {logger} from "hono/logger";
+import {prettyJSON} from "hono/pretty-json";
+import type {HTTPResponseError} from "hono/types";
+import type {Env, ProtectedEnv} from "#api/app.env";
+import {validateSessionToken} from "#auth/session";
+import env, {DEV, TEST} from "#env";
 import cookieConfig from "#lib/cookie";
 
 const origin = DEV
@@ -31,6 +31,7 @@ const origin = DEV
  */
 const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
+	console.log(sessionCookieToken);
 	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
