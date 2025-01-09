@@ -11,7 +11,6 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { toast } from "sonner";
 
 const RECONNECTION_ATTEMPTS = 5;
 const MAX_RECONNECTION_DELAY = 10000;
@@ -61,23 +60,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	// * Event Handlers
 	const handleOpen = useCallback(async () => {
-		toast.success("WebSocket connected");
-
-		// * Fetch user chats and store them in IndexedDB
-		const data = await queryClient.fetchQuery(userChatsQueryOptions);
-		await db.chats.bulkPut(data);
-
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
-	}, [queryClient]);
-
-	const handleMessage = useCallback((event: MessageEvent) => {
-		const data = JSON.parse(event.data) as Message;
-		toast.info("WebSocket message", { description: data.body });
-	}, []);
-
-	const handleError = useCallback(() => {
-		toast.error("WebSocket error");
 	}, []);
 
 	const handleClose = useCallback(() => {
@@ -89,7 +73,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 				INITIAL_RECONNECTION_DELAY * 2 ** reconnectAttemptRef.current,
 				MAX_RECONNECTION_DELAY,
 			);
-			toast(`🔄 Attempting to reconnect in ${timeout / 1000} seconds...`);
+			console.log(`🔄 Attempting to reconnect in ${timeout / 1000} seconds...`);
 			reconnectTimeoutRef.current = setTimeout(() => {
 				reconnectAttemptRef.current += 1;
 				connect();
@@ -107,10 +91,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		}
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
-		socketRef.current.onmessage = handleMessage;
-		socketRef.current.onerror = handleError;
 		socketRef.current.onclose = handleClose;
-	}, [handleOpen, handleMessage, handleError, handleClose]);
+	}, [handleOpen, handleClose]);
 
 	// * Event Listener Management
 	const addEventListener = useCallback(
