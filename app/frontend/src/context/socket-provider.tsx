@@ -110,6 +110,15 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		[],
 	);
 
+	// * Message Sending
+	const sendMessage = useCallback((data: WSEventData) => {
+		if (socketRef.current?.readyState === WebSocket.OPEN) {
+			wsEventDataSchema.parse(data);
+			console.log("sending", data);
+			socketRef.current.send(JSON.stringify(data));
+		}
+	}, []);
+
 	// * Provider DOM Lifecycle
 	useEffect(() => {
 		connect();
@@ -128,6 +137,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 				readyState,
 				addEventListener,
 				removeEventListener,
+				sendMessage,
 			}}
 		>
 			{children}
