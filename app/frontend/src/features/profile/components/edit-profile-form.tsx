@@ -15,6 +15,8 @@ import { useUpdateProfileMutation } from "@/features/profile/hooks/use-update-pr
 import type { OurFileRouter } from "@server/lib/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 // * min length 2 characters
@@ -29,6 +31,20 @@ const profileFormSchema = z.object({
 export function EditProfileForm() {
 	const { profile } = useUser();
 	const { mutateAsync } = useUpdateProfileMutation();
+	const oldAvatarUrlRef = useRef<string | null>(null);
+	const [, setIsUploading] = useState(false);
+
+	const deleteOldImage = async (avatarUrl: string) => {
+		try {
+			await fetch("/api/user/delete-profile-image", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ avatarUrl }),
+			});
+		} catch {
+			toast.error("Failed to update profile image");
+		}
+	};
 
 	const form = useForm({
 		defaultValues: {
@@ -76,12 +92,28 @@ export function EditProfileForm() {
 									{(field) => (
 										<UploadButton<OurFileRouter, "imageUploader">
 											endpoint="imageUploader"
-											onClientUploadComplete={(res: { url: string }[]) => {
-												const url = res[0].url;
-												field.handleChange(url);
+											onUploadBegin={() => {
+												setIsUploading(true);
+												oldAvatarUrlRef.current = field.state.value ?? null;
 											}}
-											onUploadError={(error: Error) => {
-												console.error("Upload failed:", error);
+											onClientUploadComplete={async (res: { url: string }[]) => {
+												const url = res[0].url;
+												if (oldAvatarUrlRef.current) {
+													await deleteOldImage(oldAvatarUrlRef.current);
+												}
+												field.handleChange(url);
+
+												await mutateAsync({
+													displayName: form.state.values.displayName,
+													avatarUrl: url,
+												});
+
+												setIsUploading(false);
+												toast.success("New profile image uploaded");
+											}}
+											onUploadError={() => {
+												setIsUploading(false);
+												toast.error("Error uploading profile image");
 											}}
 										/>
 									)}
