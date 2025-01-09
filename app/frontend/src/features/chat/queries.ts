@@ -1,5 +1,5 @@
-import { db } from "@/features/db";
 import api from "@/lib/api";
+import { db } from "@/lib/db";
 import type { Chat } from "@server/db/chats";
 import type { Message } from "@server/db/messages";
 import { queryOptions } from "@tanstack/react-query";

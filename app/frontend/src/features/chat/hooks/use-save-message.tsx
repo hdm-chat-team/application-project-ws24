@@ -1,5 +1,5 @@
 import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
-import { db } from "@/features/db";
+import { db } from "@/lib/db";
 import type { Message } from "@server/db/messages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
