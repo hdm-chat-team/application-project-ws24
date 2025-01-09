@@ -1,8 +1,7 @@
 import { userChatsQueryOptions } from "@/features/chat/queries";
 import { db } from "@/features/db";
 import api from "@/lib/api";
-import type { Message } from "@server/db/messages";
-import { useQueryClient } from "@tanstack/react-query";
+import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import {
 	type ReactNode,
 	createContext,
@@ -16,33 +15,26 @@ const RECONNECTION_ATTEMPTS = 5;
 const MAX_RECONNECTION_DELAY = 10000;
 const INITIAL_RECONNECTION_DELAY = 1000;
 
-const WebSocketEvents = {
-	OPEN: "open",
-	MESSAGE: "message",
-	ERROR: "error",
-	CLOSE: "close",
-} as const;
-type WebSocketEventName =
-	(typeof WebSocketEvents)[keyof typeof WebSocketEvents];
+const wsEvents = ["open", "message", "error", "close"] as const;
+type WSEventName = (typeof wsEvents)[number];
 
-type SocketEventMap = {
-	[WebSocketEvents.MESSAGE]: MessageEvent;
-	[WebSocketEvents.CLOSE]: CloseEvent;
-	[WebSocketEvents.ERROR]: Event;
-	[WebSocketEvents.OPEN]: Event;
+type WSEventMap = Record<WSEventName, Event> & {
+	message: MessageEvent;
+	close: CloseEvent;
 };
 
 type SocketContextType = {
 	socket: WebSocket | null;
 	readyState: number;
-	addEventListener: <K extends WebSocketEventName>(
+	addEventListener: <K extends WSEventName>(
 		event: K,
-		handler: (event: SocketEventMap[K]) => void,
+		handler: (event: WSEventMap[K]) => void,
 	) => void;
-	removeEventListener: <K extends WebSocketEventName>(
+	removeEventListener: <K extends WSEventName>(
 		event: K,
-		handler: (event: SocketEventMap[K]) => void,
+		handler: (event: WSEventMap[K]) => void,
 	) => void;
+	sendMessage: (data: WSEventData) => void;
 };
 
 export const SocketContext = createContext<SocketContextType | undefined>(
@@ -65,7 +57,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	const handleClose = useCallback(() => {
-		toast.warning("🔌 WebSocket disconnected");
 		setReadyState(WebSocket.CLOSED);
 
 		if (reconnectAttemptRef.current < RECONNECTION_ATTEMPTS) {
@@ -96,9 +87,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	// * Event Listener Management
 	const addEventListener = useCallback(
-		<K extends WebSocketEventName>(
+		<K extends WSEventName>(
 			event: K,
-			handler: (event: SocketEventMap[K]) => void,
+			handler: (event: WSEventMap[K]) => void,
 		) => {
 			if (socketRef.current) {
 				socketRef.current.addEventListener(event, handler as EventListener);
@@ -108,9 +99,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	);
 
 	const removeEventListener = useCallback(
-		<K extends WebSocketEventName>(
+		<K extends WSEventName>(
 			event: K,
-			handler: (event: SocketEventMap[K]) => void,
+			handler: (event: WSEventMap[K]) => void,
 		) => {
 			if (socketRef.current) {
 				socketRef.current.removeEventListener(event, handler as EventListener);
