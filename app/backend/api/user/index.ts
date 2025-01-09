@@ -60,8 +60,8 @@ export const profileRouter = createRouter()
 			return c.json({ data: userData });
 		},
 	)
-	.post(
-		"/delete-profile-image",
+	.delete(
+		"/avatar",
 		protectedRoute,
 		zValidator("json", deleteUserProfileImageSchema),
 		async (c) => {
