@@ -1,3 +1,5 @@
+import { useUser } from "@/features/auth";
+import { Message } from "@/features/chat/components/message";
 import MessageForm from "@/features/chat/components/message-form";
 import { useChat } from "@/features/chat/hooks";
 import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
@@ -17,6 +19,7 @@ export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
 function Chat() {
 	const chatId = Route.useParams().id;
 	const { messages } = useChat(chatId);
+	const { user } = useUser();
 
 	return (
 		<>
@@ -24,10 +27,13 @@ function Chat() {
 			<Link to="/">start page</Link>
 			<div>
 				<h2>Chat Messages</h2>
-				<ul>
+				<ul className="mx-3">
 					{messages.map((message) => (
 						<li key={message.id}>
-							{message.authorId}: {message.body}
+							<Message
+								value={message}
+								variant={message.authorId === user.id ? "sent" : "received"}
+							/>
 						</li>
 					))}
 				</ul>
