@@ -1,4 +1,4 @@
-import { EditProfileForm } from "./edit-profile-form";
+import { EditProfileForm } from "./profile-edit-form";
 import { ProfileCard } from "./profile-card";
 
 export { EditProfileForm, ProfileCard };
