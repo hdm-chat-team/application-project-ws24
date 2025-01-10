@@ -12,6 +12,7 @@ const messageSchema = z.object({
 });
 
 const wsEventDataTypeSchema = z.enum([
+	"message_sync",
 	"message_incoming",
 	"message_received",
 	"message_delivered",
@@ -21,6 +22,10 @@ const wsEventDataTypeSchema = z.enum([
 type WSEventDataType = z.infer<typeof wsEventDataTypeSchema>;
 
 const wsEventDataSchema = z.discriminatedUnion("type", [
+	z.object({
+		type: z.literal(wsEventDataTypeSchema.enum.message_sync),
+		payload: z.array(messageSchema),
+	}),
 	z.object({
 		type: z.literal(wsEventDataTypeSchema.enum.message_incoming),
 		payload: messageSchema,

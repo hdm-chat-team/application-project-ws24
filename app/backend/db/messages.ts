@@ -1,4 +1,4 @@
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, asc, eq, inArray, not, or, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -27,6 +27,28 @@ const insertMessage = async (
 		.values(message)
 		.returning()
 		.then((rows) => rows[0]);
+
+const selectUnDeliveredMessagesByUserId = db.query.messageTable
+	.findMany({
+		where: not(eq(messageTable.authorId, sql.placeholder("userId"))),
+		with: {
+			recipients: {
+				columns: {},
+				where: and(
+					eq(messageRecipientTable.recipientId, sql.placeholder("userId")),
+					eq(messageRecipientTable.state, "sent"),
+				),
+			},
+		},
+		orderBy: [asc(messageTable.chatId)],
+	})
+	.prepare("select_un_delivered_messages");
+
+async function selectMessagesToSync(userId: string) {
+	return await selectUnDeliveredMessagesByUserId
+		.execute({ userId })
+		.then((rows) => rows.map(({ recipients, ...message }) => message));
+}
 
 const deleteMessage = db
 	.delete(messageTable)
@@ -130,6 +152,7 @@ export {
 	// * Message queries
 	deleteMessage,
 	// * Message functions
+	selectMessagesToSync,
 	selectMessageRecipientIdsByMessageId,
 	insertMessageRecipients,
 	countRecipientsByMessageState,

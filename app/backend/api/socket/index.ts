@@ -3,15 +3,17 @@ import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#api/factory";
 import db from "#db";
 import {
+	type Message,
 	countRecipientsByMessageState,
 	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
+	selectMessagesToSync,
 	updateMessageRecipientsStates,
 	updateMessageStatus,
 } from "#db/messages";
 import type { User } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
-import { publish } from "#lib/utils";
+import { publish, send } from "#lib/utils";
 import { wsEventDataSchema } from "#shared/types";
 
 const { upgradeWebSocket } = createBunWebSocket();
@@ -26,8 +28,22 @@ export const socketRouter = createRouter().get(
 				const socket = ws.raw as ServerWebSocket;
 
 				socket.subscribe(user.id);
-
 				console.log(`${user.username} connected`);
+
+				// * Sync messages
+				const messages = await selectMessagesToSync(user.id);
+				if (messages.length === 0) return;
+
+				const messagesByChat = messages.reduce((accumulator, message) => {
+					const messages = accumulator.get(message.chatId) ?? [];
+					messages.push(message);
+					accumulator.set(message.chatId, messages);
+					return accumulator;
+				}, new Map<Message["chatId"], Message[]>());
+
+				for (const messages of messagesByChat.values()) {
+					send(ws, { type: "message_sync", payload: messages });
+				}
 			},
 			onMessage: async (event) => {
 				const data = wsEventDataSchema.parse(JSON.parse(event.data));

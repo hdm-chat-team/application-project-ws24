@@ -15,3 +15,16 @@ export function useSaveMessage(chatId: string) {
 			queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId)),
 	});
 }
+
+export function useSaveMessageBatch(chatId: string) {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationKey: ["db/save-message-batch", chatId],
+		mutationFn: async (messages: Message[]) => {
+			await db.messages.bulkAdd(messages);
+		},
+		onSuccess: () =>
+			queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId)),
+	});
+}

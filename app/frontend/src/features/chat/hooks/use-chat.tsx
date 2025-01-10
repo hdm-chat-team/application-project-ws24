@@ -1,34 +1,47 @@
 import { userChatsQueryOptions } from "@/features/chat/queries";
-import { useSaveMessage, useUpdateMessage } from "@/features/message/hooks";
+import {
+	useSaveMessage,
+	useSaveMessageBatch,
+	useUpdateMessage,
+} from "@/features/message/hooks";
 import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { useSocket } from "@/hooks";
-import { db } from "@/lib/db";
 import { wsEventDataSchema } from "@shared/types";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
+import { useSaveChats } from ".";
 
 export function useChat(chatId: string) {
 	const { addEventListener, removeEventListener, sendMessage } = useSocket();
 
 	const queryClient = useQueryClient();
-	const saveMessageMutation = useSaveMessage(chatId);
-	const updateMessageMutation = useUpdateMessage(chatId);
+
 	const { data: messages, ...query } = useQuery(
 		messagesByChatIdQueryOptions(chatId),
 	);
 
+	const saveChatMutation = useSaveChats();
+	const saveMessageMutation = useSaveMessage(chatId);
+	const saveMessagesByChatMutation = useSaveMessageBatch(chatId);
+	const updateMessageMutation = useUpdateMessage(chatId);
+
 	const handleOpen = useCallback(async () => {
-		// * Fetch user chats and store them in IndexedDB
+		// TODO: fetch only chats newer than the last chat in the db
 		const data = await queryClient.fetchQuery(userChatsQueryOptions);
-		await db.chats.bulkPut(data);
-	}, [queryClient]);
+		await saveChatMutation.mutateAsync(data);
+	}, [queryClient, saveChatMutation.mutateAsync]);
 
 	const handleMessage = useCallback(
 		async (event: MessageEvent) => {
 			const data = wsEventDataSchema.parse(JSON.parse(event.data));
-			console.log("received", data);
 
 			switch (data.type) {
+				case "message_sync": {
+					const messages = data.payload;
+
+					await saveMessagesByChatMutation.mutateAsync(messages);
+					break;
+				}
 				case "message_incoming": {
 					const message = data.payload;
 					await saveMessageMutation.mutateAsync(message);
@@ -55,11 +68,13 @@ export function useChat(chatId: string) {
 					break;
 				}
 				default:
+					console.log("unhandled message type", data.type);
 					break;
 			}
 		},
 		[
 			saveMessageMutation.mutateAsync,
+			saveMessagesByChatMutation.mutateAsync,
 			updateMessageMutation.mutateAsync,
 			sendMessage,
 		],
