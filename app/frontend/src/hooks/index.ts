@@ -1,4 +1,5 @@
+import { useIntersectionObserver } from "./use-intersection-observer";
 import { useSocket } from "./use-socket";
 import { useTheme } from "./use-theme";
 
-export { useTheme, useSocket };
+export { useIntersectionObserver, useSocket, useTheme };
