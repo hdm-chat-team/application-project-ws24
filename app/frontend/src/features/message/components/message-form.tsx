@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usePostMessageMutation } from "@/features/chat/hooks";
+import { usePostMessageMutation } from "@/features/message/hooks";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 

@@ -1,7 +1,7 @@
 import { useUser } from "@/features/auth";
-import { Message, MessageForm } from "@/features/chat/components";
 import { useChat } from "@/features/chat/hooks";
-import { messagesByChatIdQueryOptions } from "@/features/chat/queries";
+import { Message, MessageForm } from "@/features/message/components";
+import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({

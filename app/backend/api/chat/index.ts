@@ -9,7 +9,7 @@ import {
 	insertMessageSchema,
 } from "#db/messages";
 import { protectedRoute } from "#lib/middleware";
-import { getServer } from "#lib/utils";
+import { publish } from "#lib/utils";
 
 export const chatRouter = createRouter().post(
 	"/",
@@ -17,7 +17,6 @@ export const chatRouter = createRouter().post(
 	protectedRoute,
 	async (c) => {
 		const message = c.req.valid("form");
-		const server = getServer();
 
 		const { insertedMessage, insertedRecipientIds } = await db.transaction(
 			async (trx) => {
@@ -43,14 +42,11 @@ export const chatRouter = createRouter().post(
 			},
 		);
 
-		for (const recipient of insertedRecipientIds)
-			server.publish(
-				recipient,
-				JSON.stringify({
-					type: "message_incoming",
-					payload: insertedMessage,
-				}),
-			);
+		for (const recipientId of insertedRecipientIds)
+			publish(recipientId, {
+				type: "message_incoming",
+				payload: insertedMessage,
+			});
 
 		return c.json({ message: "Message sent" }, 201);
 	},
