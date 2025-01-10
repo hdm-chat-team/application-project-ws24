@@ -94,7 +94,9 @@ export function EditProfileForm() {
 												setIsUploading(true);
 												oldAvatarUrlRef.current = field.state.value ?? null;
 											}}
-											onClientUploadComplete={async (res: { url: string }[]) => {
+											onClientUploadComplete={async (
+												res: { url: string }[],
+											) => {
 												const url = res[0].url;
 												if (oldAvatarUrlRef.current) {
 													await deleteOldImage(oldAvatarUrlRef.current);
