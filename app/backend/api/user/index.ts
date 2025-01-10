@@ -1,7 +1,7 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import { UTApi } from "uploadthing/server";
+import { type FileRouter, UTApi, createUploadthing } from "uploadthing/server";
 import { createRouter } from "#api/factory";
 import {
 	deleteUserProfileImageSchema,
@@ -11,6 +11,23 @@ import {
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
+
+// * UploadThing configuration
+
+const f = createUploadthing();
+
+export const uploadRouter = {
+	imageUploader: f({
+		image: {
+			maxFileSize: "4MB",
+			maxFileCount: 1,
+		},
+	}).onUploadComplete((data) => {
+		console.log("upload completed", data);
+	}),
+} satisfies FileRouter;
+
+export type OurFileRouter = typeof uploadRouter;
 
 // * Create a new UploadThing API instance
 
