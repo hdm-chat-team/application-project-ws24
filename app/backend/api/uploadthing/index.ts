@@ -2,7 +2,7 @@ import { createRouteHandler } from "uploadthing/server";
 import { createRouter } from "#api/factory";
 import env from "#env";
 import { protectedRoute } from "#lib/middleware";
-import { uploadRouter } from "#lib/uploadthing";
+import { uploadRouter } from "#api/user/index";
 
 const handlers = createRouteHandler({
 	router: uploadRouter,

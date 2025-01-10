@@ -15,6 +15,7 @@ import { protectedRoute } from "#lib/middleware";
 // * UploadThing configuration
 
 const f = createUploadthing();
+const utApi = new UTApi();
 
 export const uploadRouter = {
 	imageUploader: f({
@@ -28,10 +29,6 @@ export const uploadRouter = {
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof uploadRouter;
-
-// * Create a new UploadThing API instance
-
-const utApi = new UTApi();
 
 export const profileRouter = createRouter()
 	.put(
