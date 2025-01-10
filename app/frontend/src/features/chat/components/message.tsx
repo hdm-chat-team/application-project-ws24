@@ -7,7 +7,10 @@ interface MessageBubbleProps {
 	variant?: "received" | "sent";
 }
 
-export function Message({ value, variant = "received" }: MessageBubbleProps) {
+export default function Message({
+	value,
+	variant = "received",
+}: MessageBubbleProps) {
 	return (
 		<div
 			className={cn(
