@@ -15,6 +15,7 @@ import api from "@/lib/api";
 import type { OurFileRouter } from "@server/lib/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -27,6 +28,7 @@ const profileFormSchema = z.object({
 
 export function EditProfileForm() {
 	const { profile } = useUser();
+	const [lastAvatarUrl, setLastAvatarUrl] = useState(profile.avatarUrl);
 
 	const form = useForm({
 		defaultValues: {
@@ -42,10 +44,11 @@ export function EditProfileForm() {
 					},
 				});
 
-				if (profile.avatarUrl && value.avatarUrl !== profile.avatarUrl) {
+				if (lastAvatarUrl && value.avatarUrl !== lastAvatarUrl) {
 					await api.user.avatar.$delete({
-						json: { avatarUrl: profile.avatarUrl },
+						json: { avatarUrl: lastAvatarUrl },
 					});
+					setLastAvatarUrl(value.avatarUrl || "");
 				}
 
 				toast.success("Profile updated");
