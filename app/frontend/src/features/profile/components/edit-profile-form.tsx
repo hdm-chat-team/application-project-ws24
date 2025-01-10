@@ -26,8 +26,6 @@ const profileFormSchema = z.object({
 	avatarUrl: z.string().optional(),
 });
 
-// * Ensure type safety
-
 export function EditProfileForm() {
 	const { profile } = useUser();
 	const { mutateAsync } = useUpdateProfileMutation();
