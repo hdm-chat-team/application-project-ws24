@@ -16,6 +16,7 @@ const wsEventDataTypeSchema = z.enum([
 	"message_received",
 	"message_delivered",
 	"message_read",
+	"message_completed",
 ]);
 type WSEventDataType = z.infer<typeof wsEventDataTypeSchema>;
 
@@ -30,6 +31,14 @@ const wsEventDataSchema = z.discriminatedUnion("type", [
 	}),
 	z.object({
 		type: z.literal(wsEventDataTypeSchema.enum.message_delivered),
+		payload: cuidSchema,
+	}),
+	z.object({
+		type: z.literal(wsEventDataTypeSchema.enum.message_read),
+		payload: messageSchema.pick({ id: true, authorId: true }),
+	}),
+	z.object({
+		type: z.literal(wsEventDataTypeSchema.enum.message_completed),
 		payload: cuidSchema,
 	}),
 ]);

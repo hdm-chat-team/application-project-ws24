@@ -50,6 +50,14 @@ export function useChat(chatId: string) {
 					});
 					break;
 				}
+				case "message_completed": {
+					const messageId = data.payload;
+					await updateMessageMutation.mutateAsync({
+						messageId,
+						state: "read",
+					});
+					break;
+				}
 				default:
 					break;
 			}
