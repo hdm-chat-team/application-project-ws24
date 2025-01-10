@@ -1,5 +1,3 @@
-import { EditProfileForm } from "./edit-profile-form";
-import { ProfileCard } from "./profile-card";
-
-export { EditProfileForm, ProfileCard };
+export * from "./edit-profile-form";
+export * from "./profile-card";
 export * from "./profile-states";

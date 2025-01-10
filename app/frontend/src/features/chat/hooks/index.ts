@@ -1,3 +1,1 @@
-import { useChat } from "./use-chat";
-
-export { useChat };
+export * from "./use-chat";
