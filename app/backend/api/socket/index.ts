@@ -49,8 +49,9 @@ export const socketRouter = createRouter().get(
 								trx,
 							);
 
-							const deliveredCount = await countDeliveredRecipientsByMessageId(
+							const deliveredCount = await countRecipientsByMessageState(
 								messageId,
+								"delivered",
 								trx,
 							);
 

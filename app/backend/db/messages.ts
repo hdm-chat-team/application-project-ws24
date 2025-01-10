@@ -77,15 +77,16 @@ async function selectMessageRecipientIdsByMessageId(
 		.then((rows) => rows.map((row) => row.recipientId));
 }
 
-async function countDeliveredRecipientsByMessageId(
+async function countRecipientsByMessageState(
 	messageId: string,
+	state: (typeof messageStateEnum.enumValues)[number],
 	trx: Transaction | DB = db,
 ) {
 	return await trx.$count(
 		messageRecipientTable,
 		and(
 			eq(messageRecipientTable.messageId, messageId),
-			eq(messageRecipientTable.state, "delivered"),
+			eq(messageRecipientTable.state, state),
 		),
 	);
 }
