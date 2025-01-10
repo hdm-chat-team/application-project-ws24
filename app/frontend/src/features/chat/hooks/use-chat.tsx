@@ -42,7 +42,6 @@ export function useChat(chatId: string) {
 					break;
 				}
 				case "message_delivered": {
-					console.log("message_delivered", data.payload);
 					const messageId = data.payload;
 					await updateMessageMutation.mutateAsync({
 						messageId,

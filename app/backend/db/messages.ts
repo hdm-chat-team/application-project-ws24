@@ -132,7 +132,7 @@ export {
 	// * Message functions
 	selectMessageRecipientIdsByMessageId,
 	insertMessageRecipients,
-	countDeliveredRecipientsByMessageId,
+	countRecipientsByMessageState,
 	updateMessageRecipientsStates,
 	updateMessageStatus,
 	insertMessage,

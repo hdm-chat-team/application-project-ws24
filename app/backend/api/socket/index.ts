@@ -3,14 +3,15 @@ import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#api/factory";
 import db from "#db";
 import {
-	countDeliveredRecipientsByMessageId,
+	countRecipientsByMessageState,
+	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
 	updateMessageRecipientsStates,
 	updateMessageStatus,
 } from "#db/messages";
 import type { User } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
-import { getServer } from "#lib/utils";
+import { publish } from "#lib/utils";
 import { wsEventDataSchema } from "#shared/types";
 
 const { upgradeWebSocket } = createBunWebSocket();
@@ -29,14 +30,13 @@ export const socketRouter = createRouter().get(
 				console.log(`${user.username} connected`);
 			},
 			onMessage: async (event) => {
-				const server = getServer();
 				const data = wsEventDataSchema.parse(JSON.parse(event.data));
 
 				switch (data.type) {
 					case "message_received": {
 						const { id: messageId, authorId } = data.payload;
 
-						const fullyDelivered = await db.transaction(async (trx) => {
+						await db.transaction(async (trx) => {
 							await updateMessageRecipientsStates(
 								messageId,
 								[user.id],
@@ -57,24 +57,52 @@ export const socketRouter = createRouter().get(
 
 							if (deliveredCount === recipientIds.length) {
 								await updateMessageStatus(messageId, "delivered", trx);
-								return true;
-							}
-							return false;
-						});
 
-						if (fullyDelivered)
-							server.publish(
-								authorId,
-								JSON.stringify({
+								publish(authorId, {
 									type: "message_delivered",
 									payload: messageId,
-								}),
-							);
+								});
+							}
+							await pruneMessages(trx);
+						});
 
 						break;
 					}
-					default:
+					case "message_read": {
+						const { id: messageId, authorId } = data.payload;
+
+						await db.transaction(async (trx) => {
+							await updateMessageRecipientsStates(
+								messageId,
+								[user.id],
+								"read",
+								trx,
+							);
+
+							const recipientIds = await selectMessageRecipientIdsByMessageId(
+								messageId,
+								trx,
+							);
+
+							const readCount = await countRecipientsByMessageState(
+								messageId,
+								"read",
+								trx,
+							);
+
+							if (readCount === recipientIds.length) {
+								await updateMessageStatus(messageId, "read", trx);
+
+								publish(authorId, {
+									type: "message_completed",
+									payload: messageId,
+								});
+							}
+							await pruneMessages(trx);
+						});
+
 						break;
+					}
 				}
 			},
 			onClose: (_, ws) => {
