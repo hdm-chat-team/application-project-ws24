@@ -33,7 +33,7 @@ const selectUnDeliveredMessagesByUserId = db.query.messageTable
 		where: not(eq(messageTable.authorId, sql.placeholder("userId"))),
 		with: {
 			recipients: {
-				columns: {},
+				columns: { state: true },
 				where: and(
 					eq(messageRecipientTable.recipientId, sql.placeholder("userId")),
 					eq(messageRecipientTable.state, "sent"),
