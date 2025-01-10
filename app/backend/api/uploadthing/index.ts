@@ -1,8 +1,7 @@
 import { createRouteHandler } from "uploadthing/server";
 import { createRouter } from "#api/factory";
-import env from "#env";
-import { protectedRoute } from "#lib/middleware";
 import { uploadRouter } from "#api/user/index";
+import env from "#env";
 
 const handlers = createRouteHandler({
 	router: uploadRouter,
@@ -11,7 +10,7 @@ const handlers = createRouteHandler({
 	},
 });
 
-const router = createRouter().use(protectedRoute);
+const router = createRouter();
 router.all("/", (context) => handlers(context.req.raw));
 
 export const uploadthingRouter = router;
