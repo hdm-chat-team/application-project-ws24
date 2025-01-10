@@ -11,11 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/features/auth";
-import { useUpdateProfileMutation } from "@/features/profile/hooks/use-update-profile";
+import api from "@/lib/api";
 import type { OurFileRouter } from "@server/lib/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
-import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -28,30 +27,32 @@ const profileFormSchema = z.object({
 
 export function EditProfileForm() {
 	const { profile } = useUser();
-	const { mutateAsync } = useUpdateProfileMutation();
-	const oldAvatarUrlRef = useRef<string | null>(null);
-	const [, setIsUploading] = useState(false);
-
-	const deleteOldImage = async (avatarUrl: string) => {
-		try {
-			await fetch("/api/user/delete-profile-image", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ avatarUrl }),
-			});
-		} catch {
-			toast.error("Failed to update profile image");
-		}
-	};
 
 	const form = useForm({
 		defaultValues: {
-			displayName: profile.displayName ?? "",
-			avatarUrl: profile.avatarUrl ?? "",
+			displayName: profile.displayName || "",
+			avatarUrl: profile.avatarUrl || "",
 		},
-		onSubmit: async ({ value: { displayName, avatarUrl } }) => {
-			await mutateAsync({ displayName, avatarUrl });
-			form.reset();
+		onSubmit: async ({ value }) => {
+			try {
+				await api.user.profile.$put({
+					form: {
+						displayName: value.displayName,
+						avatarUrl: value.avatarUrl || "",
+					},
+				});
+
+				if (profile.avatarUrl && value.avatarUrl !== profile.avatarUrl) {
+					await api.user.avatar.$delete({
+						json: { avatarUrl: profile.avatarUrl },
+					});
+				}
+
+				toast.success("Profile updated");
+			} catch (error: unknown) {
+				console.error(error);
+				toast.error("Failed to update profile");
+			}
 		},
 		validators: {
 			onSubmit: profileFormSchema,
@@ -90,30 +91,13 @@ export function EditProfileForm() {
 									{(field) => (
 										<UploadButton<OurFileRouter, "imageUploader">
 											endpoint="imageUploader"
-											onUploadBegin={() => {
-												setIsUploading(true);
-												oldAvatarUrlRef.current = field.state.value ?? null;
+											onClientUploadComplete={(res: { url: string }[]) => {
+												field.handleChange(res[0].url);
+												form.handleSubmit();
 											}}
-											onClientUploadComplete={async (
-												res: { url: string }[],
-											) => {
-												const url = res[0].url;
-												if (oldAvatarUrlRef.current) {
-													await deleteOldImage(oldAvatarUrlRef.current);
-												}
-												field.handleChange(url);
-
-												await mutateAsync({
-													displayName: form.state.values.displayName,
-													avatarUrl: url,
-												});
-
-												setIsUploading(false);
-												toast.success("New profile image uploaded");
-											}}
-											onUploadError={() => {
-												setIsUploading(false);
-												toast.error("Error uploading profile image");
+											onUploadError={(error) => {
+												console.error("Upload error:", error);
+												toast.error("Upload failed");
 											}}
 										/>
 									)}
