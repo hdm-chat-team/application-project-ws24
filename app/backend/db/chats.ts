@@ -4,7 +4,6 @@ import type { z } from "zod";
 import db from "#db";
 import { chatMemberTable, chatTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
-import type { User } from "./users";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -17,25 +16,29 @@ const selectChatIdsByUserId = db.query.chatMemberTable
 	})
 	.prepare("select_chat_ids_by_user_id");
 
-function insertSelfChat(user: User) {
-	return db.transaction(async (tx) => {
-		const existingChat = await tx.query.chatTable.findFirst({
-			where: eq(chatTable.name, user.username),
-		});
+async function insertSelfChat(name: string, trx: Transaction | DB = db) {
+	return await trx
+		.insert(chatTable)
+		.values({
+			name,
+		})
+		.onConflictDoNothing()
+		.returning({ id: chatTable.id })
+		.then((rows) => rows[0].id);
+}
 
-		if (!existingChat) {
-			const newChat = await tx
-				.insert(chatTable)
-				.values({
-					name: user.username,
-				})
-				.returning();
-			await tx.insert(chatMemberTable).values({
-				chatId: newChat[0].id,
-				userId: user.id,
-			});
-		}
-	});
+async function insertSelfChatMembership(
+	chatId: string,
+	userId: string,
+	trx: Transaction | DB = db,
+) {
+	await trx
+		.insert(chatMemberTable)
+		.values({
+			chatId,
+			userId,
+		})
+		.onConflictDoNothing();
 }
 
 async function selectChatWithMembersByUserId(
@@ -52,11 +55,12 @@ async function selectChatWithMembersByUserId(
 export {
 	// * Chat schemas
 	insertChatSchema,
-	// * Chat functions
-	insertSelfChat,
 	// * Chat queries
+	insertSelfChat,
+	insertSelfChatMembership,
 	selectChatIdsByUserId,
 	selectChatSchema,
+	// * Chat functions
 	selectChatWithMembersByUserId,
 };
 export type { Chat };
