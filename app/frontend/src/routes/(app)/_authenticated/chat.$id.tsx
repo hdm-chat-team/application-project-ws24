@@ -2,23 +2,22 @@ import { useUser } from "@/features/auth";
 import { useChat } from "@/features/chat/hooks";
 import { Message, MessageForm } from "@/features/message/components";
 import { messagesByChatIdQueryOptions } from "@/features/message/queries";
+import { useQuery } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
 	loader: ({ context: { queryClient }, params: { id } }) => {
-		queryClient
-			.ensureQueryData(messagesByChatIdQueryOptions(id))
-			.catch((error) => {
-				console.error(error);
-			});
+		queryClient.ensureQueryData(messagesByChatIdQueryOptions(id));
 	},
 	component: () => <Chat />,
 });
 
 function Chat() {
-	const chatId = Route.useParams().id;
-	const { messages } = useChat(chatId);
+	const { id: chatId } = Route.useParams();
 	const { user } = useUser();
+	useChat();
+
+	const { data: messages } = useQuery(messagesByChatIdQueryOptions(chatId));
 
 	return (
 		<>

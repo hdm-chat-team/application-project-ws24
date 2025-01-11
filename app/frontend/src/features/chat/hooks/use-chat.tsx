@@ -83,6 +83,4 @@ export function useChat() {
 			removeEventListener("open", handleOpen);
 		};
 	}, [addEventListener, removeEventListener, handleMessage, handleOpen]);
-
-	return { messages, query };
 }
