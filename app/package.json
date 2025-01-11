@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "^1.1.14",
+		"@types/bun": "^1.1.16",
 		"@types/pg": "^8.11.10",
 		"drizzle-kit": "^0.30.1"
 	}
