@@ -1,21 +1,19 @@
-import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { db } from "@/lib/db";
 import type { Message } from "@server/db/messages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useUpdateMessage(chatId: string) {
+export function useUpdateMessage() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationKey: ["db/update-message", chatId],
+		mutationKey: ["db/update-message"],
 		mutationFn: async ({
 			messageId,
 			state,
 		}: { messageId: string; state: Message["state"] }) => {
-			console.log(`updating message ${messageId} to state ${state}`);
 			await db.messages.update(messageId, { state });
+
+			queryClient.invalidateQueries({ queryKey: ["db/messages-by-chat"] });
 		},
-		onSuccess: () =>
-			queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId)),
 	});
 }

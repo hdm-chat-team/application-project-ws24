@@ -4,31 +4,26 @@ import {
 	useSaveMessageBatch,
 	useUpdateMessage,
 } from "@/features/message/hooks";
-import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { useSocket } from "@/hooks";
 import { wsEventDataSchema } from "@shared/types";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect } from "react";
 import { useSaveChats } from ".";
 
-export function useChat(chatId: string) {
+export function useChat() {
 	const { addEventListener, removeEventListener, sendMessage } = useSocket();
 
 	const queryClient = useQueryClient();
 
-	const { data: messages, ...query } = useQuery(
-		messagesByChatIdQueryOptions(chatId),
-	);
-
 	const saveChatMutation = useSaveChats();
-	const saveMessageMutation = useSaveMessage(chatId);
-	const saveMessagesByChatMutation = useSaveMessageBatch(chatId);
-	const updateMessageMutation = useUpdateMessage(chatId);
+	const saveMessageMutation = useSaveMessage();
+	const saveMessagesByChatMutation = useSaveMessageBatch();
+	const updateMessageMutation = useUpdateMessage();
 
 	const handleOpen = useCallback(async () => {
 		// TODO: fetch only chats newer than the last chat in the db
-		const data = await queryClient.fetchQuery(userChatsQueryOptions);
-		await saveChatMutation.mutateAsync(data);
+		const chats = await queryClient.fetchQuery(userChatsQueryOptions);
+		await saveChatMutation.mutateAsync(chats);
 	}, [queryClient, saveChatMutation.mutateAsync]);
 
 	const handleMessage = useCallback(

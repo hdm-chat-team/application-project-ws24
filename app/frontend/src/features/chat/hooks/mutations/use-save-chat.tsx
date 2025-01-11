@@ -9,8 +9,11 @@ export function useSaveChats() {
 	return useMutation({
 		mutationKey: ["db/save-chat-batch"],
 		mutationFn: async (chats: Chat[]) => {
-			await db.chats.bulkAdd(chats);
+			if (chats.length === 0) return;
+
+			const keys = chats.map((chat) => chat.id);
+			await db.chats.bulkAdd(chats, keys);
+			queryClient.invalidateQueries(userChatsQueryOptions);
 		},
-		onSuccess: () => queryClient.invalidateQueries(userChatsQueryOptions),
 	});
 }

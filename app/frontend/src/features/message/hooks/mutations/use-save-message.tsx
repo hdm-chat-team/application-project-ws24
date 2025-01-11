@@ -3,28 +3,35 @@ import { db } from "@/lib/db";
 import type { Message } from "@server/db/messages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export function useSaveMessage(chatId: string) {
+export function useSaveMessage() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationKey: ["db/save-message", chatId],
+		mutationKey: ["db/save-message"],
 		mutationFn: async (message: Message) => {
 			await db.messages.add(message);
+
+			queryClient.invalidateQueries(
+				messagesByChatIdQueryOptions(message.chatId),
+			);
 		},
-		onSuccess: () =>
-			queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId)),
 	});
 }
 
-export function useSaveMessageBatch(chatId: string) {
+export function useSaveMessageBatch() {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationKey: ["db/save-message-batch", chatId],
+		mutationKey: ["db/save-message-batch"],
 		mutationFn: async (messages: Message[]) => {
-			await db.messages.bulkAdd(messages);
+			if (messages.length === 0) return;
+			const keys = messages.map((message) => message.id);
+
+			await db.messages.bulkAdd(messages, keys);
+
+			queryClient.invalidateQueries({
+				queryKey: ["db/messages-by-chat"],
+			});
 		},
-		onSuccess: () =>
-			queryClient.invalidateQueries(messagesByChatIdQueryOptions(chatId)),
 	});
 }
