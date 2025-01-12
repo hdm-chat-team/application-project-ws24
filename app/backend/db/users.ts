@@ -1,13 +1,9 @@
-import { eq, sql } from "drizzle-orm";
-import {
-	createInsertSchema,
-	createSelectSchema,
-	createUpdateSchema,
-} from "drizzle-zod";
-import { z } from "zod";
-import type { GitHubUser } from "#auth/oauth";
+import {eq, sql} from "drizzle-orm";
+import {createInsertSchema, createSelectSchema, createUpdateSchema,} from "drizzle-zod";
+import {z} from "zod";
+import type {GitHubUser} from "#auth/oauth";
 import db from "#db";
-import { userProfileTable, userTable } from "./users.sql";
+import {contactsTable, userProfileTable, userTable} from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
 const selectUserSchema = createSelectSchema(userTable);
@@ -32,6 +28,7 @@ const insertUser = db
 		githubId: sql.placeholder("githubId"),
 		username: sql.placeholder("username"),
 		email: sql.placeholder("email"),
+		avatarUrl: sql.placeholder("avatarUrl"),
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
@@ -53,6 +50,7 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 				githubId,
 				username,
 				email: email ?? "",
+				avatarUrl: avatarUrl ?? "",
 			})
 			.onConflictDoUpdate({
 				target: userTable.githubId,
@@ -108,6 +106,18 @@ const selectUser = db.query.userTable
 	})
 	.prepare("select_user");
 
+const selectUserContacts = async (userId: string) => {
+	return db
+		.select({
+			id: userTable.id,
+			avatarUrl: userTable.avatarUrl,
+		})
+		.from(userTable)
+		.innerJoin(contactsTable, eq(contactsTable.contactId, userTable.id))
+		.where(eq(contactsTable.userId,userId))
+		.execute();
+};
+
 async function updateUserProfile(
 	userId: string,
 	newValues: {
@@ -160,5 +170,6 @@ export {
 	selectUserChats,
 	updateUserProfile,
 	insertUserWithProfile,
+	selectUserContacts, contactsTable, userTable
 };
 export type { User, UserProfile };

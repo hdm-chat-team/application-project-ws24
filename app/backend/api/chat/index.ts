@@ -3,9 +3,9 @@ import {z} from "zod";
 import {createRouter} from "#api/factory";
 import {insertChatWithMembers} from "#db/chats";
 import {selectUser} from "#db/users";
-import {messageRouter} from "./message";
 import {protectedRoute} from "#lib/middleware";
 import {HTTPException} from "hono/http-exception";
+import {messageRouter} from "#api/chat/message";
 
 const createChatSchema = z.object({
 	userId: z.string().min(1, "User Id is required"),
