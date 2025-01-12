@@ -31,7 +31,7 @@ const TopNav = () => {
 						align="end"
 						className="w-40 rounded-lg bg-white text-black shadow-lg"
 					>
-						<Link to="/profile">
+						<Link to="/user">
 							<DropdownMenuItem>
 								<User className="mr-2 h-4 w-4" />
 								Profile
