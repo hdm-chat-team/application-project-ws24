@@ -5,7 +5,6 @@ import {
 } from "uploadthing/server";
 import { createRouter } from "#api/factory";
 import env from "#env";
-import { protectedRoute } from "#lib/middleware";
 
 // * UploadThing configuration
 
@@ -30,7 +29,7 @@ const handlers = createRouteHandler({
 });
 
 const router = createRouter();
-router.all("/", protectedRoute, (c) => handlers(c.req.raw));
+router.all("/", (c) => handlers(c.req.raw));
 
 export const uploadthingRouter = router;
 export type OurFileRouter = typeof uploadRouter;
