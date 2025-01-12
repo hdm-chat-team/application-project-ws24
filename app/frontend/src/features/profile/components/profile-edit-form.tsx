@@ -7,10 +7,9 @@ import {
 	useDeleteAvatarMutation,
 	useUpdateProfileMutation,
 } from "@/features/profile/hooks";
+import { UploadButton } from "@/features/uploadthing/components";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
-import type { FileRouter } from "@server/api/uploadthing";
 import { useForm } from "@tanstack/react-form";
-import { UploadButton } from "@uploadthing/react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -79,7 +78,7 @@ export function ProfileEditForm() {
 										/>
 										<AvatarFallback>Profile</AvatarFallback>
 									</Avatar>
-									<UploadButton<FileRouter, "avatar">
+									<UploadButton
 										endpoint="avatar"
 										onClientUploadComplete={(res: { url: string }[]) => {
 											field.handleChange(res[0].url);
