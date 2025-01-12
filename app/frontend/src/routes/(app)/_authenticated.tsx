@@ -1,7 +1,6 @@
 import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
 import { userChatsQueryOptions } from "@/features/chat/queries";
-import { useSocket } from "@/hooks";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
@@ -16,18 +15,8 @@ export const Route = createFileRoute("/(app)/_authenticated")({
 	},
 	component: () => (
 		<SocketProvider>
-			<Layout />
+			<Outlet />
+			<Toaster closeButton richColors />
 		</SocketProvider>
 	),
 });
-
-function Layout() {
-	useSocket();
-
-	return (
-		<>
-			<Outlet />
-			<Toaster closeButton richColors />
-		</>
-	);
-}
