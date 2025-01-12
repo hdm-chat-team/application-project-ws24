@@ -1,8 +1,10 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
+import { UTApi } from "uploadthing/server";
 import { createRouter } from "#api/factory";
 import {
+	deleteUserProfileImageSchema,
 	selectUserChats,
 	selectUserProfile,
 	updateUserProfile,
@@ -10,17 +12,22 @@ import {
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
+// * Create UTApi instance
+
+const utApi = new UTApi();
+
 export const profileRouter = createRouter()
 	.put(
 		"/profile",
 		protectedRoute,
-		zValidator("form", updateUserProfileSchema.pick({ displayName: true })),
+		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const user = c.get("user");
-			const { displayName } = c.req.valid("form");
+			const { displayName, avatarUrl } = c.req.valid("form");
 
 			const updatedProfile = await updateUserProfile(user.id, {
 				displayName,
+				avatarUrl,
 			}).catch((error) => {
 				throw new HTTPException(400, { message: error.message });
 			});
@@ -51,5 +58,27 @@ export const profileRouter = createRouter()
 				throw new HTTPException(404, { message: "profile not found" });
 			}
 			return c.json({ data: userData });
+		},
+	)
+	.delete(
+		"/avatar",
+		protectedRoute,
+		zValidator("json", deleteUserProfileImageSchema),
+		async (c) => {
+			try {
+				const { avatarUrl } = c.req.valid("json");
+				const fileKey = avatarUrl.split("/").pop();
+
+				if (fileKey) {
+					await utApi.deleteFiles([fileKey], { keyType: "fileKey" });
+					return c.json({ success: true });
+				}
+
+				throw new HTTPException(400, {
+					message: "Invalid avatar URL",
+				});
+			} catch (error) {
+				throw new HTTPException(500);
+			}
 		},
 	);

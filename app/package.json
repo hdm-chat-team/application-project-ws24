@@ -29,6 +29,7 @@
 		"drizzle-zod": "^0.6.1",
 		"hono": "^4.6.16",
 		"pg": "^8.13.1",
+		"uploadthing": "^7.4.4",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
