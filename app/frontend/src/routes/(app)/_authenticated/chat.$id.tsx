@@ -1,5 +1,4 @@
 import { useUser } from "@/features/auth";
-import { useChat } from "@/features/chat/hooks";
 import { Message, MessageForm } from "@/features/message/components";
 import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { useQuery } from "@tanstack/react-query";
@@ -15,7 +14,6 @@ export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
 function Chat() {
 	const { id: chatId } = Route.useParams();
 	const { user } = useUser();
-	useChat();
 
 	const { data: messages } = useQuery(messagesByChatIdQueryOptions(chatId));
 

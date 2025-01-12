@@ -1,5 +1,7 @@
 import { SocketProvider } from "@/context";
 import { authQueryOptions } from "@/features/auth";
+import { userChatsQueryOptions } from "@/features/chat/queries";
+import { useSocket } from "@/hooks";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 
@@ -9,10 +11,23 @@ export const Route = createFileRoute("/(app)/_authenticated")({
 		if (!(await queryClient.fetchQuery(authQueryOptions)))
 			throw redirect({ to: "/signin", search: { from: location.href } });
 	},
+	loader: async ({ context: { queryClient } }) => {
+		queryClient.fetchQuery(userChatsQueryOptions);
+	},
 	component: () => (
 		<SocketProvider>
-			<Outlet />
-			<Toaster closeButton richColors />
+			<Layout />
 		</SocketProvider>
 	),
 });
+
+function Layout() {
+	useSocket();
+
+	return (
+		<>
+			<Outlet />
+			<Toaster closeButton richColors />
+		</>
+	);
+}

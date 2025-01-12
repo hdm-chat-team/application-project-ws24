@@ -1,3 +1,8 @@
+import {
+	useSaveMessage,
+	useSaveMessageBatch,
+	useUpdateMessage,
+} from "@/features/message/hooks";
 import api from "@/lib/api";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import {
@@ -13,25 +18,8 @@ const RECONNECTION_ATTEMPTS = 5;
 const MAX_RECONNECTION_DELAY = 10000;
 const INITIAL_RECONNECTION_DELAY = 1000;
 
-const wsEvents = ["open", "message", "error", "close"] as const;
-type WSEventName = (typeof wsEvents)[number];
-
-type WSEventMap = Record<WSEventName, Event> & {
-	message: MessageEvent;
-	close: CloseEvent;
-};
-
 type SocketContextType = {
-	socket: WebSocket | null;
 	readyState: number;
-	addEventListener: <K extends WSEventName>(
-		event: K,
-		handler: (event: WSEventMap[K]) => void,
-	) => void;
-	removeEventListener: <K extends WSEventName>(
-		event: K,
-		handler: (event: WSEventMap[K]) => void,
-	) => void;
 	sendMessage: (data: WSEventData) => void;
 };
 
@@ -46,11 +34,59 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
 
+	const saveMessage = useSaveMessage().mutate;
+	const saveMessagesByChat = useSaveMessageBatch().mutate;
+	const updateMessage = useUpdateMessage().mutate;
+
 	// * Event Handlers
 	const handleOpen = useCallback(async () => {
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
 	}, []);
+
+	const handleMessage = useCallback(
+		(event: MessageEvent) => {
+			const data = wsEventDataSchema.parse(JSON.parse(event.data));
+
+			switch (data.type) {
+				case "message_sync": {
+					const messages = data.payload;
+
+					saveMessagesByChat(messages);
+					break;
+				}
+				case "message_incoming": {
+					const message = data.payload;
+					saveMessage(message);
+					sendMessage({
+						type: "message_received",
+						payload: { id: message.id, authorId: message.authorId },
+					});
+					break;
+				}
+				case "message_delivered": {
+					const messageId = data.payload;
+					updateMessage({
+						messageId,
+						state: "delivered",
+					});
+					break;
+				}
+				case "message_completed": {
+					const messageId = data.payload;
+					updateMessage({
+						messageId,
+						state: "read",
+					});
+					break;
+				}
+				default:
+					console.log("unhandled message type", data.type);
+					break;
+			}
+		},
+		[saveMessage, saveMessagesByChat, updateMessage],
+	);
 
 	const handleClose = useCallback(() => {
 		setReadyState(WebSocket.CLOSED);
@@ -78,33 +114,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 		}
 		socketRef.current = api.socket.$ws();
 		socketRef.current.onopen = handleOpen;
+		socketRef.current.onmessage = handleMessage;
 		socketRef.current.onclose = handleClose;
-	}, [handleOpen, handleClose]);
-
-	// * Event Listener Management
-	const addEventListener = useCallback(
-		<K extends WSEventName>(
-			event: K,
-			handler: (event: WSEventMap[K]) => void,
-		) => {
-			if (socketRef.current) {
-				socketRef.current.addEventListener(event, handler as EventListener);
-			}
-		},
-		[],
-	);
-
-	const removeEventListener = useCallback(
-		<K extends WSEventName>(
-			event: K,
-			handler: (event: WSEventMap[K]) => void,
-		) => {
-			if (socketRef.current) {
-				socketRef.current.removeEventListener(event, handler as EventListener);
-			}
-		},
-		[],
-	);
+	}, [handleOpen, handleMessage, handleClose]);
 
 	// * Message Sending
 	const sendMessage = useCallback((data: WSEventData) => {
@@ -129,10 +141,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 	return (
 		<SocketContext.Provider
 			value={{
-				socket: socketRef.current,
 				readyState,
-				addEventListener,
-				removeEventListener,
 				sendMessage,
 			}}
 		>
