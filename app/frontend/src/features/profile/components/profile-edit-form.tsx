@@ -11,15 +11,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/features/auth";
-import api from "@/lib/api";
-import type { OurFileRouter } from "@server/lib/uploadthing";
+import type { OurFileRouter } from "@server/api/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
-import { useState } from "react";
+import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import {
+	useDeleteAvatarMutation,
+	useUpdateProfileMutation,
+} from "../hooks/use-update-profile";
 
-// * min length 2 characters
+// * Profile form schema, used for validation
 
 const profileFormSchema = z.object({
 	displayName: z.string().min(2, "Name must be at least 2 characters"),
@@ -28,7 +31,9 @@ const profileFormSchema = z.object({
 
 export function EditProfileForm() {
 	const { profile } = useUser();
-	const [lastAvatarUrl, setLastAvatarUrl] = useState(profile.avatarUrl);
+	const lastAvatarUrlRef = useRef(profile.avatarUrl);
+	const updateProfile = useUpdateProfileMutation();
+	const deleteAvatar = useDeleteAvatarMutation();
 
 	const form = useForm({
 		defaultValues: {
@@ -37,18 +42,17 @@ export function EditProfileForm() {
 		},
 		onSubmit: async ({ value }) => {
 			try {
-				await api.user.profile.$put({
-					form: {
-						displayName: value.displayName,
-						avatarUrl: value.avatarUrl || "",
-					},
+				await updateProfile.mutateAsync({
+					displayName: value.displayName,
+					avatarUrl: value.avatarUrl || "",
 				});
 
-				if (lastAvatarUrl && value.avatarUrl !== lastAvatarUrl) {
-					await api.user.avatar.$delete({
-						json: { avatarUrl: lastAvatarUrl },
-					});
-					setLastAvatarUrl(value.avatarUrl || "");
+				if (
+					lastAvatarUrlRef.current &&
+					value.avatarUrl !== lastAvatarUrlRef.current
+				) {
+					await deleteAvatar.mutateAsync(lastAvatarUrlRef.current);
+					lastAvatarUrlRef.current = value.avatarUrl || null;
 				}
 
 				toast.success("Profile updated");
@@ -98,7 +102,7 @@ export function EditProfileForm() {
 												field.handleChange(res[0].url);
 												form.handleSubmit();
 											}}
-											onUploadError={(error) => {
+											onUploadError={(error: Error) => {
 												console.error("Upload error:", error);
 												toast.error("Upload failed");
 											}}
