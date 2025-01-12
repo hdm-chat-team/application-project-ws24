@@ -15,6 +15,7 @@ import {
 	useDeleteAvatarMutation,
 	useUpdateProfileMutation,
 } from "@/features/profile/hooks";
+import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import type { FileRouter } from "@server/api/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
@@ -28,7 +29,7 @@ const profileFormSchema = z.object({
 });
 
 export function ProfileEditForm() {
-	const { profile } = useUser();
+	const { user, profile } = useUser();
 	const lastAvatarUrlRef = useRef(profile.avatarUrl);
 	const updateProfile = useUpdateProfileMutation();
 	const deleteAvatar = useDeleteAvatarMutation();
@@ -85,26 +86,29 @@ export function ProfileEditForm() {
 						<div className="space-y-2">
 							<Label>Profile Picture</Label>
 							<div className="flex items-center gap-4">
-								<div className="size-16 overflow-hidden rounded-full bg-muted">
-									<img
-										src={form.state.values.avatarUrl || profile.avatarUrl || ""}
-										alt="Profile"
-										className="h-full w-full object-cover"
-									/>
-								</div>
 								<form.Field name="avatarUrl">
 									{(field) => (
-										<UploadButton<FileRouter, "avatar">
-											endpoint="avatar"
-											onClientUploadComplete={(res: { url: string }[]) => {
-												field.handleChange(res[0].url);
-												form.handleSubmit();
-											}}
-											onUploadError={(error: Error) => {
-												console.error("Upload error:", error);
-												toast.error("Upload failed");
-											}}
-										/>
+										<>
+											<Avatar className="size-16">
+												<AvatarImage
+													src={form.state.values.avatarUrl}
+													alt={user.username}
+													className="size-full rounded-full object-cover"
+												/>
+												<AvatarFallback>Profile</AvatarFallback>
+											</Avatar>
+											<UploadButton<FileRouter, "avatar">
+												endpoint="avatar"
+												onClientUploadComplete={(res: { url: string }[]) => {
+													field.handleChange(res[0].url);
+													form.handleSubmit();
+												}}
+												onUploadError={(error: Error) => {
+													console.error("Upload error:", error);
+													toast.error("Upload failed");
+												}}
+											/>
+										</>
 									)}
 								</form.Field>
 							</div>
