@@ -30,3 +30,23 @@ export function useUpdateProfileMutation() {
 		},
 	});
 }
+
+// * New hook for deleting avatar
+
+export function useDeleteAvatarMutation() {
+	return useMutation({
+		mutationKey: [api.user.avatar.$url().pathname],
+		mutationFn: async (avatarUrl: string) => {
+			const response = await api.user.avatar.$delete({
+				json: { avatarUrl },
+			});
+			if (!response.ok) {
+				throw new Error("Failed to delete avatar");
+			}
+			return response.json();
+		},
+		onError: (error) => {
+			console.error("Error deleting avatar:", error.message);
+		},
+	});
+}
