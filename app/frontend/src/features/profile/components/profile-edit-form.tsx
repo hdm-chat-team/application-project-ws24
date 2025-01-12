@@ -11,25 +11,23 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/features/auth";
-import type { OurFileRouter } from "@server/api/uploadthing";
+import {
+	useDeleteAvatarMutation,
+	useUpdateProfileMutation,
+} from "@/features/profile/hooks";
+import type { FileRouter } from "@server/api/uploadthing";
 import { useForm } from "@tanstack/react-form";
 import { UploadButton } from "@uploadthing/react";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-	useDeleteAvatarMutation,
-	useUpdateProfileMutation,
-} from "../hooks/use-update-profile";
-
-// * Profile form schema, used for validation
 
 const profileFormSchema = z.object({
 	displayName: z.string().min(2, "Name must be at least 2 characters"),
 	avatarUrl: z.string().optional(),
 });
 
-export function EditProfileForm() {
+export function ProfileEditForm() {
 	const { profile } = useUser();
 	const lastAvatarUrlRef = useRef(profile.avatarUrl);
 	const updateProfile = useUpdateProfileMutation();
@@ -96,8 +94,8 @@ export function EditProfileForm() {
 								</div>
 								<form.Field name="avatarUrl">
 									{(field) => (
-										<UploadButton<OurFileRouter, "imageUploader">
-											endpoint="imageUploader"
+										<UploadButton<FileRouter, "avatar">
+											endpoint="avatar"
 											onClientUploadComplete={(res: { url: string }[]) => {
 												field.handleChange(res[0].url);
 												form.handleSubmit();
@@ -120,7 +118,7 @@ export function EditProfileForm() {
 										id={field.name}
 										name={field.name}
 										value={field.state.value}
-										onChange={(e) => field.handleChange(e.target.value)}
+										onChange={(event) => field.handleChange(event.target.value)}
 										placeholder="Enter your display name"
 									/>
 								</div>

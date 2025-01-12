@@ -31,8 +31,6 @@ export function useUpdateProfileMutation() {
 	});
 }
 
-// * New hook for deleting avatar
-
 export function useDeleteAvatarMutation() {
 	return useMutation({
 		mutationKey: [api.user.avatar.$url().pathname],
