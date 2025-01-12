@@ -1,11 +1,11 @@
 import {
-	createRouteHandler,
 	type FileRouter,
+	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
 import { createRouter } from "#api/factory";
-import { protectedRoute } from "#lib/middleware";
 import env from "#env";
+import { protectedRoute } from "#lib/middleware";
 
 // * UploadThing configuration
 
@@ -22,8 +22,6 @@ export const uploadRouter = {
 	}),
 } satisfies FileRouter;
 
-export type OurFileRouter = typeof uploadRouter;
-
 const handlers = createRouteHandler({
 	router: uploadRouter,
 	config: {
@@ -35,3 +33,4 @@ const router = createRouter();
 router.all("/", protectedRoute, (c) => handlers(c.req.raw));
 
 export const uploadthingRouter = router;
+export type OurFileRouter = typeof uploadRouter;
