@@ -83,12 +83,14 @@ export const profileRouter = createRouter()
 				const { avatarUrl } = c.req.valid("json");
 				const fileKey = avatarUrl.split("/").pop();
 
-				if (!fileKey) {
-					throw new HTTPException(400);
+				if (fileKey) {
+					await utApi.deleteFiles([fileKey], { keyType: "fileKey" });
+					return c.json({ success: true });
 				}
 
-				await utApi.deleteFiles([fileKey], { keyType: "fileKey" });
-				return c.json({ success: true });
+				throw new HTTPException(400, {
+					message: "Invalid avatar URL",
+				});
 			} catch (error) {
 				throw new HTTPException(500);
 			}
