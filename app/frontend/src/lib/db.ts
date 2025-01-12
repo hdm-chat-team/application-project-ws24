@@ -3,7 +3,7 @@ import type { Message } from "@server/db/messages";
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
 
-type LocalDatabase = Dexie & {
+export type LocalDatabase = Dexie & {
 	messages: EntityTable<Message, "id">;
 	chats: EntityTable<Chat, "id">;
 };
