@@ -8,7 +8,5 @@ export const messagesByChatIdQueryOptions = (chatId: string) =>
 	queryOptions({
 		queryKey: ["db/messages-by-chat", chatId],
 		initialData: [],
-		queryFn: async () => {
-			return await messagesByChatIdQueryFn(chatId);
-		},
+		queryFn: () => messagesByChatIdQueryFn(chatId),
 	});
