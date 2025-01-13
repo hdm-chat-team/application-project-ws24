@@ -1,4 +1,4 @@
-import { useUser } from "@/features/auth";
+import { useUser } from "@/features/auth/hooks";
 import api from "@/lib/api";
 import { createId } from "@application-project-ws24/cuid";
 import type { Message } from "@server/db/messages";

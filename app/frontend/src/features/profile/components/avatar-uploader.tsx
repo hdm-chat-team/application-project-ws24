@@ -1,10 +1,10 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUploadThing } from "@/features/uploadthing/hooks";
+import { cn } from "@/lib/utils";
 import type { FileRouter } from "@server/api/uploadthing";
 import type { UseUploadthingProps } from "@uploadthing/react";
 import { Upload } from "lucide-react";
 import type { ClientUploadedFileData } from "uploadthing/types";
-import { cn } from "@/lib/utils";
 
 type UploadAvatarProps = Omit<
 	UseUploadthingProps<FileRouter["avatar"], FileRouter>,
@@ -45,7 +45,10 @@ export function AvatarUploader({
 
 	return (
 		<div className={cn("flex w-full justify-center", className)}>
-			<label htmlFor="avatar-upload" className="group relative aspect-square cursor-pointer">
+			<label
+				htmlFor="avatar-upload"
+				className="group relative aspect-square cursor-pointer"
+			>
 				<Avatar className="h-full w-full border border-gray-200 dark:border-gray-800">
 					<AvatarImage
 						src={avatarUrl}
@@ -72,7 +75,7 @@ export function AvatarUploader({
 					}
 				}}
 				disabled={isUploading}
-				/>
+			/>
 		</div>
 	);
 }

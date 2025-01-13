@@ -1,5 +1,5 @@
 import { QueryClientProvider, RouterProvider } from "@/context";
-import { AuthProvider } from "@/features/auth";
+import { AuthProvider } from "@/features/auth/context";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./main.css";

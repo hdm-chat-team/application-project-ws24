@@ -1,4 +1,4 @@
-import { authQueryOptions } from "@/features/auth";
+import { authQueryOptions } from "@/features/auth/queries";
 import api from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 

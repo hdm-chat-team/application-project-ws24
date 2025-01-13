@@ -1,5 +1,5 @@
 import TopNav from "@/components/nav/top-nav";
-import { useUser } from "@/features/auth";
+import { useUser } from "@/features/auth/hooks";
 import { createLazyFileRoute } from "@tanstack/react-router";
 
 export const Route = createLazyFileRoute("/(app)/_authenticated/")({

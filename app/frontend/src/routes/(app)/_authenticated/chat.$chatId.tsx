@@ -1,4 +1,4 @@
-import { useUser } from "@/features/auth";
+import { useUser } from "@/features/auth/hooks";
 import { Message, MessageForm } from "@/features/message/components";
 import { messagesByChatIdQueryFn } from "@/features/message/queries";
 import { Link, createFileRoute } from "@tanstack/react-router";
