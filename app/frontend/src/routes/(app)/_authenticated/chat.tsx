@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { userChatsQueryOptions } from "@/features/chat/queries";
+import { syncChatsQueryOptions } from "@/features/chat/queries";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat")({
 	loader: async ({ context: { queryClient } }) =>
-		await queryClient.ensureQueryData(userChatsQueryOptions),
+		await queryClient.ensureQueryData(syncChatsQueryOptions),
 	component: () => <Chat />,
 });
 
@@ -18,7 +18,7 @@ function Chat() {
 						<div className="flex">
 							<span>{chat.name}</span>
 							<Button variant="link" asChild>
-								<Link to="/chat/$id" params={{ id: chat.id }}>
+								<Link to="/chat/$chatId" params={{ id: chat.id }}>
 									Open Chat
 								</Link>
 							</Button>

@@ -4,19 +4,20 @@ import { messagesByChatIdQueryFn } from "@/features/message/queries";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 
-export const Route = createFileRoute("/(app)/_authenticated/chat/$id")({
-	loader: async ({ params: { id } }) => await messagesByChatIdQueryFn(id),
+export const Route = createFileRoute("/(app)/_authenticated/chat/$chatId")({
+	loader: async ({ params: { chatId } }) =>
+		await messagesByChatIdQueryFn(chatId),
 	component: () => <Chat />,
 });
 
 function Chat() {
-	const { id: chatId } = Route.useParams();
+	const { chatId } = Route.useParams();
 	const { user } = useUser();
 
-	const messages = useLiveQuery(
-		() => messagesByChatIdQueryFn(chatId),
-		[chatId],
-	);
+	const preloadedMessages = Route.useLoaderData();
+	const messages =
+		useLiveQuery(() => messagesByChatIdQueryFn(chatId), [chatId]) ??
+		preloadedMessages;
 
 	return (
 		<>
