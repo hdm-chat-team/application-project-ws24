@@ -7,12 +7,11 @@ import {
 	useDeleteAvatarMutation,
 	useUpdateProfileMutation,
 } from "@/features/profile/hooks";
-import { UploadButton } from "@/features/uploadthing/components";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { useForm } from "@tanstack/react-form";
 import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { AvatarUploader } from "./avatar-uploader";
 
 const profileFormSchema = z.object({
 	displayName: z.string().min(2, "Name must be at least 2 characters"),
@@ -69,27 +68,18 @@ export function ProfileEditForm() {
 					<div className="flex items-center gap-4">
 						<form.Field name="avatarUrl">
 							{(field) => (
-								<>
-									<Avatar className="size-16">
-										<AvatarImage
-											src={field.state.value}
-											alt={user.username}
-											className="size-full rounded-full object-cover"
-										/>
-										<AvatarFallback>Profile</AvatarFallback>
-									</Avatar>
-									<UploadButton
-										endpoint="avatar"
-										onClientUploadComplete={(res: { url: string }[]) => {
-											field.handleChange(res[0].url);
-											form.handleSubmit();
-										}}
-										onUploadError={(error: Error) => {
-											console.error("Upload error:", error);
-											toast.error("Upload failed");
-										}}
-									/>
-								</>
+								<AvatarUploader
+									avatarUrl={field.state.value}
+									fallback={user.username}
+									onClientUploadComplete={(res) => {
+										field.handleChange(res[0].url);
+										form.handleSubmit();
+									}}
+									onUploadError={(error: Error) => {
+										console.error("Upload error:", error);
+										toast.error("Upload failed");
+									}}
+								/>
 							)}
 						</form.Field>
 					</div>

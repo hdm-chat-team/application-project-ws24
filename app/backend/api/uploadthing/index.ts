@@ -24,7 +24,9 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides };
 		})
-		.onUploadComplete(() => {}),
+		.onUploadComplete(({ file }) => ({
+			url: file.url,
+		})),
 } satisfies FR;
 
 const handlers = createRouteHandler({
