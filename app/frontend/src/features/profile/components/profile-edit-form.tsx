@@ -64,11 +64,11 @@ export function ProfileEditForm() {
 		>
 			<div className="space-y-4">
 				<div className="space-y-2">
-					<Label>Profile Picture</Label>
-					<div className="flex items-center gap-4">
+					<div className="flex w-full items-center justify-center gap-4">
 						<form.Field name="avatarUrl">
 							{(field) => (
 								<AvatarUploader
+									className="size-32"
 									avatarUrl={field.state.value}
 									fallback={user.username}
 									onClientUploadComplete={(res) => {
@@ -84,7 +84,7 @@ export function ProfileEditForm() {
 						</form.Field>
 					</div>
 				</div>
-				<Separator />
+
 				<form.Field name="displayName">
 					{(field) => (
 						<div className="space-y-2">
