@@ -1,24 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { syncChatsQueryOptions } from "@/features/chat/queries";
+import { chatsQueryFn, chatsQueryOptions } from "@/features/chat/queries";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Route = createFileRoute("/(app)/_authenticated/chat")({
 	loader: async ({ context: { queryClient } }) =>
-		await queryClient.ensureQueryData(syncChatsQueryOptions),
+		await queryClient.fetchQuery(chatsQueryOptions),
 	component: () => <Chat />,
 });
 
 function Chat() {
-	const chats = Route.useLoaderData();
+	const preloadedChats = Route.useLoaderData();
+	const chats = useLiveQuery(chatsQueryFn, []) ?? preloadedChats;
+
 	return (
 		<div>
 			<ul>
-				{chats.map((chat) => (
-					<li key={chat.id}>
+				{chats.map(({ id, name }) => (
+					<li key={id}>
 						<div className="flex">
-							<span>{chat.name}</span>
+							<span>{name}</span>
 							<Button variant="link" asChild>
-								<Link to="/chat/$chatId" params={{ id: chat.id }}>
+								<Link to="/chat/$chatId" params={{ chatId: id }}>
 									Open Chat
 								</Link>
 							</Button>

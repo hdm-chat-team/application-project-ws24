@@ -1,3 +1,8 @@
+import { useSaveChats } from "@/features/chat/hooks";
+import {
+	chatByIdQueryOptions,
+	syncChatsQueryOptions,
+} from "@/features/chat/queries";
 import {
 	useSaveMessage,
 	useSaveMessageBatch,
@@ -5,6 +10,7 @@ import {
 } from "@/features/message/hooks";
 import api from "@/lib/api";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	type ReactNode,
 	createContext,
@@ -34,15 +40,21 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
 	const [readyState, setReadyState] = useState<number>(WebSocket.CLOSED);
 
+	const queryClient = useQueryClient();
+
 	const saveMessage = useSaveMessage().mutate;
 	const saveMessagesByChat = useSaveMessageBatch().mutate;
 	const updateMessage = useUpdateMessage().mutate;
+	const saveChats = useSaveChats().mutate;
 
 	// * Event Handlers
 	const handleOpen = useCallback(async () => {
 		setReadyState(WebSocket.OPEN);
 		reconnectAttemptRef.current = 0;
-	}, []);
+
+		const chats = await queryClient.fetchQuery(syncChatsQueryOptions);
+		saveChats(chats);
+	}, [queryClient, saveChats]);
 
 	const handleMessage = useCallback(
 		(event: MessageEvent) => {
@@ -53,6 +65,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 					const messages = data.payload;
 
 					saveMessagesByChat(messages);
+
 					break;
 				}
 				case "message_incoming": {
@@ -62,6 +75,13 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 						type: "message_received",
 						payload: { id: message.id, authorId: message.authorId },
 					});
+
+					// * sync chats when needed
+					const chatSynched = queryClient.getQueryData(
+						chatByIdQueryOptions(message.chatId).queryKey,
+					);
+					if (!chatSynched) queryClient.refetchQueries(syncChatsQueryOptions);
+
 					break;
 				}
 				case "message_delivered": {
@@ -70,6 +90,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 						messageId,
 						state: "delivered",
 					});
+
 					break;
 				}
 				case "message_completed": {
@@ -78,14 +99,16 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 						messageId,
 						state: "read",
 					});
+
 					break;
 				}
 				default:
 					console.log("unhandled message type", data.type);
+
 					break;
 			}
 		},
-		[saveMessage, saveMessagesByChat, updateMessage],
+		[queryClient, saveMessage, saveMessagesByChat, updateMessage],
 	);
 
 	const handleClose = useCallback(() => {
