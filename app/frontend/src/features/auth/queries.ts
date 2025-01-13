@@ -9,7 +9,8 @@ export const authQueryOptions = queryOptions<{
 	queryKey: [api.auth.$url().pathname],
 	queryFn: async () => {
 		const response = await api.auth.$get();
-		if (!response.ok) return null;
+		if (response.status === 401) return null;
+		if (!response.ok) throw new Error("Failed to authenticate");
 
 		return (await response.json()).data;
 	},
