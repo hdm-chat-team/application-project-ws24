@@ -10,3 +10,10 @@ export const messagesByChatIdQueryOptions = (chatId: string) =>
 		initialData: [],
 		queryFn: () => messagesByChatIdQueryFn(chatId),
 	});
+
+export const messageStateByIdQueryFn = (id: string) =>
+	db.messages
+		.where("id")
+		.equals(id)
+		.first()
+		.then((message) => message?.state);
