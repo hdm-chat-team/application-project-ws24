@@ -8,41 +8,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useState, useEffect } from "react";
 
 const TopNav = () => {
-  const [showToggle, setShowToggle] = useState(true);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 400) {
-        setShowToggle(false);
-      } else {
-        setShowToggle(true);
-      }
-    };
-
-    handleResize();
-
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
 
   return (
     <div className="flex items-center justify-between bg-red-600 px-4 py-3 text-white shadow-md dark:bg-slate-900">
-      {showToggle ? (
         <div className="flex items-center space-x-2">
           <img src={Logo} alt="Logo" className="h-1 w-10 sm:h-8 sm:w-8" />
           <span className="truncate font-semibold text-sm sm:text-lg">
             StudyConnect
           </span>
         </div>
-      ) : (
-        <p>Hier kommt toggle hin für Sidebar ein und ausklappen!</p>
-      )}
 
       <div className="flex items-center space-x-4">
         <ModeToggle />
