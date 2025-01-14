@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { authQueryOptions } from "@/features/auth";
 import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
-import Logo from "@assets/hdm-logo-clipart-lg.png";
+import Logo from "@assets/hdmChat.svg";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
@@ -34,7 +34,7 @@ function SignIn() {
 				<div className="flex-col items-center gap-2 py-4">
 					<img
 						src={Logo}
-						className="-top-[2.75rem] -translate-x-1/2 absolute left-1/2 h-[5.5rem] w-auto"
+						className="-top-[3.75rem] -translate-x-1/2 absolute left-1/2 h-[9rem] w-auto"
 						alt="Hdm-Logo"
 					/>
 					<CardHeader className="my-3">
