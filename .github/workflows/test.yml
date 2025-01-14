@@ -28,5 +28,4 @@ jobs:
                 CALLBACK_URL_GITHUB: ${{ vars.CALLBACK_URL_GITHUB }}
                 DATABASE_URL: ${{ vars.DATABASE_URL }}
                 UPLOADTHING_TOKEN: ${{ vars.UPLOADTHING_TOKEN }}
-                UPLOADTHING_SECRET: ${{ secrets.UPLOADTHING_SECRET }}
               run: bun run test

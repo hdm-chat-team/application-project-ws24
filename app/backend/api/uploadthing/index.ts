@@ -1,25 +1,33 @@
+import { createId } from "@application-project-ws24/cuid";
+import { contextStorage, getContext } from "hono/context-storage";
 import {
-	type FileRouter,
+	type FileRouter as FR,
+	UTFiles,
 	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
+import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import env from "#env";
 
-// * UploadThing configuration
-
-const f = createUploadthing();
+const routeBuilder = createUploadthing();
 
 export const uploadRouter = {
-	imageUploader: f({
-		image: {
-			maxFileSize: "4MB",
-			maxFileCount: 1,
-		},
-	}).onUploadComplete((data) => {
-		console.log("upload completed", data);
-	}),
-} satisfies FileRouter;
+	avatar: routeBuilder(["image"])
+		.middleware(async ({ files }) => {
+			const { user, session } = getContext<Env>().var;
+			if (!(user && session)) throw new Error("Unauthorized");
+
+			const fileOverrides = files.map((file) => {
+				return { ...file, name: `${user.id}:avatar`, customId: createId() };
+			});
+
+			return { [UTFiles]: fileOverrides };
+		})
+		.onUploadComplete(({ file }) => ({
+			url: file.url,
+		})),
+} satisfies FR;
 
 const handlers = createRouteHandler({
 	router: uploadRouter,
@@ -28,8 +36,8 @@ const handlers = createRouteHandler({
 	},
 });
 
-const router = createRouter();
-router.all("/", (c) => handlers(c.req.raw));
+export const uploadthingRouter = createRouter()
+	.use(contextStorage())
+	.all("/", (c) => handlers(c.req.raw));
 
-export const uploadthingRouter = router;
-export type OurFileRouter = typeof uploadRouter;
+export type FileRouter = typeof uploadRouter;

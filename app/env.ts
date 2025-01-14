@@ -31,7 +31,6 @@ export const EnvSchema = z.object({
 
 	// * UploadThing
 	UPLOADTHING_TOKEN: z.string().min(1),
-	UPLOADTHING_SECRET: z.string().min(1),
 });
 
 type NodeEnv = z.infer<typeof EnvSchema>;

@@ -24,5 +24,5 @@ export function useUser() {
 
 	const { data, ...rest } = context;
 
-	return { isSignedIn: !!data, ...data, ...rest };
+	return { ...data, ...rest };
 }

@@ -1,8 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { usePostMessageMutation } from "@/features/chat/hooks";
-import { messageFormSchema } from "@shared/message";
+import { usePostMessageMutation } from "@/features/message/hooks";
 import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+
+const messageFormSchema = z.object({ body: z.string().trim().nonempty() });
 
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
@@ -24,6 +26,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 	return (
 		<form
 			className="flex"
+			autoComplete="off"
 			onSubmit={(event) => {
 				event.preventDefault();
 				event.stopPropagation();

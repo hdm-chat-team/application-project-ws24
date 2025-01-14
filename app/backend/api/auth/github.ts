@@ -7,7 +7,8 @@ import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import { insertSelfChat } from "#db/chats";
+import db from "#db";
+import { insertSelfChat, insertSelfChatMembership } from "#db/chats";
 import { insertUserWithProfile } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
@@ -70,19 +71,21 @@ export const githubRouter = createRouter()
 			});
 			const githubUser = (await githubResponse.json()) as GitHubUser;
 
-			const user = await insertUserWithProfile(githubUser).catch((error) => {
-				console.error("Error inserting user:", error);
-				throw new HTTPException(500, {
-					message: "Error creating user",
-				});
-			});
+			const user = await db
+				.transaction(async (trx) => {
+					const user = await insertUserWithProfile(githubUser, trx);
 
-			await insertSelfChat(user).catch((error) => {
-				console.error("Error inserting chat:", error);
-				throw new HTTPException(500, {
-					message: "Error creating chat",
+					// TODO: Fix it creating a chat every time
+					const insertedChatId = await insertSelfChat(user.username, trx);
+					await insertSelfChatMembership(insertedChatId, user.id, trx);
+
+					return user;
+				})
+				.catch((error: Error) => {
+					throw new HTTPException(500, {
+						message: error.message,
+					});
 				});
-			});
 
 			await createAndSetSessionCookie(c, user.id);
 			return c.redirect(oauth_redirect_to || REDIRECT_URL);
