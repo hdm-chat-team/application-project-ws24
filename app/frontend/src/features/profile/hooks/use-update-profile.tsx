@@ -1,18 +1,19 @@
-import { authQueryOptions, useUser } from "@/features/auth";
+import { authQueryOptions } from "@/features/auth";
 import api from "@/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useUpdateProfileMutation() {
 	const queryClient = useQueryClient();
-	const { profile } = useUser();
 	return useMutation({
 		mutationKey: [api.user.profile.$url().pathname],
-		mutationFn: async (newName: string) => {
-			if (profile.displayName === newName) return;
-
+		mutationFn: async ({
+			displayName,
+			avatarUrl,
+		}: { displayName: string; avatarUrl?: string }) => {
 			const response = await api.user.profile.$put({
 				form: {
-					displayName: newName,
+					displayName,
+					avatarUrl,
 				},
 			});
 			if (!response.ok) {
@@ -26,6 +27,26 @@ export function useUpdateProfileMutation() {
 		},
 		onError: (error) => {
 			console.error("Error updating profile:", error.message);
+		},
+	});
+}
+
+// * New hook for deleting avatar
+
+export function useDeleteAvatarMutation() {
+	return useMutation({
+		mutationKey: [api.user.avatar.$url().pathname],
+		mutationFn: async (avatarUrl: string) => {
+			const response = await api.user.avatar.$delete({
+				json: { avatarUrl },
+			});
+			if (!response.ok) {
+				throw new Error("Failed to delete avatar");
+			}
+			return response.json();
+		},
+		onError: (error) => {
+			console.error("Error deleting avatar:", error.message);
 		},
 	});
 }

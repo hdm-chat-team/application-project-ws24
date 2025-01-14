@@ -28,6 +28,10 @@ export const EnvSchema = z.object({
 	CLIENT_ID_GITHUB: z.string().min(1),
 	CLIENT_SECRET_GITHUB: z.string().min(1),
 	CALLBACK_URL_GITHUB: z.string().min(1).url(),
+
+	// * UploadThing
+	UPLOADTHING_TOKEN: z.string().min(1),
+	UPLOADTHING_SECRET: z.string().min(1),
 });
 
 type NodeEnv = z.infer<typeof EnvSchema>;
