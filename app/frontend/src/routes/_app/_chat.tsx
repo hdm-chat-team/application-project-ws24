@@ -1,10 +1,10 @@
 import ChatContent from "@/components/chat/chat";
 import TopNav from "@/components/nav/top-nav";
 import Sidebar from "@/components/sidebar";
+import { createFileRoute } from "@tanstack/react-router";
 // import { useUser } from "@/features/auth";
-import { createLazyFileRoute } from "@tanstack/react-router";
 
-export const Route = createLazyFileRoute("/(app)/_authenticated/")({
+export const Route = createFileRoute("/_app/_chat")({
 	component: Index,
 });
 

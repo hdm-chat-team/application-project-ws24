@@ -4,7 +4,7 @@ import { messagesByChatIdQueryFn } from "@/features/message/queries";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 
-export const Route = createFileRoute("/(app)/_authenticated/chat/$chatId")({
+export const Route = createFileRoute("/_app/_chat/$chatId")({
 	loader: async ({ params: { chatId } }) =>
 		await messagesByChatIdQueryFn(chatId),
 	component: () => <Chat />,

@@ -7,7 +7,7 @@ import {
 import { userProfileQueryOptions } from "@/features/profile/queries";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/(app)/user/$userId")({
+export const Route = createFileRoute("/_app/user/$userId")({
 	loader: async ({ context: { queryClient }, params: { userId } }) => {
 		const profile = await queryClient.ensureQueryData(
 			userProfileQueryOptions(userId),

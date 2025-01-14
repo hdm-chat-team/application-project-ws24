@@ -2,7 +2,7 @@ import TopNav from "@/components/nav/top-nav";
 import { ProfileEditForm } from "@/features/profile/components";
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/(app)/_authenticated/user")({
+export const Route = createFileRoute("/_app/user/")({
 	component: ProfilePage,
 });
 

@@ -3,7 +3,7 @@ import { chatsQueryFn, chatsQueryOptions } from "@/features/chat/queries";
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 
-export const Route = createFileRoute("/(app)/_authenticated/chat")({
+export const Route = createFileRoute("/_app/_chat/")({
 	loader: async ({ context: { queryClient } }) =>
 		await queryClient.fetchQuery(chatsQueryOptions),
 	component: () => <Chat />,
@@ -21,7 +21,7 @@ function Chat() {
 						<div className="flex">
 							<span>{name}</span>
 							<Button variant="link" asChild>
-								<Link to="/chat/$chatId" params={{ chatId: id }}>
+								<Link to="/$chatId" params={{ chatId: id }}>
 									Open Chat
 								</Link>
 							</Button>
