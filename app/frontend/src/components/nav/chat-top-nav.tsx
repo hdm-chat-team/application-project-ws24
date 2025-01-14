@@ -2,12 +2,12 @@ import type React from "react";
 
 interface IChatNav {
 	username: string;
-	profilePicture?: string; // Optional profile picture
+	profilePicture?: string;
 }
 
-const ChatNav: React.FC<IChatNav> = ({ username, profilePicture }) => {
+const ChatTopNav: React.FC<IChatNav> = ({ username, profilePicture }) => {
 	return (
-		<div className="flex items-center gap-4 border-gray-700 border-b bg-gray-800 p-4 text-white">
+		<div className="flex items-center gap-4 border-gray-300 border-b bg-white p-4 text-black">
 			{profilePicture ? (
 				<img
 					src={profilePicture}
@@ -22,4 +22,4 @@ const ChatNav: React.FC<IChatNav> = ({ username, profilePicture }) => {
 	);
 };
 
-export default ChatNav;
+export default ChatTopNav;
