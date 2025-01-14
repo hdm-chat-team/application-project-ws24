@@ -1,5 +1,5 @@
 import { SocketProvider } from "@/context";
-import { authQueryOptions } from "@/features/auth";
+import { authQueryOptions } from "@/features/auth/queries";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
 import { Toaster } from "sonner";
 

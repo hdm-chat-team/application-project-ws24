@@ -8,8 +8,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { authQueryOptions } from "@/features/auth";
-import { GithubSignInButton } from "@/features/auth/components/github-signin-button";
+import { GithubSignInButton } from "@/features/auth/components";
+import { authQueryOptions } from "@/features/auth/queries";
 import Logo from "@assets/hdm-logo-clipart-lg.png";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { z } from "zod";

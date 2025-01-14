@@ -1,4 +1,4 @@
-import { EditProfileForm } from "@/features/profile/components";
+import { ProfileEditForm } from "@/features/profile/components";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(app)/_authenticated/user")({
@@ -8,7 +8,7 @@ export const Route = createFileRoute("/(app)/_authenticated/user")({
 function ProfilePage() {
 	return (
 		<div>
-			<EditProfileForm />
+			<ProfileEditForm />
 		</div>
 	);
 }

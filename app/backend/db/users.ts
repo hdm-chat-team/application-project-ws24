@@ -8,6 +8,7 @@ import { z } from "zod";
 import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { chatMemberTable } from "./chats.sql";
+import type { DB, Transaction } from "./types";
 import { userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
@@ -39,7 +40,10 @@ const userWithProfileSchema = z.object({
 });
 type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 
-async function insertUserWithProfile(githubUser: GitHubUser) {
+async function insertUserWithProfile(
+	githubUser: GitHubUser,
+	trx: Transaction | DB = db,
+) {
 	const {
 		id,
 		login: username,
@@ -49,8 +53,8 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 		html_url: htmlUrl,
 	} = githubUser;
 	const githubId = id.toString();
-	return db.transaction(async (tx) => {
-		const [user] = await tx
+	return trx.transaction(async (innerTrx) => {
+		const [user] = await innerTrx
 			.insert(userTable)
 			.values({
 				githubId,
@@ -63,9 +67,9 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 			})
 			.returning();
 
-		if (!user) throw new Error("Failed to insert or get existing user");
+		if (!user) throw new Error("Failed to insert or update user");
 
-		await tx
+		await innerTrx
 			.insert(userProfileTable)
 			.values({
 				userId: user.id,

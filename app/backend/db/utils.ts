@@ -7,7 +7,10 @@ const ID_SIZE_CONFIG = { length: LENGTH };
 const id = varchar(ID_SIZE_CONFIG).primaryKey().$default(createId);
 
 const createdAt = timestamp({ mode: "string" }).notNull().defaultNow();
-const updatedAt = timestamp({ mode: "string" }).defaultNow();
+const updatedAt = timestamp({ mode: "string" })
+	.notNull()
+	.$onUpdate(() => new Date().toISOString());
+
 const timestamps = { createdAt, updatedAt };
 
 export { id, ID_SIZE_CONFIG, createdAt, updatedAt, timestamps };

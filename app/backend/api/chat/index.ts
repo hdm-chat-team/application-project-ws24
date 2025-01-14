@@ -1,27 +1,53 @@
-import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
-import { protectedRoute } from "#lib/middleware";
-import { getServer } from "#lib/utils";
+import db from "#db";
+import { selectChatWithMembersByUserId } from "#db/chats";
 import {
-	createMessage,
-	messageFormSchema,
-	stringifyMessage,
-} from "#shared/message";
+	insertMessage,
+	insertMessageRecipients,
+	insertMessageSchema,
+} from "#db/messages";
+import { protectedRoute } from "#lib/middleware";
+import { publish } from "#lib/utils";
 
 export const chatRouter = createRouter().post(
-	"/:id",
-	zValidator("param", cuidParamSchema),
-	zValidator("form", messageFormSchema),
+	"/",
+	zValidator("form", insertMessageSchema),
 	protectedRoute,
 	async (c) => {
-		const { body } = c.req.valid("form");
-		const { id: chatId } = c.req.valid("param");
-		const { id: authorId } = c.get("user");
+		const message = c.req.valid("form");
 
-		const message = createMessage(chatId, authorId, body);
-		getServer().publish(chatId, stringifyMessage(message));
+		const { insertedMessage, insertedRecipientIds } = await db.transaction(
+			async (trx) => {
+				const chat = await selectChatWithMembersByUserId(message.chatId, trx);
 
-		return c.text("Message sent");
+				if (!chat) throw new HTTPException(404, { message: "Chat not found" });
+				if (!chat.members.some((member) => member.userId === message.authorId))
+					throw new HTTPException(403, { message: "Not a chat member" });
+
+				const insertedMessage = await insertMessage(
+					{ ...message, state: "sent" },
+					trx,
+				);
+				const insertedRecipientIds = await insertMessageRecipients(
+					insertedMessage.id,
+					chat.members.map((member) => member.userId),
+					trx,
+				);
+				return {
+					insertedMessage,
+					insertedRecipientIds,
+				};
+			},
+		);
+
+		for (const recipientId of insertedRecipientIds)
+			publish(recipientId, {
+				type: "message_incoming",
+				payload: insertedMessage,
+			});
+
+		return c.json({ message: "Message sent" }, 201);
 	},
 );
