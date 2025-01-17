@@ -6,7 +6,6 @@ import { ID_SIZE_CONFIG } from "./utils";
 export const attachmentTypeEnum = pgEnum("type", [
 	"image",
 	"video",
-	"audio",
 	"document",
 ]);
 
