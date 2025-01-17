@@ -7,10 +7,10 @@ import {
 	text,
 	varchar,
 } from "drizzle-orm/pg-core";
+import { attachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
-import { attachmentTable } from "./attachments.sql";
 
 export const messageStateEnum = pgEnum("state", [
 	"pending",

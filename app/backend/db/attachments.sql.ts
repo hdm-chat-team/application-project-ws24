@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
+import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import { messageTable } from "./messages.sql";
 import { ID_SIZE_CONFIG } from "./utils";
-import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 
 export const attachmentTypeEnum = pgEnum("type", [
 	"image",
