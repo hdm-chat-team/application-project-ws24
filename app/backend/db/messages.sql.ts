@@ -10,6 +10,7 @@ import {
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import { attachmentTable } from "./attachments.sql";
 
 export const messageStateEnum = pgEnum("state", [
 	"pending",
@@ -54,6 +55,7 @@ export const messageTableRelations = relations(
 			references: [userTable.id],
 		}),
 		recipients: many(messageRecipientTable),
+		attachments: many(attachmentTable),
 	}),
 );
 
