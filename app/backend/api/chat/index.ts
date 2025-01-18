@@ -1,15 +1,14 @@
 import {zValidator} from "@hono/zod-validator";
 import {HTTPException} from "hono/http-exception";
-import {z} from "zod";
 import {messageRouter} from "#api/chat/message";
 import {createRouter} from "#api/factory";
 import {insertChatWithMembers} from "#db/chats";
 import {selectUser} from "#db/users";
 import {protectedRoute} from "#lib/middleware";
+import {createInsertSchema} from "drizzle-zod";
+import {chatMemberTable} from "#db/chats.sql";
 
-const createChatSchema = z.object({
-	userId: z.string().min(1, "User Id is required"),
-});
+const createChatSchema = createInsertSchema(chatMemberTable);
 
 export const chatRouter = createRouter()
 	.route("/messages", messageRouter)
