@@ -1,9 +1,9 @@
-import {eq, sql} from "drizzle-orm";
-import {createInsertSchema, createSelectSchema} from "drizzle-zod";
-import type {z} from "zod";
+import { eq, sql } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { z } from "zod";
 import db from "#db";
-import {chatMemberTable, chatTable} from "./chats.sql";
-import type {User} from "./users";
+import { chatMemberTable, chatTable } from "./chats.sql";
+import type { User } from "./users";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -39,26 +39,26 @@ function insertSelfChat(user: User) {
 
 async function insertChatWithMembers(userIds: string[]) {
 	if (userIds.length < 2) {
-		throw new Error ( "A chat must have at least two members." );
+		throw new Error("A chat must have at least two members.");
 	}
 	return db.transaction(async (tx) => {
 		const chatName = userIds.sort().join("-");
-		let newChat: { id: string }[] = [];
+		const newChat: { id: string }[] = [];
 
 		const existingChat = await tx.query.chatTable.findFirst({
 			where: eq(chatTable.name, chatName),
 		});
 
 		if (existingChat) {
-			throw new Error ( "Chat already exists" );
+			throw new Error("Chat already exists");
 		} else {
-			const mappedUsers = userIds.map((id) =>{
+			const mappedUsers = userIds.map((id) => {
 				return {
 					chatId: newChat[0].id,
 					userId: id,
-				}
-			})
-				//{chatId: newChat[0].id, userId: userA.id},
+				};
+			});
+			//{chatId: newChat[0].id, userId: userA.id},
 			await tx.insert(chatMemberTable).values(mappedUsers);
 		}
 		return newChat[0];
