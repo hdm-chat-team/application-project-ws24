@@ -4,7 +4,6 @@ import type {z} from "zod";
 import db from "#db";
 import {chatMemberTable, chatTable} from "./chats.sql";
 import type {User} from "./users";
-import {HTTPException} from "hono/http-exception";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -38,27 +37,29 @@ function insertSelfChat(user: User) {
 	});
 }
 
-async function insertChatWithMembers(userA: User, userB: User) {
+async function insertChatWithMembers(userIds: string[]) {
+	if (userIds.length < 2) {
+		throw new Error ( "A chat must have at least two members." );
+	}
 	return db.transaction(async (tx) => {
+		const chatName = userIds.sort().join("-");
 		let newChat: { id: string }[] = [];
+
 		const existingChat = await tx.query.chatTable.findFirst({
-			where: (chat) =>
-				eq(chat.name, `${userA.id}-${userB.id}`) ||
-				eq(chat.name, `${userB.id}-${userA.id}`),
+			where: eq(chatTable.name, chatName),
 		});
-		if (!existingChat) {
-			newChat = await tx
-				.insert(chatTable)
-				.values({
-					name: `${userA.id}-${userB.id}`,
-				})
-				.returning({ id: chatTable.id });
-			await tx.insert(chatMemberTable).values([
-				{ chatId: newChat[0].id, userId: userA.id },
-				{ chatId: newChat[0].id, userId: userB.id },
-			]);
+
+		if (existingChat) {
+			throw new Error ( "Chat already exists" );
 		} else {
-			throw new HTTPException(400, { message: "Chat already exists" });
+			const mappedUsers = userIds.map((id) =>{
+				return {
+					chatId: newChat[0].id,
+					userId: id,
+				}
+			})
+				//{chatId: newChat[0].id, userId: userA.id},
+			await tx.insert(chatMemberTable).values(mappedUsers);
 		}
 		return newChat[0];
 	});

@@ -1,9 +1,13 @@
-import {eq, sql} from "drizzle-orm";
-import {createInsertSchema, createSelectSchema, createUpdateSchema,} from "drizzle-zod";
-import {z} from "zod";
-import type {GitHubUser} from "#auth/oauth";
+import { eq, sql } from "drizzle-orm";
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from "drizzle-zod";
+import { z } from "zod";
+import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
-import {contactsTable, userProfileTable, userTable} from "./users.sql";
+import { contactsTable, userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
 const selectUserSchema = createSelectSchema(userTable);
@@ -114,7 +118,7 @@ const selectUserContacts = async (userId: string) => {
 		})
 		.from(userTable)
 		.innerJoin(contactsTable, eq(contactsTable.contactId, userTable.id))
-		.where(eq(contactsTable.userId,userId))
+		.where(eq(contactsTable.userId, userId))
 		.execute();
 };
 
@@ -170,6 +174,8 @@ export {
 	selectUserChats,
 	updateUserProfile,
 	insertUserWithProfile,
-	selectUserContacts, contactsTable, userTable
+	selectUserContacts,
+	contactsTable,
+	userTable,
 };
 export type { User, UserProfile };

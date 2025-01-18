@@ -1,9 +1,9 @@
-import {relations} from "drizzle-orm";
-import {id, ID_SIZE_CONFIG, timestamps} from "./utils";
+import { relations } from "drizzle-orm";
+import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
-import {index, pgTable, varchar} from "drizzle-orm/pg-core";
-import {sessionTable} from "#db/sessions.sql";
-import {chatMemberTable} from "#db/chats.sql";
+import { index, pgTable, varchar } from "drizzle-orm/pg-core";
+import { chatMemberTable } from "#db/chats.sql";
+import { sessionTable } from "#db/sessions.sql";
 
 export const userTable = pgTable(
 	"users",
@@ -53,9 +53,13 @@ export const userProfileTableRelations = relations(
 );
 
 export const contactsTable = pgTable("contacts", {
-	id,
-	userId: varchar(ID_SIZE_CONFIG).notNull().references(() => userTable.id, { onDelete: "cascade" }),
-	contactId: varchar(ID_SIZE_CONFIG).notNull().references(() => userTable.id, { onDelete: "cascade" }),
+	//chatmember primary key
+	userId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id, { onDelete: "cascade" }),
+	contactId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id, { onDelete: "cascade" }),
 });
 
 export const contactsRelations = relations(userTable, ({ one }) => ({
@@ -67,7 +71,7 @@ export const contactsRelations = relations(userTable, ({ one }) => ({
 		fields: [contactsTable.contactId],
 		references: [userTable.id],
 	}),
-}))
+}));
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	profile: one(userProfileTable),

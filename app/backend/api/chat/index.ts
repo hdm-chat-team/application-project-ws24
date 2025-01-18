@@ -1,11 +1,11 @@
-import {zValidator} from "@hono/zod-validator";
-import {z} from "zod";
-import {createRouter} from "#api/factory";
-import {insertChatWithMembers} from "#db/chats";
-import {selectUser} from "#db/users";
-import {protectedRoute} from "#lib/middleware";
-import {HTTPException} from "hono/http-exception";
-import {messageRouter} from "#api/chat/message";
+import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
+import { messageRouter } from "#api/chat/message";
+import { createRouter } from "#api/factory";
+import { insertChatWithMembers } from "#db/chats";
+import { selectUser } from "#db/users";
+import { protectedRoute } from "#lib/middleware";
 
 const createChatSchema = z.object({
 	userId: z.string().min(1, "User Id is required"),
@@ -25,7 +25,9 @@ export const chatRouter = createRouter()
 			});
 
 			if (!userToCreateChatWith) {
-				throw new HTTPException(404, {message: `User with id ${userId} does not exist`})
+				throw new HTTPException(404, {
+					message: `User with id ${userId} does not exist`,
+				});
 			}
 
 			// Prüfen ob Chat schon existiert --> Zwei Einträge in Chat_members die die selbe chatId haben mit userIdA und userIdB
