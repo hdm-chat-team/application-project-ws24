@@ -7,10 +7,9 @@ import {
 import { z } from "zod";
 import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
-import { contactsTable, userProfileTable, userTable } from "./users.sql";
 import { chatMemberTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
-import { userProfileTable, userTable } from "./users.sql";
+import { contactsTable, userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
 const selectUserSchema = createSelectSchema(userTable).omit({
@@ -173,7 +172,6 @@ export {
 	selectUserWithProfile,
 	selectUserProfile,
 	selectUser,
-	insertProfile,
 	insertUser,
 	selectUserChats,
 	insertUserProfileSchema,

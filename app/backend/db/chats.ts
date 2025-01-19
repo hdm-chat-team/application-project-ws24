@@ -66,16 +66,15 @@ async function insertChatWithMembers(userIds: string[]) {
 
 		if (existingChat) {
 			throw new Error("Chat already exists");
-		} else {
-			const mappedUsers = userIds.map((id) => {
-				return {
-					chatId: newChat[0].id,
-					userId: id,
-				};
-			});
-			//{chatId: newChat[0].id, userId: userA.id},
-			await tx.insert(chatMemberTable).values(mappedUsers);
 		}
+		const mappedUsers = userIds.map((id) => {
+			return {
+				chatId: newChat[0].id,
+				userId: id,
+			};
+		});
+		//{chatId: newChat[0].id, userId: userA.id},
+		await tx.insert(chatMemberTable).values(mappedUsers);
 		return newChat[0];
 	});
 }

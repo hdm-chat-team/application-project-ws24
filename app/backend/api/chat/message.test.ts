@@ -2,9 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { createId } from "@application-project-ws24/cuid";
 import { testClient } from "hono/testing";
 import { createApi } from "#api/factory";
-import { messageRouter } from ".";
 import type { Message } from "#db/messages";
-import { chatRouter } from ".";
+import { messageRouter } from "./message.ts";
 
 const { chat } = testClient(createApi().route("/chat", messageRouter));
 
