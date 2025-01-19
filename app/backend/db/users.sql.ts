@@ -1,10 +1,9 @@
-import { relations } from "drizzle-orm";
-import { sessionTable } from "./sessions.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
-
-import { index, pgTable, varchar } from "drizzle-orm/pg-core";
-import { chatMemberTable } from "./chats.sql";
-import { messageTable } from "./messages.sql";
+import {relations} from "drizzle-orm";
+import {id, ID_SIZE_CONFIG, timestamps} from "./utils";
+import {index, pgTable, primaryKey, varchar} from "drizzle-orm/pg-core";
+import {sessionTable} from "#db/sessions.sql";
+import {chatMemberTable} from "./chats.sql";
+import {messageTable} from "./messages.sql";
 
 export const userTable = pgTable(
 	"users",
@@ -14,6 +13,7 @@ export const userTable = pgTable(
 		githubId: varchar({ length: 20 }).notNull().unique(),
 		username: varchar({ length: 39 }).notNull().unique(),
 		email: varchar({ length: 255 }).notNull().unique(),
+		avatarUrl: varchar("avatar_url"),
 	},
 	(table) => [
 		{
@@ -27,6 +27,7 @@ export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	sessions: many(sessionTable),
 	chats: many(chatMemberTable),
 	messages: many(messageTable),
+	contacts: many(contactsTable),
 }));
 
 export const userProfileTable = pgTable(
@@ -58,3 +59,17 @@ export const userProfileTableRelations = relations(
 		}),
 	}),
 );
+
+export const contactsTable = pgTable("contacts", {
+	userId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id, { onDelete: "cascade" }),
+	contactId: varchar(ID_SIZE_CONFIG)
+		.notNull()
+		.references(() => userTable.id, { onDelete: "cascade" }),
+},(table) => [
+	{
+		pk: primaryKey({ columns: [table.userId, table.contactId] }),
+	},
+],);
+

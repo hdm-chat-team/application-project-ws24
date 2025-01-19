@@ -52,6 +52,33 @@ async function selectChatWithMembersByUserId(
 	});
 }
 
+async function insertChatWithMembers(userIds: string[]) {
+	if (userIds.length < 2) {
+		throw new Error("A chat must have at least two members.");
+	}
+	return db.transaction(async (tx) => {
+		const chatName = userIds.sort().join("-");
+		const newChat: { id: string }[] = [];
+
+		const existingChat = await tx.query.chatTable.findFirst({
+			where: eq(chatTable.name, chatName),
+		});
+
+		if (existingChat) {
+			throw new Error("Chat already exists");
+		}
+		const mappedUsers = userIds.map((id) => {
+			return {
+				chatId: newChat[0].id,
+				userId: id,
+			};
+		});
+		//{chatId: newChat[0].id, userId: userA.id},
+		await tx.insert(chatMemberTable).values(mappedUsers);
+		return newChat[0];
+	});
+}
+
 export {
 	// * Chat schemas
 	insertChatSchema,
@@ -61,6 +88,7 @@ export {
 	selectChatIdsByUserId,
 	selectChatSchema,
 	// * Chat functions
+	insertChatWithMembers,
 	selectChatWithMembersByUserId,
 };
 export type { Chat };

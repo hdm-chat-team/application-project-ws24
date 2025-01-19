@@ -9,7 +9,7 @@ import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { chatMemberTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
-import { userProfileTable, userTable } from "./users.sql";
+import { contactsTable, userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
 const selectUserSchema = createSelectSchema(userTable).omit({
@@ -34,6 +34,16 @@ const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
 
+const insertUser = db
+	.insert(userTable)
+	.values({
+		githubId: sql.placeholder("githubId"),
+		username: sql.placeholder("username"),
+		email: sql.placeholder("email"),
+		avatarUrl: sql.placeholder("avatarUrl"),
+	})
+	.returning({ id: userTable.id })
+	.prepare("insert_user");
 const userWithProfileSchema = z.object({
 	...selectUserSchema.shape,
 	profile: selectUserProfileSchema,
@@ -60,6 +70,7 @@ async function insertUserWithProfile(
 				githubId,
 				username,
 				email: email ?? "",
+				avatarUrl: avatarUrl ?? "",
 			})
 			.onConflictDoUpdate({
 				target: userTable.githubId,
@@ -92,6 +103,24 @@ const selectUserProfile = db.query.userProfileTable
 		where: eq(userProfileTable.userId, sql.placeholder("id")),
 	})
 	.prepare("select_user_profile");
+
+const selectUser = db.query.userTable
+	.findFirst({
+		where: eq(userTable.id, sql.placeholder("id")),
+	})
+	.prepare("select_user");
+
+const selectUserContacts = async (userId: string) => {
+	return db
+		.select({
+			id: userTable.id,
+			avatarUrl: userTable.avatarUrl,
+		})
+		.from(userTable)
+		.innerJoin(contactsTable, eq(contactsTable.contactId, userTable.id))
+		.where(eq(contactsTable.userId, userId))
+		.execute();
+};
 
 const selectUserWithProfile = db.query.userTable
 	.findFirst({
@@ -142,10 +171,15 @@ export {
 	// * User queries
 	selectUserWithProfile,
 	selectUserProfile,
+	selectUser,
+	insertUser,
 	selectUserChats,
 	insertUserProfileSchema,
 	// * User functions
 	updateUserProfile,
 	insertUserWithProfile,
+	selectUserContacts,
+	contactsTable,
+	userTable,
 };
 export type { User, UserProfile, UserWithProfile };
