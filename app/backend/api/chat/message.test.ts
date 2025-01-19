@@ -8,18 +8,16 @@ import { messageRouter } from "./message.ts";
 const { chat } = testClient(createApi().route("/chat", messageRouter));
 
 describe("/api/chat/messages", () => {
-	describe("POST /:id", () => {
-const mockMessage: Message = {
-	id: createId(),
-	createdAt: new Date().toISOString(),
-	updatedAt: new Date().toISOString(),
-	state: "pending",
-	body: "test",
-	authorId: createId(),
-	chatId: createId(),
-};
+	const mockMessage: Message = {
+		id: createId(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		state: "pending",
+		body: "test",
+		authorId: createId(),
+		chatId: createId(),
+	};
 
-describe("/api/chat", () => {
 	describe("POST /", () => {
 		test("returns 401 when not authorized", async () => {
 			const res = chat.$post({
