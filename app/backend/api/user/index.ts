@@ -1,8 +1,10 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
+import { UTApi } from "uploadthing/server";
 import { createRouter } from "#api/factory";
 import {
+	deleteUserProfileImageSchema,
 	selectUserChats,
 	selectUserProfile,
 	updateUserProfile,
@@ -10,26 +12,22 @@ import {
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
+// * Create UTApi instance
+
+const utApi = new UTApi();
+
 export const profileRouter = createRouter()
-	.get("/profile", protectedRoute, async (c) => {
-		const { id } = c.get("user");
-		const data = await selectUserProfile.execute({ id });
-		if (!data) {
-			throw new HTTPException(404, { message: "profile not found" });
-		}
-		return c.json(data);
-	})
 	.put(
 		"/profile",
 		protectedRoute,
 		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const user = c.get("user");
-			const { avatarUrl, displayName } = c.req.valid("form");
+			const { displayName, avatarUrl } = c.req.valid("form");
 
 			const updatedProfile = await updateUserProfile(user.id, {
-				avatarUrl,
 				displayName,
+				avatarUrl,
 			}).catch((error) => {
 				throw new HTTPException(400, { message: error.message });
 			});
@@ -43,7 +41,9 @@ export const profileRouter = createRouter()
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
-		const chats = await selectUserChats(id);
+		const chats = await selectUserChats
+			.execute({ id })
+			.then((chats) => chats.map((chat) => chat.chat));
 
 		return c.json({ data: chats });
 	})
@@ -58,5 +58,27 @@ export const profileRouter = createRouter()
 				throw new HTTPException(404, { message: "profile not found" });
 			}
 			return c.json({ data: userData });
+		},
+	)
+	.delete(
+		"/avatar",
+		protectedRoute,
+		zValidator("json", deleteUserProfileImageSchema),
+		async (c) => {
+			try {
+				const { avatarUrl } = c.req.valid("json");
+				const fileKey = avatarUrl.split("/").pop();
+
+				if (fileKey) {
+					await utApi.deleteFiles([fileKey], { keyType: "fileKey" });
+					return c.json({ success: true });
+				}
+
+				throw new HTTPException(400, {
+					message: "Invalid avatar URL",
+				});
+			} catch (error) {
+				throw new HTTPException(500);
+			}
 		},
 	);

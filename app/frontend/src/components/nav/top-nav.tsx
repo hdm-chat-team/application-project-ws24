@@ -1,4 +1,4 @@
-import Logo from "@assets/hdm-logo-clipart-lg.png";
+import Logo from "@assets/hdmChat.svg";
 import { Link } from "@tanstack/react-router";
 import { LogOut, Settings, User } from "lucide-react";
 import { ModeToggle } from "../mode-toggle";
@@ -31,7 +31,7 @@ const TopNav = () => {
 						align="end"
 						className="w-40 rounded-lg bg-white text-black shadow-lg"
 					>
-						<Link to="/profile">
+						<Link to="/user">
 							<DropdownMenuItem>
 								<User className="mr-2 h-4 w-4" />
 								Profile

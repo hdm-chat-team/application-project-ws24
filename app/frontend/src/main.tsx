@@ -1,8 +1,7 @@
-import { QueryClientProvider } from "@/context";
-import { RouterProvider } from "@/context";
-import { AuthProvider } from "@/features/auth";
+import { QueryClientProvider, RouterProvider } from "@/context";
+import { AuthProvider } from "@/features/auth/context";
 import { StrictMode } from "react";
-import ReactDOM from "react-dom/client";
+import { createRoot } from "react-dom/client";
 import "./main.css";
 
 // * Mount React application with Router and Query providers
@@ -10,7 +9,7 @@ import "./main.css";
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
 	// * Render the app
-	const root = ReactDOM.createRoot(rootElement);
+	const root = createRoot(rootElement);
 	root.render(
 		<StrictMode>
 			<QueryClientProvider>

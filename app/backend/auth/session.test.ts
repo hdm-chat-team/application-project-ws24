@@ -9,8 +9,8 @@ import {
 } from "bun:test";
 import * as sessionManager from "./session";
 
-describe("session", () => {
-	let mockQueries = {
+function createMockQueries() {
+	return {
 		deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
 		insertSession: {
 			execute: mock(() =>
@@ -23,7 +23,7 @@ describe("session", () => {
 				]),
 			),
 		},
-		selectSessionById: {
+		selectSessionByToken: {
 			execute: mock(() =>
 				Promise.resolve({
 					token: "",
@@ -43,43 +43,13 @@ describe("session", () => {
 			),
 		},
 	};
+}
+
+describe("session", () => {
+	let mockQueries = createMockQueries();
 
 	beforeEach(() => {
-		// Reset mocks before each test
-		mockQueries = {
-			deleteSessionByToken: { execute: mock(() => Promise.resolve()) },
-			insertSession: {
-				execute: mock(() =>
-					Promise.resolve([
-						{
-							token: "test-token",
-							userId: "test-user-id",
-							expiresAt: new Date(),
-						},
-					]),
-				),
-			},
-			selectSessionById: {
-				execute: mock(() =>
-					Promise.resolve({
-						token: "",
-						userId: "",
-						expiresAt: new Date(),
-						user: { id: "", name: "" },
-					}),
-				),
-			},
-			updateSessionExpiresAt: {
-				execute: mock(() =>
-					Promise.resolve([
-						{
-							newExpiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
-						},
-					]),
-				),
-			},
-		};
-
+		mockQueries = createMockQueries();
 		mock.module("#db/sessions", () => mockQueries);
 	});
 
@@ -150,12 +120,13 @@ describe("session", () => {
 				},
 			};
 
-			mockQueries.selectSessionById.execute = mock(() =>
-				Promise.resolve(mockSession),
-			);
+			mockQueries.selectSessionByToken.execute = mock(() => {
+				return Promise.resolve(mockSession);
+			});
 			const result = await sessionManager.validateSessionToken("valid-token");
 
-			expect(result.session).toEqual(mockSession);
+			const { user, ...sessionWithoutUser } = mockSession;
+			expect(result.session).toEqual(sessionWithoutUser);
 			expect(result.user).toEqual(mockSession.user);
 			expect(result.fresh).toBe(false); // Should be false since expiry is far in future
 		});
@@ -170,7 +141,11 @@ describe("session", () => {
 
 			mock.module("#db/queries.sql", () => ({
 				selectSessionById: {
-					execute: mock(() => Promise.resolve(mockExpiredSession)),
+					execute: mock(({ token }) => {
+						return token === "hashed-expired-token"
+							? Promise.resolve(mockExpiredSession)
+							: Promise.resolve(null);
+					}),
 				},
 			}));
 
@@ -188,9 +163,9 @@ describe("session", () => {
 				user: { id: "test-user-id", name: "Test User" },
 			};
 
-			mockQueries.selectSessionById.execute = mock(() =>
-				Promise.resolve(mockSession),
-			);
+			mockQueries.selectSessionByToken.execute = mock(() => {
+				return Promise.resolve(mockSession);
+			});
 			mockQueries.updateSessionExpiresAt.execute = mock(() =>
 				Promise.resolve([
 					{

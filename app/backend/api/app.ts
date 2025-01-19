@@ -4,6 +4,7 @@ import { contactRouter } from "#api/user/contact";
 import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
 import { socketRouter } from "./socket";
+import { uploadthingRouter } from "./uploadthing";
 import { profileRouter } from "./user";
 
 // * API
@@ -16,6 +17,7 @@ const apiRoutes = apiRouter
 	.route("/chat", chatRouter)
 	.route("/user", profileRouter)
 	.route("/contact", contactRouter)
+	.route("/uploadthing", uploadthingRouter)
 	.get("/", (c) => {
 		return c.text("Connected!");
 	});

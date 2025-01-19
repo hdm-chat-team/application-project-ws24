@@ -8,20 +8,29 @@ import { z } from "zod";
 import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { contactsTable, userProfileTable, userTable } from "./users.sql";
+import { chatMemberTable } from "./chats.sql";
+import type { DB, Transaction } from "./types";
+import { userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
-const selectUserSchema = createSelectSchema(userTable);
+const selectUserSchema = createSelectSchema(userTable).omit({
+	githubId: true,
+});
 type User = z.infer<typeof selectUserSchema>;
 
+const deleteUserProfileImageSchema = z.object({
+	avatarUrl: z.string().url(),
+});
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
-	avatarUrl: z.string().nonempty(),
 	displayName: z.string().nonempty(),
+	avatarUrl: z.string().url().optional(),
 }).omit({
 	userId: true,
 	createdAt: true,
 	id: true,
 	updatedAt: true,
+	htmlUrl: true,
 });
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
@@ -36,8 +45,16 @@ const insertUser = db
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
+const userWithProfileSchema = z.object({
+	...selectUserSchema.shape,
+	profile: selectUserProfileSchema,
+});
+type UserWithProfile = z.infer<typeof userWithProfileSchema>;
 
-async function insertUserWithProfile(githubUser: GitHubUser) {
+async function insertUserWithProfile(
+	githubUser: GitHubUser,
+	trx: Transaction | DB = db,
+) {
 	const {
 		id,
 		login: username,
@@ -47,8 +64,8 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 		html_url: htmlUrl,
 	} = githubUser;
 	const githubId = id.toString();
-	return db.transaction(async (tx) => {
-		const [user] = await tx
+	return trx.transaction(async (innerTrx) => {
+		const [user] = await innerTrx
 			.insert(userTable)
 			.values({
 				githubId,
@@ -62,9 +79,9 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 			})
 			.returning();
 
-		if (!user) throw new Error("Failed to insert or get existing user");
+		if (!user) throw new Error("Failed to insert or update user");
 
-		await tx
+		await innerTrx
 			.insert(userProfileTable)
 			.values({
 				userId: user.id,
@@ -80,22 +97,6 @@ async function insertUserWithProfile(githubUser: GitHubUser) {
 		return user;
 	});
 }
-
-const selectUserByGithubId = db.query.userTable
-	.findFirst({
-		where: eq(userTable.githubId, sql.placeholder("githubId")),
-	})
-	.prepare("select_user_by_github_id");
-
-const insertProfile = db
-	.insert(userProfileTable)
-	.values({
-		userId: sql.placeholder("userId"),
-		displayName: sql.placeholder("displayname"),
-		avatarUrl: sql.placeholder("avatar_url"),
-		htmlUrl: sql.placeholder("html_url"),
-	})
-	.returning({ id: userProfileTable.id });
 
 const selectUserProfile = db.query.userProfileTable
 	.findFirst({
@@ -122,14 +123,19 @@ const selectUserContacts = async (userId: string) => {
 		.execute();
 };
 
+const selectUserWithProfile = db.query.userTable
+	.findFirst({
+		columns: { githubId: false },
+		with: { profile: true },
+		where: eq(userTable.id, sql.placeholder("id")),
+	})
+	.prepare("select_user_with_profile");
+
 async function updateUserProfile(
 	userId: string,
-	newValues: {
-		avatarUrl: string;
-		displayName: string;
-	},
+	newValues: { displayName: string; avatarUrl?: string },
 ) {
-	const { avatarUrl, displayName } = newValues;
+	const { displayName, avatarUrl } = newValues;
 	return await db
 		.insert(userProfileTable)
 		.values({
@@ -139,43 +145,43 @@ async function updateUserProfile(
 		})
 		.onConflictDoUpdate({
 			target: userProfileTable.userId,
-			set: { avatarUrl, displayName },
+			set: { displayName, avatarUrl },
 		})
 		.returning()
 		.then((rows) => rows[0]);
 }
 
-async function selectUserChats(userId: string) {
-	return await db.query.chatMemberTable
-		.findMany({
-			columns: {},
-			where: (chatMemberTable, { eq }) => eq(chatMemberTable.userId, userId),
-			with: {
-				chat: {},
-			},
-		})
-		.then((rows) => rows.map(({ chat }) => chat));
-}
+const selectUserChats = db.query.chatMemberTable
+	.findMany({
+		columns: {},
+		where: eq(chatMemberTable.userId, sql.placeholder("id")),
+		with: {
+			chat: true,
+		},
+	})
+	.prepare("select_user_chats");
 
 export {
 	// * User schemas
 	insertUserSchema,
-	selectUserByGithubId,
-	selectUserProfileSchema,
 	selectUserSchema,
+	selectUserProfileSchema,
 	updateUserProfileSchema,
+	userWithProfileSchema,
+	deleteUserProfileImageSchema,
 	// * User queries
+	selectUserWithProfile,
 	selectUserProfile,
 	selectUser,
 	insertProfile,
 	insertUser,
+	selectUserChats,
 	insertUserProfileSchema,
 	// * User functions
-	selectUserChats,
 	updateUserProfile,
 	insertUserWithProfile,
 	selectUserContacts,
 	contactsTable,
 	userTable,
 };
-export type { User, UserProfile };
+export type { User, UserProfile, UserWithProfile };

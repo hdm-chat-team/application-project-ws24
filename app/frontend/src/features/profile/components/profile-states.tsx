@@ -1,5 +1,6 @@
 import TopNav from "@/components/nav/top-nav";
 import { Card } from "@/components/ui/card";
+import type { ErrorComponentProps } from "@tanstack/react-router";
 
 function DefaultLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -25,13 +26,13 @@ export function ProfileLoadingState() {
 }
 
 // * Failed to load State
-export function ProfileErrorState({ error }: { error: Error }) {
+export function ProfileErrorState(error: ErrorComponentProps) {
 	return (
 		<DefaultLayout>
 			<Card>
 				<div className="flex items-center space-x-2 text-destructive">
 					<span>❌</span>
-					<div>Failed to load profile: {error.message}</div>
+					<div>Failed to load profile: {error.error.message}</div>
 				</div>
 			</Card>
 		</DefaultLayout>

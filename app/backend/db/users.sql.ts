@@ -4,6 +4,8 @@ import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 import { index, pgTable, varchar } from "drizzle-orm/pg-core";
 import { chatMemberTable } from "#db/chats.sql";
 import { sessionTable } from "#db/sessions.sql";
+import { chatMemberTable } from "./chats.sql";
+import { messageTable } from "./messages.sql";
 
 export const userTable = pgTable(
 	"users",
@@ -21,6 +23,13 @@ export const userTable = pgTable(
 		},
 	],
 );
+
+export const userTableRelations = relations(userTable, ({ one, many }) => ({
+	profile: one(userProfileTable),
+	sessions: many(sessionTable),
+	chats: many(chatMemberTable),
+	messages: many(messageTable),
+}));
 
 export const userProfileTable = pgTable(
 	"user_profiles",

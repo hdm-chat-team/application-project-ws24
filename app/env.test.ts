@@ -10,6 +10,7 @@ describe("env", () => {
 			CLIENT_ID_GITHUB: "client-id",
 			CLIENT_SECRET_GITHUB: "client-secret",
 			CALLBACK_URL_GITHUB: "https://example.com/callback",
+			UPLOADTHING_TOKEN: "uploadthing-token",
 		};
 
 		const result = EnvSchema.safeParse(validEnv);
