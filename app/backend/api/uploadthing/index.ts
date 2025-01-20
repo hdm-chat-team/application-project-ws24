@@ -60,7 +60,7 @@ export const uploadRouter = {
 				id: messageId,
 				chatId,
 				authorId: user.id,
-				state: "pending",
+				state: "sent",
 				body: messageText || "",
 				createdAt: new Date().toISOString(),
 			});
