@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const messageFormSchema = z.object({ body: z.string().trim().nonempty() });
 
-export default function MessageForm({ chatId }: { chatId: string }) {
+export function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
 
 	const form = useForm({
