@@ -30,7 +30,7 @@
 		"clsx": "^2.1.1",
 		"dexie": "^4.0.10",
 		"dexie-react-hooks": "^1.1.7",
-		"hono": "^4.6.16",
+		"hono": "^4.6.17",
 		"lucide-react": "^0.471.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
