@@ -1,3 +1,8 @@
+import type { Env } from "#api/app.env";
+import { createRouter } from "#api/factory";
+import { insertAttachment } from "#db/attachments";
+import type { attachmentTypeEnum } from "#db/attachments.sql";
+import env from "#env";
 import { createId } from "@application-project-ws24/cuid";
 import { contextStorage, getContext } from "hono/context-storage";
 import {
@@ -6,9 +11,11 @@ import {
 	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
-import type { Env } from "#api/app.env";
-import { createRouter } from "#api/factory";
-import env from "#env";
+import type { UploadedFileData } from "uploadthing/types";
+
+interface FileWithMessageId extends UploadedFileData {
+	messageId: string;
+}
 
 const routeBuilder = createUploadthing();
 
@@ -27,6 +34,38 @@ export const uploadRouter = {
 		.onUploadComplete(({ file }) => ({
 			url: file.url,
 		})),
+
+	attachment: routeBuilder(["image", "video", "pdf"])
+		.middleware(async ({ files }) => {
+			const { user, session } = getContext<Env>().var;
+			if (!(user && session)) throw new Error("Unauthorized");
+
+			const messageId = createId();
+			const fileOverrides = files.map((file) => {
+				return { ...file, name: `${user.id}:attachment`, messageId };
+			});
+
+			return { [UTFiles]: fileOverrides };
+		})
+		.onUploadComplete(async ({ file }) => {
+			const { messageId } = file as FileWithMessageId;
+
+			const type: (typeof attachmentTypeEnum.enumValues)[number] =
+				file.type.startsWith("image/")
+					? "image"
+					: file.type.startsWith("video/")
+						? "video"
+						: file.type.startsWith("application/pdf")
+							? "document"
+							: "document";
+
+			await insertAttachment({
+				url: file.url,
+				type,
+				messageId,
+			});
+			return { url: file.url, messageId };
+		}),
 } satisfies FR;
 
 const handlers = createRouteHandler({
