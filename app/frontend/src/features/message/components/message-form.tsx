@@ -10,6 +10,7 @@ import { usePostMessageMutation } from "@/features/message/hooks";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { useForm } from "@tanstack/react-form";
 import { FileIcon, ImageIcon, PaperclipIcon, VideoIcon } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const messageFormSchema = z.object({
@@ -30,12 +31,14 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 			try {
 				if (value.file) {
 					await startUpload([value.file]);
+					toast.success("Upload successful");
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
 				}
 				form.reset();
 			} catch (error) {
 				console.error("Error:", error);
+				toast.error("Upload failed");
 			}
 		},
 		validators: {
