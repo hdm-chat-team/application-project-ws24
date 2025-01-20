@@ -10,7 +10,6 @@ import {
 
 import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
-
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 
