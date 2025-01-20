@@ -1,7 +1,34 @@
-// ? Mostly copied from: https://usehooks-ts.com/react-hook/use-intersection-observer
-
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * A custom hook that uses the Intersection Observer API to detect when an element enters or leaves the viewport
+ *
+ * @param options - Configuration options for the Intersection Observer
+ * @param {number | number[]} [options.threshold=0] - A number or array of numbers between 0 and 1, indicating at what percentage of the target's visibility the observer's callback should be executed
+ * @param {Element | null} [options.root=null] - The element that is used as the viewport for checking visibility of the target
+ * @param {string} [options.rootMargin="0%"] - Margin around the root element
+ * @param {boolean} [options.freezeOnceVisible=false] - If true, stops observing the element once it becomes visible
+ * @param {boolean} [options.initialIsIntersecting=false] - Initial intersection state before the observer is initialized
+ * @param {(isIntersecting: boolean, entry: IntersectionObserverEntry) => void} [options.onChange] - Callback function that is triggered when intersection changes
+ *
+ * @returns {IntersectionReturn} An array containing:
+ * - ref: A function to attach to the target element
+ * - isIntersecting: A boolean indicating if the element is currently intersecting
+ * - entry: The IntersectionObserverEntry object
+ *
+ * The return value also supports object destructuring with properties: ref, isIntersecting, and entry
+ *
+ * @example
+ * const [ref, isIntersecting, entry] = useIntersectionObserver({
+ *   threshold: 0.5,
+ *   freezeOnceVisible: true
+ * });
+ *
+ * // Or using object destructuring:
+ * const { ref, isIntersecting, entry } = useIntersectionObserver();
+ *
+ * @see https://usehooks-ts.com/react-hook/use-intersection-observer
+ */
 export function useIntersectionObserver({
 	threshold = 0,
 	root = null,
