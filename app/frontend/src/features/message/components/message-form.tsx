@@ -13,10 +13,14 @@ import { FileIcon, ImageIcon, PaperclipIcon, VideoIcon } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-const messageFormSchema = z.object({
-	body: z.string().trim().nonempty(),
-	file: z.instanceof(File).nullable(),
-});
+const messageFormSchema = z
+	.object({
+		body: z.string().trim(),
+		file: z.instanceof(File).nullable(),
+	})
+	.refine((data) => data.body.trim().length > 0 || data.file !== null, {
+		message: "Please enter a message or upload a file",
+	});
 
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
