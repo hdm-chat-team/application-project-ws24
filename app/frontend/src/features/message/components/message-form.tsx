@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { usePostMessageMutation } from "@/features/message/hooks";
-import { useUploadThing } from "@/features/uploadthing/hooks";
+import { useSaveAttachmentMessage } from "@/features/message/hooks/mutations/use-save-attachments";
 import { useForm } from "@tanstack/react-form";
 import {
 	FileIcon,
@@ -32,7 +32,7 @@ const messageFormSchema = z
 
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
-	const { startUpload } = useUploadThing("attachment");
+	const saveAttachmentMessage = useSaveAttachmentMessage(chatId);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -44,7 +44,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: async ({ value }) => {
 			try {
 				if (value.file) {
-					await startUpload([value.file], { chatId });
+					await saveAttachmentMessage.mutateAsync(value.file);
 					toast.success("Upload successful");
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
