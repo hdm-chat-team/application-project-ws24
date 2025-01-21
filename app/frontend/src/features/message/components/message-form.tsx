@@ -9,7 +9,13 @@ import { Input } from "@/components/ui/input";
 import { usePostMessageMutation } from "@/features/message/hooks";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { useForm } from "@tanstack/react-form";
-import { FileIcon, ImageIcon, PaperclipIcon, VideoIcon } from "lucide-react";
+import {
+	FileIcon,
+	ImageIcon,
+	PaperclipIcon,
+	VideoIcon,
+	SendHorizontal,
+} from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -131,7 +137,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 			>
 				{([canSubmit, isSubmitting]) => (
 					<Button type="submit" disabled={!canSubmit}>
-						{isSubmitting ? "..." : "Submit"}
+						{isSubmitting ? "..." : <SendHorizontal className="h-5 w-5" />}
 					</Button>
 				)}
 			</form.Subscribe>
