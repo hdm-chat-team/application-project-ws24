@@ -9,9 +9,6 @@ import {
 import { z } from "zod";
 import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
-import { insertAttachment } from "#db/attachments";
-import type { attachmentTypeEnum } from "#db/attachments.sql";
-import { insertMessage } from "#db/messages";
 import env from "#env";
 
 const attachmentInput = z.object({
@@ -38,20 +35,11 @@ export const uploadRouter = {
 
 	attachment: routeBuilder(["image", "video", "pdf"])
 		.input(attachmentInput)
-		.middleware(async ({ files, input }) => {
+		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
 			if (!(user && session)) throw new Error("Unauthorized");
 
 			const messageId = createId();
-
-			await insertMessage({
-				id: messageId,
-				chatId: input.chatId,
-				authorId: user.id,
-				state: "sent",
-				body: "",
-				createdAt: new Date().toISOString(),
-			});
 
 			const fileOverrides = files.map((file) => ({
 				...file,
@@ -62,26 +50,10 @@ export const uploadRouter = {
 			return { [UTFiles]: fileOverrides };
 		})
 		.onUploadComplete(async ({ file }) => {
-			if (!file.customId) {
-				throw new Error("No messageId found");
-			}
-
-			const type: (typeof attachmentTypeEnum.enumValues)[number] =
-				file.type.startsWith("image/")
-					? "image"
-					: file.type.startsWith("video/")
-						? "video"
-						: file.type.startsWith("application/pdf")
-							? "document"
-							: "document";
-
-			await insertAttachment({
+			return {
 				url: file.url,
-				type,
 				messageId: file.customId,
-			});
-
-			return { url: file.url };
+			};
 		}),
 } satisfies FR;
 
