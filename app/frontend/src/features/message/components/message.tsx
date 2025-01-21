@@ -68,7 +68,7 @@ export default function Message({
 								className="flex items-center gap-2 rounded bg-black/10 p-2 hover:bg-black/20"
 							>
 								<FileIcon className="size-4" />
-								<span className="text-sm">Download Document</span>
+								<span className="text-sm">Document</span>
 							</a>
 						)}
 					</div>
