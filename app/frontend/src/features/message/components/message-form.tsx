@@ -44,7 +44,11 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: async ({ value }) => {
 			try {
 				if (value.file) {
-					await saveAttachmentMessage.mutateAsync(value.file);
+					await saveAttachmentMessage.mutateAsync({
+						file: value.file,
+						body: value.body,
+					});
+
 					toast.success("Upload successful");
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
@@ -157,7 +161,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 						<DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
 							<label className="flex w-full cursor-pointer items-center gap-2">
 								<FileIcon className="h-4 w-4" />
-								<span>Document</span>
+								<span>Document (PDF)</span>
 								<input
 									type="file"
 									className="hidden"
