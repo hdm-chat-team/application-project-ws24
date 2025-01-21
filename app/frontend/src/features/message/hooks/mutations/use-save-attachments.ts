@@ -8,15 +8,14 @@ import { createId } from "@application-project-ws24/cuid";
 import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 
-
 export function useSaveAttachmentMessage(chatId: string) {
 	const { user } = useUser();
 	const { startUpload } = useUploadThing("attachment");
 	const queryClient = useQueryClient();
 
-	return useMutation({
+	return useMutation<void, Error, { file: File; body: string }>({
 		mutationKey: ["db/save-attachment-message", chatId],
-		mutationFn: async (file: File) => {
+		mutationFn: async ({ file, body }) => {
 			if (!user) return;
 
 			try {
@@ -27,7 +26,7 @@ export function useSaveAttachmentMessage(chatId: string) {
 					id: messageId,
 					chatId,
 					authorId: user.id,
-					body: "",
+					body: body,
 					state: "pending",
 					createdAt: now,
 					updatedAt: now,
@@ -45,7 +44,6 @@ export function useSaveAttachmentMessage(chatId: string) {
 							? "video"
 							: "document",
 				};
-
 
 				await db.messages.add(message);
 				await db.attachments.add(attachment);
