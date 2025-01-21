@@ -6,7 +6,7 @@ import {
 	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
-import type { UploadedFileData } from "uploadthing/types";
+import { z } from "zod";
 import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { insertAttachment } from "#db/attachments";
@@ -14,11 +14,9 @@ import type { attachmentTypeEnum } from "#db/attachments.sql";
 import { insertMessage } from "#db/messages";
 import env from "#env";
 
-interface FileWithMessageId extends UploadedFileData {
-	messageId: string;
-	chatId: string;
-	messageText?: string;
-}
+const attachmentInput = z.object({
+	chatId: z.string(),
+});
 
 const routeBuilder = createUploadthing();
 
@@ -39,31 +37,34 @@ export const uploadRouter = {
 		})),
 
 	attachment: routeBuilder(["image", "video", "pdf"])
-		.middleware(async ({ files }) => {
+		.input(attachmentInput)
+		.middleware(async ({ files, input }) => {
 			const { user, session } = getContext<Env>().var;
 			if (!(user && session)) throw new Error("Unauthorized");
 
 			const messageId = createId();
-			const fileOverrides = files.map((file) => {
-				return { ...file, name: `${user.id}:attachment`, messageId };
+
+			await insertMessage({
+				id: messageId,
+				chatId: input.chatId,
+				authorId: user.id,
+				state: "sent",
+				body: "",
+				createdAt: new Date().toISOString(),
 			});
+
+			const fileOverrides = files.map((file) => ({
+				...file,
+				name: `${user.id}:attachment`,
+				customId: messageId,
+			}));
 
 			return { [UTFiles]: fileOverrides };
 		})
 		.onUploadComplete(async ({ file }) => {
-			const { user } = getContext<Env>().var;
-			if (!user) throw new Error("Unauthorized");
-
-			const { messageId, chatId, messageText } = file as FileWithMessageId;
-
-			await insertMessage({
-				id: messageId,
-				chatId,
-				authorId: user.id,
-				state: "sent",
-				body: messageText || "",
-				createdAt: new Date().toISOString(),
-			});
+			if (!file.customId) {
+				throw new Error("No messageId found");
+			}
 
 			const type: (typeof attachmentTypeEnum.enumValues)[number] =
 				file.type.startsWith("image/")
@@ -77,9 +78,10 @@ export const uploadRouter = {
 			await insertAttachment({
 				url: file.url,
 				type,
-				messageId,
+				messageId: file.customId,
 			});
-			return { url: file.url, messageId };
+
+			return { url: file.url };
 		}),
 } satisfies FR;
 

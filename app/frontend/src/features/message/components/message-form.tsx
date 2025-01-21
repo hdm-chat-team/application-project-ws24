@@ -44,14 +44,14 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: async ({ value }) => {
 			try {
 				if (value.file) {
-					await startUpload([value.file]);
+					await startUpload([value.file], { chatId });
 					toast.success("Upload successful");
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
 				}
 				form.reset();
 				setPreview(null);
-				setSelectedFileName(null); 
+				setSelectedFileName(null);
 			} catch (error) {
 				console.error("Error:", error);
 				toast.error("Upload failed");
@@ -61,7 +61,6 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 			onSubmit: messageFormSchema,
 		},
 	});
-
 
 	// * Handle file selection and picture preview
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
