@@ -30,6 +30,38 @@ const messageFormSchema = z
 		message: "Please enter a message or upload a file",
 	});
 
+// * File Upload component
+const FileUploadMenuItem = ({
+	icon: Icon,
+	label,
+	accept,
+	onSelect,
+}: {
+	icon: typeof ImageIcon;
+	label: string;
+	accept: string;
+	onSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) => (
+	<DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+		<label className="flex w-full cursor-pointer items-center gap-2">
+			<Icon className="h-4 w-4" />
+			<span>{label}</span>
+			<input
+				type="file"
+				className="hidden"
+				accept={accept}
+				onChange={onSelect}
+			/>
+		</label>
+	</DropdownMenuItem>
+);
+
+const UPLOAD_OPTIONS = [
+	{ icon: ImageIcon, label: "Picture", accept: "image/*" },
+	{ icon: VideoIcon, label: "Video", accept: "video/*" },
+	{ icon: FileIcon, label: "Document (PDF)", accept: "application/pdf" },
+] as const;
+
 // * Attachment Preview
 const FilePreview = ({
 	file,
@@ -136,7 +168,6 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 					}}
 				/>
 			)}
-
 			<form
 				className="flex"
 				autoComplete="off"
@@ -153,45 +184,17 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="start" side="top">
-						<DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-							<label className="flex w-full cursor-pointer items-center gap-2">
-								<ImageIcon className="h-4 w-4" />
-								<span>Picture</span>
-								<input
-									type="file"
-									className="hidden"
-									accept="image/*"
-									onChange={handleFileSelect}
-								/>
-							</label>
-						</DropdownMenuItem>
-						<DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-							<label className="flex w-full cursor-pointer items-center gap-2">
-								<VideoIcon className="h-4 w-4" />
-								<span>Video</span>
-								<input
-									type="file"
-									className="hidden"
-									accept="video/*"
-									onChange={handleFileSelect}
-								/>
-							</label>
-						</DropdownMenuItem>
-						<DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-							<label className="flex w-full cursor-pointer items-center gap-2">
-								<FileIcon className="h-4 w-4" />
-								<span>Document (PDF)</span>
-								<input
-									type="file"
-									className="hidden"
-									accept="application/pdf"
-									onChange={handleFileSelect}
-								/>
-							</label>
-						</DropdownMenuItem>
+						{UPLOAD_OPTIONS.map((option) => (
+							<FileUploadMenuItem
+								key={option.label}
+								icon={option.icon}
+								label={option.label}
+								accept={option.accept}
+								onSelect={handleFileSelect}
+							/>
+						))}
 					</DropdownMenuContent>
 				</DropdownMenu>
-
 				<form.Field name="body">
 					{(field) => (
 						<Input
