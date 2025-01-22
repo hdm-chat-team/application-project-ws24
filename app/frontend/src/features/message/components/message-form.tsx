@@ -6,8 +6,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { usePostMessageMutation } from "@/features/message/hooks";
-import { useSaveAttachmentMessage } from "@/features/message/hooks/mutations/use-save-attachments";
+import { usePostAttachment } from "@/features/message/hooks/mutations/use-post-attachments.tsx";
+import { useSaveAttachment } from "@/features/message/hooks/mutations/use-save-attachments.tsx";
 import { useForm } from "@tanstack/react-form";
 import {
 	FileIcon,
@@ -20,6 +20,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { usePostMessageMutation } from "../hooks/mutations/use-post-message";
 
 const messageFormSchema = z
 	.object({
@@ -106,7 +107,8 @@ const FilePreview = ({
 
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
-	const saveAttachmentMessage = useSaveAttachmentMessage(chatId);
+	const postAttachment = usePostAttachment(chatId);
+	const saveAttachment = useSaveAttachment();
 	const [preview, setPreview] = useState<string | null>(null);
 	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
@@ -124,11 +126,16 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: async ({ value }) => {
 			try {
 				if (value.file) {
-					await saveAttachmentMessage.mutateAsync({
+					// Neue zwei-Schritt Logik für Attachments
+					const result = await postAttachment.mutateAsync({
 						file: value.file,
 						body: value.body,
 					});
-					toast.success("Upload successful");
+
+					if (result) {
+						await saveAttachment.mutateAsync(result);
+						toast.success("Upload successful");
+					}
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
 				}
