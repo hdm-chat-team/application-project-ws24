@@ -7,21 +7,27 @@ export const messagesByChatIdQueryFn = async (id: string) => {
 		.equals(id)
 		.sortBy("createdAt");
 
-	const messagesWithAttachments = await Promise.all(
-		messages.map(async (message) => {
-			const attachments = await db.attachments
-				.where("messageId")
-				.equals(message.id)
-				.toArray();
+	const attachments = await db.attachments
+		.where("messageId")
+		.anyOf(messages.map((m) => m.id))
+		.toArray();
 
-			return {
-				...message,
-				attachments,
-			};
-		}),
+	// * If there are no attachments, return messages without attachments
+	if (attachments.length === 0) {
+		return messages.map((message) => ({ ...message, attachments: [] }));
+	}
+
+	// * Group attachments by messageId
+	const attachmentsByMessageId = Object.groupBy(
+		attachments,
+		(att) => att.messageId,
 	);
 
-	return messagesWithAttachments;
+	// * Map messages to their attachments
+	return messages.map((message) => ({
+		...message,
+		attachments: attachmentsByMessageId[message.id] || [],
+	}));
 };
 
 export const messageStateByIdQueryFn = (id: string) =>
