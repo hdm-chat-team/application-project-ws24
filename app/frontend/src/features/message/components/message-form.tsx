@@ -126,7 +126,6 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: async ({ value }) => {
 			try {
 				if (value.file) {
-					// Neue zwei-Schritt Logik für Attachments
 					const result = await postAttachment.mutateAsync({
 						file: value.file,
 						body: value.body,
