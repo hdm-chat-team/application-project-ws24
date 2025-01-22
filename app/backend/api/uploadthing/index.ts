@@ -18,7 +18,9 @@ const attachmentInput = z.object({
 const routeBuilder = createUploadthing();
 
 export const uploadRouter = {
-	avatar: routeBuilder(["image"])
+	avatar: routeBuilder({
+		image: { maxFileSize: "4MB" },
+	})
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
 			if (!(user && session)) throw new Error("Unauthorized");
@@ -33,7 +35,11 @@ export const uploadRouter = {
 			url: file.url,
 		})),
 
-	attachment: routeBuilder(["image", "video", "pdf"])
+	attachment: routeBuilder({
+		image: { maxFileSize: "4MB" },
+		video: { maxFileSize: "16MB" },
+		pdf: { maxFileSize: "4MB" },
+	})
 		.input(attachmentInput)
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
