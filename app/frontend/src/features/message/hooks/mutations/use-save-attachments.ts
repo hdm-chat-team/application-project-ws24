@@ -7,6 +7,7 @@ import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useSaveAttachmentMessage(chatId: string) {
 	const { user } = useUser();
@@ -18,11 +19,23 @@ export function useSaveAttachmentMessage(chatId: string) {
 		mutationFn: async ({ file, body }) => {
 			if (!user) return;
 
+			const maxSize = file.type.startsWith("image/")
+				? 4 * 1024 * 1024
+				: file.type.startsWith("video/")
+					? 16 * 1024 * 1024
+					: 4 * 1024 * 1024;
+
+			if (file.size > maxSize) {
+				toast.error(
+					"File size too big / max 4MB for images and documents / max 16MB for videos",
+				);
+			}
+
 			try {
 				const messageId = createId();
 
 				// * Remove T and Z from the timestamp so its the same format as the messages so they can be sorted
-				
+
 				const now = new Date().toISOString().replace("T", " ").replace("Z", "");
 
 				const message: Message = {
