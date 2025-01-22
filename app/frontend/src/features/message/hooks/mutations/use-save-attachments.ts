@@ -24,7 +24,6 @@ export function useSaveAttachmentMessage(chatId: string) {
 				: file.type.startsWith("video/")
 					? 16 * 1024 * 1024
 					: 4 * 1024 * 1024;
-
 			if (file.size > maxSize) {
 				toast.error(
 					"File size too big / max 4MB for images and documents / max 16MB for videos",
@@ -48,11 +47,16 @@ export function useSaveAttachmentMessage(chatId: string) {
 					updatedAt: now,
 				};
 
-				const result = await startUpload([file], { chatId });
-				if (!result?.[0]) throw new Error("Upload failed");
+				const [uploadResult] = await Promise.all([
+					startUpload([file], { chatId }).then((res) => {
+						if (!res?.[0]) throw new Error("Upload failed");
+						return res[0];
+					}),
+					db.messages.add(message),
+				]);
 
 				const attachment: Attachment = {
-					url: result[0].url,
+					url: uploadResult.url,
 					messageId,
 					type: file.type.startsWith("image/")
 						? "image"
