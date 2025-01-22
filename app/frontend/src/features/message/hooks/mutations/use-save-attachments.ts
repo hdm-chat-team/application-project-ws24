@@ -20,7 +20,10 @@ export function useSaveAttachmentMessage(chatId: string) {
 
 			try {
 				const messageId = createId();
-				const now = new Date().toISOString();
+
+				// * Remove T and Z from the timestamp so its the same format as the messages so they can be sorted
+				
+				const now = new Date().toISOString().replace("T", " ").replace("Z", "");
 
 				const message: Message = {
 					id: messageId,
