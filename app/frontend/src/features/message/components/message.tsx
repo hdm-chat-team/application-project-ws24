@@ -1,14 +1,12 @@
 import { useMessageState } from "@/features/message/hooks";
 import { cn } from "@/lib/utils";
+import type { Attachment } from "@server/db/attachments";
 import type { Message as MessageType } from "@server/db/messages";
 import { Check, CheckCheck, ClockArrowUp, FileIcon } from "lucide-react";
 
 type MessageBubbleProps = {
 	value: MessageType & {
-		attachments?: Array<{
-			url: string;
-			type: "image" | "video" | "document";
-		}>;
+		attachments?: Attachment[];
 	};
 	variant?: "received" | "sent";
 };

@@ -48,7 +48,6 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 						file: value.file,
 						body: value.body,
 					});
-
 					toast.success("Upload successful");
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
