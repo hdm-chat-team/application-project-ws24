@@ -1,8 +1,8 @@
 import { useUser } from "@/features/auth/hooks";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { createId } from "@application-project-ws24/cuid";
-import type { Message } from "@server/db/messages";
 import type { Attachment } from "@server/db/attachments";
+import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
