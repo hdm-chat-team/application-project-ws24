@@ -30,11 +30,60 @@ const messageFormSchema = z
 		message: "Please enter a message or upload a file",
 	});
 
+
+// * Attachment Preview
+const FilePreview = ({
+	file,
+	preview,
+	fileName,
+	onRemove,
+}: {
+	file: File;
+	preview: string | null;
+	fileName: string | null;
+	onRemove: () => void;
+}) => (
+	<div className="relative inline-block rounded border bg-white p-2 shadow-sm">
+		<div className="flex items-center gap-2">
+			{preview ? (
+				<img
+					src={preview}
+					alt="Preview"
+					className="max-h-32 rounded object-contain"
+				/>
+			) : (
+				<div className="flex items-center gap-2">
+					{file.type.startsWith("video/") && (
+						<VideoIcon className="h-5 w-5 text-blue-500" />
+					)}
+					{file.type === "application/pdf" && (
+						<FileIcon className="h-5 w-5 text-red-500" />
+					)}
+					<span className="font-medium text-gray-900 text-sm">{fileName}</span>
+				</div>
+			)}
+			<button
+				type="button"
+				onClick={onRemove}
+				className="-right-2 -top-2 absolute rounded-full bg-white p-1 text-gray-600 shadow-sm hover:bg-gray-200 hover:text-gray-900"
+			>
+				<XIcon className="h-4 w-4" />
+			</button>
+		</div>
+	</div>
+);
+
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
 	const saveAttachmentMessage = useSaveAttachmentMessage(chatId);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+
+	const resetForm = () => {
+		form.reset();
+		setPreview(null);
+		setSelectedFileName(null);
+	};
 
 	const form = useForm({
 		defaultValues: {
@@ -52,9 +101,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 				} else {
 					await postMessageMutation.mutateAsync(value.body);
 				}
-				form.reset();
-				setPreview(null);
-				setSelectedFileName(null);
+				resetForm();
 			} catch (error) {
 				console.error("Error:", error);
 				toast.error("Upload failed");
@@ -65,7 +112,6 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 		},
 	});
 
-	// * Handle file selection and picture preview
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
@@ -80,41 +126,16 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 	return (
 		<div className="space-y-2">
 			{form.state.values.file && (
-				<div className="relative inline-block rounded border bg-white p-2 shadow-sm">
-					<div className="flex items-center gap-2">
-						{preview ? (
-							<img
-								src={preview}
-								alt="Preview"
-								className="max-h-32 rounded object-contain"
-							/>
-						) : (
-							<div className="flex items-center gap-2">
-								{form.state.values.file.type.startsWith("video/") && (
-									<VideoIcon className="h-5 w-5 text-blue-500" />
-								)}
-								{form.state.values.file.type === "application/pdf" && (
-									<FileIcon className="h-5 w-5 text-red-500" />
-								)}
-								<span className="font-medium text-gray-900 text-sm">
-									{selectedFileName}
-								</span>
-							</div>
-						)}
-
-						<button
-							type="button"
-							onClick={() => {
-								form.setFieldValue("file", null);
-								setPreview(null);
-								setSelectedFileName(null);
-							}}
-							className="-right-2 -top-2 absolute rounded-full bg-white p-1 text-gray-600 shadow-sm hover:bg-gray-200 hover:text-gray-900"
-						>
-							<XIcon className="h-4 w-4" />
-						</button>
-					</div>
-				</div>
+				<FilePreview
+					file={form.state.values.file}
+					preview={preview}
+					fileName={selectedFileName}
+					onRemove={() => {
+						form.setFieldValue("file", null);
+						setPreview(null);
+						setSelectedFileName(null);
+					}}
+				/>
 			)}
 
 			<form
