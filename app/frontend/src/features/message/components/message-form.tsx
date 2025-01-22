@@ -30,7 +30,6 @@ const messageFormSchema = z
 		message: "Please enter a message or upload a file",
 	});
 
-
 // * Attachment Preview
 const FilePreview = ({
 	file,
