@@ -1,9 +1,10 @@
 import DefaultNotFound from "@/components/default-not-found";
 import { queryClient } from "@/context/query-provider";
-import { db } from "@/lib/db";
 import { routeTree } from "@/routeTree.gen";
-import { createRouter } from "@tanstack/react-router";
-import { RouterProvider as Provider } from "@tanstack/react-router";
+import {
+	RouterProvider as Provider,
+	createRouter,
+} from "@tanstack/react-router";
 
 /**
  * The router instance:
@@ -14,7 +15,7 @@ import { RouterProvider as Provider } from "@tanstack/react-router";
 const router = createRouter({
 	routeTree,
 	defaultNotFoundComponent: DefaultNotFound,
-	context: { queryClient, db },
+	context: { queryClient },
 });
 
 // * TypeScript type registration for router instance

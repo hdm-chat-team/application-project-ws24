@@ -7,7 +7,7 @@ import {
 import { userProfileQueryOptions } from "@/features/profile/queries";
 import { createFileRoute, notFound } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/(app)/user/$userId")({
+export const Route = createFileRoute("/_app/user/$userId")({
 	loader: async ({ context: { queryClient }, params: { userId } }) => {
 		const profile = await queryClient.ensureQueryData(
 			userProfileQueryOptions(userId),
@@ -21,6 +21,10 @@ export const Route = createFileRoute("/(app)/user/$userId")({
 });
 
 function UserProfilePage() {
+	/* 
+	TODO: display a user's profile. If the user is the current user, show an edit form instead
+	 */
+
 	const profile = Route.useLoaderData();
 
 	return !profile ? <ProfileLoadingState /> : <ProfileCard {...profile} />;

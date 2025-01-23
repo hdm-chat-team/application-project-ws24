@@ -3,7 +3,11 @@ import { withUt } from "uploadthing/tw";
 
 const config = withUt({
 	darkMode: ["class"],
-	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+	content: [
+		"./index.html",
+		"./src/**/*.{js,ts,jsx,tsx}",
+		"../../node_modules/@uploadthing/react/dist/**/*.{js,ts,jsx,tsx}",
+	],
 	theme: {
 		extend: {
 			borderRadius: {
