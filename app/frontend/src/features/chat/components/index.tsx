@@ -15,7 +15,7 @@ export function Chat() {
 			Open a chat to start messaging
 		</div>
 	) : (
-		<div className="relative flex size-full flex-col">
+		<div className="relative flex size-full flex-col justify-end">
 			<MessagesScrollArea
 				chatId={chat.id}
 				className="m-3 flex-1 overflow-auto"
