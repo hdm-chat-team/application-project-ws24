@@ -14,47 +14,43 @@ const routeBuilder = createUploadthing();
 
 export const uploadRouter = {
 	avatar: routeBuilder({
-		image: { maxFileSize: "4MB" },
+		image: { maxFileSize: "4MB", minFileCount: 1, maxFileCount: 1 },
 	})
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
 			if (!(user && session)) throw new Error("Unauthorized");
-
-			const fileOverrides = files.map((file) => {
-				return { ...file, name: `${user.id}:avatar`, customId: createId() };
-			});
-
-			return { [UTFiles]: fileOverrides };
-		})
-		.onUploadComplete(({ file }) => ({
-			url: file.url,
-		})),
-
-	attachment: routeBuilder({
-		image: { maxFileSize: "4MB" },
-		video: { maxFileSize: "16MB" },
-		pdf: { maxFileSize: "4MB" },
-	})
-		.middleware(async ({ files }) => {
-			const { user, session } = getContext<Env>().var;
-			if (!(user && session)) throw new Error("Unauthorized");
-
-			const messageId = createId();
 
 			const fileOverrides = files.map((file) => ({
 				...file,
-				name: `${user.id}:attachment`,
-				customId: messageId,
+				name: `${user.id}:avatar`,
+				customId: createId(),
 			}));
 
 			return { [UTFiles]: fileOverrides };
 		})
-		.onUploadComplete(async ({ file }) => {
-			return {
-				url: file.url,
-				messageId: file.customId,
-			};
-		}),
+		.onUploadComplete(({ file: { url } }) => ({
+			url,
+		})),
+	attachment: routeBuilder({
+		image: { maxFileSize: "4MB", maxFileCount: 4 },
+		video: { maxFileSize: "16MB", maxFileCount: 1 },
+		pdf: { maxFileSize: "4MB", maxFileCount: 1 },
+	})
+		.middleware(async ({ files }) => {
+			const { user, session } = getContext<Env>().var;
+			if (!(user && session)) throw new Error("Unauthorized");
+
+			const fileOverrides = files.map((file) => ({
+				...file,
+				name: `${user.id}:attachment`,
+				customId: createId(),
+			}));
+
+			return { [UTFiles]: fileOverrides };
+		})
+		.onUploadComplete(async ({ file: { url } }) => ({
+			url,
+		})),
 } satisfies FR;
 
 const handlers = createRouteHandler({
