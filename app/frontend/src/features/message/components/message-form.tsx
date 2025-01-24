@@ -120,7 +120,7 @@ export default function MessageForm({ chatId }: { chatId: string }) {
 
 	const form = useForm({
 		defaultValues: {
-			body: "",
+			body: "", // ? persist draft in local-storage/indexedDB ?
 			file: null,
 		},
 		onSubmit: async ({ value }) => {

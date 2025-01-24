@@ -34,12 +34,10 @@ export const socketRouter = createRouter().get(
 				const messages = await selectMessagesToSync(user.id);
 				if (messages.length === 0) return;
 
-				const messagesByChat = messages.reduce((accumulator, message) => {
-					const messages = accumulator.get(message.chatId) ?? [];
-					messages.push(message);
-					accumulator.set(message.chatId, messages);
-					return accumulator;
-				}, new Map<Message["chatId"], Message[]>());
+				const messagesByChat = Map.groupBy(
+					messages,
+					(message) => message.chatId,
+				);
 
 				for (const messages of messagesByChat.values()) {
 					send(ws, { type: "message_sync", payload: messages });

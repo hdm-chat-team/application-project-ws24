@@ -27,7 +27,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
   - `/frontend`: a ⚡ [Vite](https://vite.dev) SPA using
     - ⚛️ [React](https://react.dev) as the frontend framework.
     - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes.
-    - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server.state on the client
+    - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
 
 ### 📦 Packages
 

@@ -4,6 +4,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { Suspense, lazy } from "react";
+import { Toaster } from "sonner";
 
 const TanStackRouterDevtools = import.meta.env.PROD
 	? () => null // Render nothing in production
@@ -23,8 +24,10 @@ export const Route = createRootRouteWithContext<{
 		<>
 			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
 				<Outlet />
+				<Toaster closeButton richColors />
 			</ThemeProvider>
 			<Suspense>
+				{/* Devtools */}
 				<TanStackRouterDevtools />
 				<ReactQueryDevtools />
 			</Suspense>
