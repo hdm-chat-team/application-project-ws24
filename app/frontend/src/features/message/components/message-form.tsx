@@ -105,7 +105,7 @@ const FilePreview = ({
 	</div>
 );
 
-export default function MessageForm({ chatId }: { chatId: string }) {
+export function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
 	const postAttachment = usePostAttachment(chatId);
 	const saveAttachment = useSaveMessage();
