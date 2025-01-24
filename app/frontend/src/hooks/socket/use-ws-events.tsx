@@ -14,6 +14,7 @@ import { useCallback } from "react";
 
 export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const queryClient = useQueryClient();
+
 	const saveMessage = useSaveMessage().mutate;
 	const saveMessagesByChat = useSaveMessageBatch().mutate;
 	const updateMessage = useUpdateMessage().mutate;
@@ -35,7 +36,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				}
 				case "message_incoming": {
 					const message = data.payload;
-					saveMessage(message);
+					saveMessage({ message });
 					sendMessage({
 						type: "message_received",
 						payload: { id: message.id, authorId: message.authorId },
