@@ -3,7 +3,6 @@ import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#api/factory";
 import db from "#db";
 import {
-	type Message,
 	countRecipientsByMessageState,
 	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
