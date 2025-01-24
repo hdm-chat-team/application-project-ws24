@@ -1,21 +1,24 @@
 import { useMessageState } from "@/features/message/hooks";
+import db from "@/lib/db";
 import { cn } from "@/lib/utils";
-import type { Attachment } from "@server/db/attachments";
 import type { Message as MessageType } from "@server/db/messages";
+import { useQuery } from "@tanstack/react-query";
 import { Check, CheckCheck, ClockArrowUp, FileIcon } from "lucide-react";
 
 type MessageBubbleProps = {
-	value: MessageType & {
-		attachments?: Attachment[];
-	};
+	value: MessageType;
 	variant?: "received" | "sent";
 };
 
 export default function Message({
-	value: { id, body, authorId, state, attachments },
+	value: { id, body, authorId, state },
 	variant = "received",
 }: MessageBubbleProps) {
 	const ref = useMessageState({ id, authorId });
+	const { data: attachments } = useQuery({
+		queryKey: ["db/message-attachments", id],
+		queryFn: () => db.attachments.where("messageId").equals(id).toArray(), // Search for attachments by messageId, if there are no attachments, return an empty array
+	});
 
 	return (
 		<div
