@@ -29,7 +29,7 @@ export function usePostAttachment(chatId: string) {
 			}
 
 			const message = createAttachmentMessage(chatId, user.id, body);
-			const result = await startUpload([file], { chatId });
+			const result = await startUpload([file]);
 			if (!result?.[0]) throw new Error("Upload failed");
 
 			return {

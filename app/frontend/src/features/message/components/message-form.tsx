@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { usePostAttachment } from "@/features/message/hooks/mutations/use-post-attachments.tsx";
-import { useSaveAttachment } from "@/features/message/hooks/mutations/use-save-attachments.tsx";
+import { useSaveMessage } from "@/features/message/hooks/mutations/use-save-message";
 import { useForm } from "@tanstack/react-form";
 import {
 	FileIcon,
@@ -108,7 +108,7 @@ const FilePreview = ({
 export default function MessageForm({ chatId }: { chatId: string }) {
 	const postMessageMutation = usePostMessageMutation(chatId);
 	const postAttachment = usePostAttachment(chatId);
-	const saveAttachment = useSaveAttachment();
+	const saveAttachment = useSaveMessage();
 	const [preview, setPreview] = useState<string | null>(null);
 	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 

@@ -6,14 +6,9 @@ import {
 	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
-import { z } from "zod";
 import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import env from "#env";
-
-const attachmentInput = z.object({
-	chatId: z.string(),
-});
 
 const routeBuilder = createUploadthing();
 
@@ -40,7 +35,6 @@ export const uploadRouter = {
 		video: { maxFileSize: "16MB" },
 		pdf: { maxFileSize: "4MB" },
 	})
-		.input(attachmentInput)
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
 			if (!(user && session)) throw new Error("Unauthorized");
