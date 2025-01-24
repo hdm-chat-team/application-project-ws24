@@ -1,5 +1,6 @@
 import { messagesByChatIdQueryOptions } from "@/features/message/queries";
 import { db } from "@/lib/db";
+import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -8,8 +9,18 @@ export function useSaveMessage() {
 
 	return useMutation({
 		mutationKey: ["db/save-message"],
-		mutationFn: async (message: Message) => {
+		mutationFn: async ({
+			message,
+			attachment,
+		}: {
+			message: Message;
+			attachment?: Attachment;
+		}) => {
 			await db.messages.add(message);
+
+			if (attachment) {
+				await db.attachments.add(attachment);
+			}
 
 			queryClient.invalidateQueries(
 				messagesByChatIdQueryOptions(message.chatId),
