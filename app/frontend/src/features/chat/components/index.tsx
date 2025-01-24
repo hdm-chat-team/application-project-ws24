@@ -32,8 +32,10 @@ function MessagesScrollArea({
 	chatId,
 	className,
 }: { chatId: string; className?: string }) {
-	/* 
+	/*
 	 TODO: Scroll behavior on new message
+	 TODO: Chips for date separators
+	 TODO: Scroll to bottom and top buttons
 	*/
 	const { user } = useUser();
 	const messages = useLiveQuery(
