@@ -24,18 +24,18 @@
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
-		"arctic": "^3.1.2",
-		"drizzle-orm": "^0.38.3",
+		"arctic": "^3.2.1",
+		"drizzle-orm": "^0.38.4",
 		"drizzle-zod": "^0.6.1",
-		"hono": "^4.6.16",
+		"hono": "^4.6.18",
 		"pg": "^8.13.1",
 		"uploadthing": "^7.4.4",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@types/bun": "^1.1.16",
+		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.10",
-		"drizzle-kit": "^0.30.1"
+		"drizzle-kit": "^0.30.2"
 	}
 }

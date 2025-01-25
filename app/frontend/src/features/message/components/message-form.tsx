@@ -6,16 +6,15 @@ import { z } from "zod";
 
 const messageFormSchema = z.object({ body: z.string().trim().nonempty() });
 
-export default function MessageForm({ chatId }: { chatId: string }) {
-	const postMessageMutation = usePostMessageMutation(chatId);
+export function MessageForm({ chatId }: { chatId: string }) {
+	const postMessage = usePostMessageMutation(chatId).mutate;
 
 	const form = useForm({
 		defaultValues: {
-			body: "",
+			body: "", // ? persist draft in local-storage/indexedDB ?
 		},
-		onSubmit: async ({ value }) => {
-			await postMessageMutation.mutateAsync(value.body);
-
+		onSubmit: ({ value }) => {
+			postMessage(value.body);
 			form.reset();
 		},
 		validators: {
