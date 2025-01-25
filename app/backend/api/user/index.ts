@@ -12,8 +12,6 @@ import {
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
-// * Create UTApi instance
-
 const utApi = new UTApi();
 
 export const profileRouter = createRouter()
@@ -22,14 +20,12 @@ export const profileRouter = createRouter()
 		protectedRoute,
 		zValidator("form", updateUserProfileSchema),
 		async (c) => {
-			const user = c.get("user");
-			const { displayName, avatarUrl } = c.req.valid("form");
+			const { id } = c.get("profile");
+			const formData = c.req.valid("form");
 
-			const updatedProfile = await updateUserProfile(user.id, {
-				displayName,
-				avatarUrl,
-			}).catch((error) => {
-				throw new HTTPException(400, { message: error.message });
+			const [updatedProfile] = await updateUserProfile.execute({
+				id,
+				...formData,
 			});
 
 			return c.json({
