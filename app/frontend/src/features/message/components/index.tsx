@@ -1,9 +1,9 @@
 import { useMessageState } from "@/features/message/hooks";
-import db from "@/lib/db";
 import { cn } from "@/lib/utils";
 import type { Message as MessageType } from "@server/db/messages";
 import { useLiveQuery } from "dexie-react-hooks";
 import { Check, CheckCheck, ClockArrowUp, FileIcon } from "lucide-react";
+import { attachmentsByMessageIdQueryFn } from "../queries";
 
 export * from "./message-form";
 
@@ -18,8 +18,9 @@ export function Message({
 }: MessageBubbleProps) {
 	const ref = useMessageState({ id, authorId });
 
-	const attachments = useLiveQuery(() =>
-		db.attachments.where({ messageId: id }).toArray(),
+	const attachments = useLiveQuery(
+		() => attachmentsByMessageIdQueryFn(id),
+		[id],
 	);
 
 	return (
