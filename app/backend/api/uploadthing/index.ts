@@ -3,6 +3,7 @@ import { contextStorage, getContext } from "hono/context-storage";
 import {
 	type FileRouter as FR,
 	UTFiles,
+	UploadThingError,
 	createRouteHandler,
 	createUploadthing,
 } from "uploadthing/server";
@@ -18,7 +19,11 @@ export const uploadRouter = {
 	})
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
-			if (!(user && session)) throw new Error("Unauthorized");
+			if (!(user && session))
+				throw new UploadThingError({
+					code: "FORBIDDEN",
+					message: "Unauthorized",
+				});
 
 			const fileOverrides = files.map((file) => ({
 				...file,
@@ -38,7 +43,11 @@ export const uploadRouter = {
 	})
 		.middleware(async ({ files }) => {
 			const { user, session } = getContext<Env>().var;
-			if (!(user && session)) throw new Error("Unauthorized");
+			if (!(user && session))
+				throw new UploadThingError({
+					code: "FORBIDDEN",
+					message: "Unauthorized",
+				});
 
 			const fileOverrides = files.map((file) => ({
 				...file,
