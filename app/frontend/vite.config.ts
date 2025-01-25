@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
 		react(),
 		TanStackRouterVite(),
@@ -87,4 +87,7 @@ export default defineConfig({
 			},
 		},
 	},
-});
+	esbuild: {
+		drop: mode === "production" ? ["console", "debugger"] : [],
+	},
+}));

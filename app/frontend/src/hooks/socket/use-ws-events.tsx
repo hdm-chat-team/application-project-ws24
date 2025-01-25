@@ -28,6 +28,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const handleMessage = useCallback(
 		(event: MessageEvent) => {
 			const data = wsEventDataSchema.parse(JSON.parse(event.data));
+			console.log("receiving", data);
 
 			switch (data.type) {
 				case "message_sync": {
