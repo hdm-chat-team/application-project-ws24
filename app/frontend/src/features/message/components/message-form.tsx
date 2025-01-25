@@ -6,9 +6,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { usePostAttachment } from "@/features/message/hooks/mutations/use-post-attachments.tsx";
-import { useSaveMessage } from "@/features/message/hooks/mutations/use-save-message";
-import { useForm } from "@tanstack/react-form";
 import {
 	FileIcon,
 	ImageIcon,
@@ -17,10 +14,13 @@ import {
 	VideoIcon,
 	XIcon,
 } from "lucide-react";
+
+import { useUser } from "@/features/auth/hooks";
+import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { toast } from "sonner";
 import { z } from "zod";
-import { usePostMessageMutation } from "../hooks/mutations/use-post-message";
+import { usePostMessage } from "../hooks";
+import { createMessage } from "../utils";
 
 const messageFormSchema = z
 	.object({
@@ -106,43 +106,23 @@ const FilePreview = ({
 );
 
 export function MessageForm({ chatId }: { chatId: string }) {
-	const postMessageMutation = usePostMessageMutation(chatId);
-	const postAttachment = usePostAttachment(chatId);
-	const saveAttachment = useSaveMessage();
+	const { user } = useUser();
+
+	const { mutate: postMessage } = usePostMessage(chatId);
+
 	const [preview, setPreview] = useState<string | null>(null);
 	const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
-
-	const resetForm = () => {
-		form.reset();
-		setPreview(null);
-		setSelectedFileName(null);
-	};
 
 	const form = useForm({
 		defaultValues: {
 			body: "", // ? persist draft in local-storage/indexedDB ?
 			file: null,
 		},
-		onSubmit: async ({ value }) => {
-			try {
-				if (value.file) {
-					const result = await postAttachment.mutateAsync({
-						file: value.file,
-						body: value.body,
-					});
+		onSubmit: ({ value }) => {
+			const message = createMessage(chatId, user.id, value.body);
 
-					if (result) {
-						await saveAttachment.mutateAsync(result);
-						toast.success("Upload successful");
-					}
-				} else {
-					await postMessageMutation.mutateAsync(value.body);
-				}
-				resetForm();
-			} catch (error) {
-				console.error("Error:", error);
-				toast.error("Upload failed");
-			}
+			postMessage(message);
+			form.reset();
 		},
 		validators: {
 			onSubmit: messageFormSchema,
@@ -216,7 +196,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 					selector={(state) => [state.canSubmit, state.isSubmitting]}
 				>
 					{([canSubmit, isSubmitting]) => (
-						<Button type="submit" disabled={!canSubmit}>
+						<Button disabled={!canSubmit} type="submit" size="icon">
 							{isSubmitting ? "..." : <SendHorizontal className="h-5 w-5" />}
 						</Button>
 					)}

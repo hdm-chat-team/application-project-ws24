@@ -21,7 +21,7 @@ export function Message({
 	const attachments = useLiveQuery(() =>
 		db.attachments.where({ messageId: id }).toArray(),
 	);
-	
+
 	return (
 		<div
 			ref={ref}
