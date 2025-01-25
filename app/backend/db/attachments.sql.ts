@@ -1,25 +1,22 @@
 import { relations } from "drizzle-orm";
-import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { messageTable } from "./messages.sql";
 import { ID_SIZE_CONFIG } from "./utils";
 
-export const attachmentTypeEnum = pgEnum("type", [
-	"image",
-	"video",
-	"document",
-]);
-
-export const attachmentTable = pgTable("attachments", {
+export const messageAttachmentTable = pgTable("message_attachments", {
 	url: varchar({ length: 255 }).primaryKey(),
-	type: attachmentTypeEnum("type").notNull(),
+	type: text().notNull(),
 	messageId: varchar(ID_SIZE_CONFIG)
-		.references(() => messageTable.id)
+		.references(() => messageTable.id, { onDelete: "cascade" })
 		.notNull(),
 });
 
-export const attachmentRelations = relations(attachmentTable, ({ one }) => ({
-	message: one(messageTable, {
-		fields: [attachmentTable.messageId],
-		references: [messageTable.id],
+export const messageAttachmentRelations = relations(
+	messageAttachmentTable,
+	({ one }) => ({
+		message: one(messageTable, {
+			fields: [messageAttachmentTable.messageId],
+			references: [messageTable.id],
+		}),
 	}),
-}));
+);
