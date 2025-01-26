@@ -40,4 +40,3 @@ export function AvatarUploader({ className }: { className?: string }) {
 		</div>
 	);
 }
-
