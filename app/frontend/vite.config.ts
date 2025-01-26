@@ -75,6 +75,9 @@ export default defineConfig(({ mode }) => ({
 			"@shared": `${__dirname}/../shared/`,
 		},
 	},
+	optimizeDeps: {
+		exclude: ["@jsquash/avif"],
+	},
 	build: {
 		outDir: "../dist/client",
 		emptyOutDir: true,
