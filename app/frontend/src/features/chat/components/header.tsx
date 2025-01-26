@@ -1,9 +1,9 @@
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useChat } from "@/features/chat/context";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Search, X } from "lucide-react";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 
 export function ChatHeader() {
 	const { chat: currentChat } = useChat();
@@ -32,7 +32,7 @@ export function ChatHeader() {
 						/>
 					</Avatar>
 					<div>
-						<p className="text-sm font-medium">{currentChat.name}</p>
+						<p className="font-medium text-sm">{currentChat.name}</p>
 					</div>
 				</div>
 			)}
@@ -42,7 +42,7 @@ export function ChatHeader() {
 						<div className="flex items-center gap-2">
 							<Input
 								placeholder="Search Chat..."
-								className="w-64 transition-all duration-300 ease-in-out transform scale-100"
+								className="w-64 scale-100 transform transition-all duration-300 ease-in-out"
 							/>
 							<X
 								className="cursor-pointer"
@@ -52,7 +52,7 @@ export function ChatHeader() {
 						</div>
 					) : (
 						<Search
-							className="cursor-pointer transition-all duration-300 ease-in-out transform scale-100"
+							className="scale-100 transform cursor-pointer transition-all duration-300 ease-in-out"
 							size="1.1rem"
 							onClick={toggleSearch}
 						/>
