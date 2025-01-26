@@ -4,7 +4,6 @@ import { createRouter } from "#api/factory";
 import db from "#db";
 import {
 	countRecipientsByMessageState,
-	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
 	selectMessagesToSync,
 	updateMessageRecipientsStates,
@@ -76,7 +75,6 @@ export const socketRouter = createRouter().get(
 									payload: messageId,
 								});
 							}
-							await pruneMessages(trx);
 						});
 
 						break;
@@ -111,7 +109,6 @@ export const socketRouter = createRouter().get(
 									payload: messageId,
 								});
 							}
-							await pruneMessages(trx);
 						});
 
 						break;
