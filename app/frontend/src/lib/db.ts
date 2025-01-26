@@ -7,7 +7,7 @@ import type { EntityTable } from "dexie";
 export type LocalDatabase = Dexie & {
 	messages: EntityTable<Message, "id">;
 	chats: EntityTable<Chat, "id">;
-	attachments: EntityTable<Attachment, "url">;
+	attachments: EntityTable<Attachment & { blob?: Blob }, "url">;
 };
 
 const db = new Dexie("database") as LocalDatabase;

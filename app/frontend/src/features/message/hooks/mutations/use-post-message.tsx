@@ -38,5 +38,17 @@ export function useSaveAttachment() {
 		mutationFn: async (attachment: Attachment) => {
 			await db.attachments.add(attachment);
 		},
+		onMutate: async ({ url }) => {
+			const blob = await fetch(url)
+				.then((res) => res.blob())
+				.catch((err) => {
+					console.error("Failed to fetch attachment", err);
+				});
+
+			if (!blob) return;
+
+			return blob;
+		},
+		onSuccess: (_, { url }, blob) => db.attachments.update(url, { blob }),
 	});
 }

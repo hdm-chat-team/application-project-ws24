@@ -45,7 +45,11 @@ export function Message({
 						{attachment.type.startsWith("image") && (
 							<div className="relative max-h-[300px] max-w-[280px] overflow-hidden rounded-lg">
 								<img
-									src={attachment.url}
+									src={
+										attachment.blob
+											? URL.createObjectURL(attachment.blob)
+											: attachment.url
+									}
 									alt=""
 									className="h-auto w-full object-contain"
 									loading="lazy"
@@ -55,7 +59,11 @@ export function Message({
 						{attachment.type.startsWith("video") && (
 							<div className="relative max-h-[300px] max-w-[280px] overflow-hidden rounded-lg">
 								<video
-									src={attachment.url}
+									src={
+										attachment.blob
+											? URL.createObjectURL(attachment.blob)
+											: attachment.url
+									}
 									controls
 									className="h-auto w-full"
 									preload="metadata"
@@ -66,7 +74,11 @@ export function Message({
 						)}
 						{attachment.type.startsWith("application") && (
 							<a
-								href={attachment.url}
+								href={
+									attachment.blob
+										? URL.createObjectURL(attachment.blob)
+										: attachment.url
+								}
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-2 rounded bg-black/10 p-2 hover:bg-black/20"
