@@ -1,12 +1,21 @@
-import { relations } from "drizzle-orm";
-import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
-import { userTable } from "./users.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import {relations} from "drizzle-orm";
+import {index, pgEnum, pgTable, primaryKey, varchar} from "drizzle-orm/pg-core";
+import {userTable} from "./users.sql";
+import {id, ID_SIZE_CONFIG, timestamps} from "./utils";
+
+export const chatTypeEnum = pgEnum("chatType", [
+	"self",
+	"contact",
+	"group",
+]);
+export type chatTypeEnumType = (typeof chatTypeEnum.enumValues)[number]
+
 
 export const chatTable = pgTable("chats", {
 	id,
 	...timestamps,
 	name: varchar({ length: 255 }),
+	chatType: chatTypeEnum().notNull()
 });
 
 export const chatRelations = relations(chatTable, ({ many }) => ({

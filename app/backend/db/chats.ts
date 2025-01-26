@@ -1,9 +1,9 @@
-import { eq, sql } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import type { z } from "zod";
+import {eq, sql} from "drizzle-orm";
+import {createInsertSchema, createSelectSchema} from "drizzle-zod";
+import type {z} from "zod";
 import db from "#db";
-import { chatMemberTable, chatTable } from "./chats.sql";
-import type { DB, Transaction } from "./types";
+import {chatMemberTable, chatTable, type chatTypeEnumType} from "./chats.sql";
+import type {DB, Transaction} from "./types";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -21,6 +21,7 @@ async function insertSelfChat(name: string, trx: Transaction | DB = db) {
 		.insert(chatTable)
 		.values({
 			name,
+			chatType: 'self'
 		})
 		.onConflictDoNothing()
 		.returning({ id: chatTable.id })
@@ -51,14 +52,17 @@ async function selectChatWithMembersByUserId(
 		with: { members: { columns: { userId: true } } },
 	});
 }
-
 async function insertChatWithMembers(userIds: string[]) {
 	if (userIds.length < 2) {
 		throw new Error("A chat must have at least two members.");
 	}
+	let chatType: chatTypeEnumType = 'contact';
+	if (userIds.length > 2) {
+		chatType = 'group'
+	}
 	return db.transaction(async (tx) => {
 		const chatName = userIds.sort().join("-");
-		const newChat: { id: string }[] = [];
+		let chatId: string = '';
 
 		const existingChat = await tx.query.chatTable.findFirst({
 			where: eq(chatTable.name, chatName),
@@ -67,15 +71,23 @@ async function insertChatWithMembers(userIds: string[]) {
 		if (existingChat) {
 			throw new Error("Chat already exists");
 		}
+		else {
+			const result = await tx
+				.insert(chatTable)
+				.values({
+					name: chatName,
+					chatType: chatType
+				}).returning();
+			chatId = result[0].id;
+		}
 		const mappedUsers = userIds.map((id) => {
 			return {
-				chatId: newChat[0].id,
+				chatId: chatId,
 				userId: id,
 			};
 		});
-		//{chatId: newChat[0].id, userId: userA.id},
 		await tx.insert(chatMemberTable).values(mappedUsers);
-		return newChat[0];
+		return chatId;
 	});
 }
 
