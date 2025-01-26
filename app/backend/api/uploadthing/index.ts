@@ -1,4 +1,5 @@
 import { createId, cuidParamSchema } from "@application-project-ws24/cuid";
+import { eq } from "drizzle-orm";
 import { contextStorage, getContext } from "hono/context-storage";
 import {
 	type FileRouter as FR,
@@ -9,9 +10,12 @@ import {
 } from "uploadthing/server";
 import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
+import db from "#db";
 import { insertAttachment } from "#db/attachments";
+import { messageRecipientTable } from "#db/messages.sql";
 import { updateUserProfile } from "#db/users";
 import env from "#env";
+import { publish } from "#lib/utils";
 
 const routeBuilder = createUploadthing();
 
@@ -61,16 +65,39 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides, messageId: message.id };
 		})
-		.onUploadComplete(async ({ file, metadata: { messageId } }) => {
-			const uploadedAttachmentUrls = await insertAttachment
-				.execute({
-					url: file.url,
-					type: file.type,
-					messageId,
-				})
-				.then((result) => result.map((row) => row.url));
-			return { uploadedAttachmentUrls };
-		}),
+		.onUploadComplete(
+			async ({ file: { url, type }, metadata: { messageId } }) => {
+				const [attachment] = await insertAttachment
+					.execute({
+						url,
+						type,
+						messageId,
+					})
+					.catch((error) => {
+						console.error(error);
+						throw new UploadThingError({
+							code: "INTERNAL_SERVER_ERROR",
+							cause: "Database",
+							message: "Failed to insert attachment",
+						});
+					});
+
+				const recipientIds = await db.query.messageRecipientTable
+					.findMany({
+						columns: { recipientId: true },
+						where: eq(messageRecipientTable.messageId, messageId),
+					})
+					.then((rows) => rows.map((row) => row.recipientId));
+
+				for (const recipientId of recipientIds)
+					publish(recipientId, {
+						type: "message_attachment",
+						payload: attachment,
+					});
+
+				return attachment;
+			},
+		),
 } satisfies FR;
 
 const handlers = createRouteHandler({

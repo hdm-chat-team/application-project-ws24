@@ -17,8 +17,8 @@ const insertAttachment = db
 		type: sql.placeholder("type"),
 		messageId: sql.placeholder("messageId"),
 	})
-	.returning({ url: messageAttachmentTable.url })
-	.prepare("insert_attachment");
+	.returning()
+	.prepare("insert__message_attachment");
 
 const selectAttachmentsByMessageId = async (
 	messageId: string,

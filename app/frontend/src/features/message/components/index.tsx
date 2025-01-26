@@ -42,7 +42,7 @@ export function Message({
 				{/* Attachment rendering */}
 				{attachments?.map((attachment) => (
 					<div key={attachment.url} className="space-y-2">
-						{attachment.type === "image" && (
+						{attachment.type.startsWith("image") && (
 							<div className="relative max-h-[300px] max-w-[280px] overflow-hidden rounded-lg">
 								<img
 									src={attachment.url}
@@ -52,7 +52,7 @@ export function Message({
 								/>
 							</div>
 						)}
-						{attachment.type === "video" && (
+						{attachment.type.startsWith("video") && (
 							<div className="relative max-h-[300px] max-w-[280px] overflow-hidden rounded-lg">
 								<video
 									src={attachment.url}
@@ -64,7 +64,7 @@ export function Message({
 								</video>
 							</div>
 						)}
-						{attachment.type === "document" && (
+						{attachment.type.startsWith("application") && (
 							<a
 								href={attachment.url}
 								target="_blank"

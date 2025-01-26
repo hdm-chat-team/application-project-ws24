@@ -3,7 +3,6 @@ import { Input } from "@/components/ui/input";
 import { Paperclip, SendHorizontal } from "lucide-react";
 
 import { useUser } from "@/features/auth/hooks";
-import { useUploadThing } from "@/features/uploadthing/hooks";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { usePostMessage } from "../hooks";
@@ -17,21 +16,18 @@ const messageFormSchema = z.object({
 export function MessageForm({ chatId }: { chatId: string }) {
 	const { user } = useUser();
 
-	const { mutate: postMessage } = usePostMessage(chatId);
-	const { startUpload } = useUploadThing(
-		(routeRegistry) => routeRegistry.attachment,
-	);
+	const { mutateAsync: postMessage } = usePostMessage(chatId);
 
 	const form = useForm({
 		defaultValues: {
 			body: "", // ? persist draft in local-storage/indexedDB ?
 			files: null,
 		},
-		onSubmit: ({ value }) => {
+		onSubmit: async ({ value }) => {
 			const message = createMessage(chatId, user.id, value.body);
 
-			postMessage(message);
-			if (value.files) startUpload(Array.from(value.files), { id: message.id });
+			await postMessage({ message, files: Array.from(value.files ?? []) });
+
 			form.reset();
 		},
 		validators: {
@@ -60,9 +56,11 @@ export function MessageForm({ chatId }: { chatId: string }) {
 									name={field.name}
 									className="hidden"
 									type="file"
-									multiple
 									accept="image/*,video/*,audio/*,.pdf"
-									onChange={(event) => field.handleChange(event.target.files)}
+									onChange={(event) => {
+										field.handleChange(event.target.files);
+										console.log({ files: event.target.files });
+									}}
 								/>
 							</label>
 						</Button>

@@ -149,20 +149,20 @@ async function pruneMessages(trx: Transaction | DB = db) {
 }
 
 export {
+	countRecipientsByMessageState,
 	// * Message queries
 	deleteMessage,
-	// * Message functions
-	selectMessagesToSync,
-	selectMessageRecipientIdsByMessageId,
-	insertMessageRecipients,
-	countRecipientsByMessageState,
-	updateMessageRecipientsStates,
-	updateMessageStatus,
 	insertMessage,
-	pruneMessages,
+	insertMessageRecipients,
 	// * Message schemas
 	insertMessageSchema,
+	pruneMessages,
+	selectMessageRecipientIdsByMessageId,
 	selectMessageSchema,
+	// * Message functions
+	selectMessagesToSync,
+	updateMessageRecipientsStates,
 	updateMessageSchema,
+	updateMessageStatus,
 };
 export type { Message };
