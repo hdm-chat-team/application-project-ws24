@@ -1,7 +1,7 @@
 import { useUploadThing } from "@/features/uploadthing/hooks";
-import api from "@/lib/api";
+import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
-import db from "@/lib/db";
+import { db } from "@/lib/db";
 import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
@@ -24,7 +24,14 @@ export function usePostMessage(chatId: string) {
 
 			if (files.length === 0) return;
 
-			const processedFiles = await Promise.all(files.map(compressToAvif));
+			const processedFiles = await Promise.all(
+				files.map(async (file) => {
+					if (!file.type.startsWith("image/")) return file;
+					const compressed = await compressToAvif(file);
+					return compressed.size < file.size ? compressed : file;
+				}),
+			);
+
 			await startUpload(processedFiles, { id: messageId });
 		},
 		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
