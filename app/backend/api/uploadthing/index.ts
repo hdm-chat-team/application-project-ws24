@@ -109,7 +109,7 @@ const handlers = createRouteHandler({
 
 export const uploadthingRouter = createRouter()
 	.use(contextStorage())
-	.all("/", (c) => handlers(c.req.raw));
+	.mount("/", (request) => handlers(request));
 
 export type FileRouter = typeof uploadRouter;
 
