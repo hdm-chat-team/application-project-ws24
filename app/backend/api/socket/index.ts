@@ -56,10 +56,11 @@ export const socketRouter = createRouter().get(
 								trx,
 							);
 
-							const recipientIds = await selectMessageRecipientIdsByMessageId(
-								messageId,
-								trx,
-							);
+							const recipientIds = await selectMessageRecipientIdsByMessageId
+								.execute({
+									messageId,
+								})
+								.then((rows) => rows.map(({ recipientId }) => recipientId));
 
 							const deliveredCount = await countRecipientsByMessageState(
 								messageId,
@@ -90,10 +91,11 @@ export const socketRouter = createRouter().get(
 								trx,
 							);
 
-							const recipientIds = await selectMessageRecipientIdsByMessageId(
-								messageId,
-								trx,
-							);
+							const recipientIds = await selectMessageRecipientIdsByMessageId
+								.execute({
+									messageId,
+								})
+								.then((rows) => rows.map(({ recipientId }) => recipientId));
 
 							const readCount = await countRecipientsByMessageState(
 								messageId,

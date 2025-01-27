@@ -1,5 +1,4 @@
 import { createId, cuidParamSchema } from "@application-project-ws24/cuid";
-import { eq } from "drizzle-orm";
 import { contextStorage, getContext } from "hono/context-storage";
 import {
 	type FileRouter as FR,
@@ -10,9 +9,8 @@ import {
 } from "uploadthing/server";
 import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
-import db from "#db";
 import { insertAttachment } from "#db/attachments";
-import { messageRecipientTable } from "#db/messages.sql";
+import { selectMessageRecipientIdsByMessageId } from "#db/messages";
 import { updateUserProfile } from "#db/users";
 import env from "#env";
 import { publish } from "#lib/utils";
@@ -43,7 +41,7 @@ export const uploadRouter = {
 				throw new UploadThingError({
 					code: "INTERNAL_SERVER_ERROR",
 					cause: "Database",
-					message: "Failed to update user profile",
+					message: "Failed to update user avatar",
 				});
 
 			return { avatarUrl };
@@ -73,21 +71,16 @@ export const uploadRouter = {
 						type,
 						messageId,
 					})
-					.catch((error) => {
-						console.error(error);
-						throw new UploadThingError({
-							code: "INTERNAL_SERVER_ERROR",
-							cause: "Database",
-							message: "Failed to insert attachment",
-						});
+					.catch(() => {
+						throw uploadthingDBError("Failed to insert attachment");
 					});
 
-				const recipientIds = await db.query.messageRecipientTable
-					.findMany({
-						columns: { recipientId: true },
-						where: eq(messageRecipientTable.messageId, messageId),
+				const recipientIds = await selectMessageRecipientIdsByMessageId
+					.execute({ messageId })
+					.catch(() => {
+						throw uploadthingDBError("Failed to select recipient IDs");
 					})
-					.then((rows) => rows.map((row) => row.recipientId));
+					.then((rows) => rows.map(({ recipientId }) => recipientId));
 
 				for (const recipientId of recipientIds)
 					publish(recipientId, {
@@ -113,7 +106,7 @@ export const uploadthingRouter = createRouter()
 
 export type FileRouter = typeof uploadRouter;
 
-// * Authentication helper
+// * utils
 function uploadRouterAuth() {
 	const { user, profile, session } = getContext<Env>().var;
 	if (!(user && profile && session))
@@ -123,3 +116,10 @@ function uploadRouterAuth() {
 		});
 	return { user, profile, session };
 }
+
+const uploadthingDBError = (message: string) =>
+	new UploadThingError({
+		code: "INTERNAL_SERVER_ERROR",
+		cause: "Database",
+		message,
+	});
