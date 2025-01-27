@@ -14,7 +14,7 @@ import { protectedRoute } from "#lib/middleware";
 
 const utApi = new UTApi();
 
-export const profileRouter = createRouter()
+export const userRouter = createRouter()
 	.put(
 		"/profile",
 		protectedRoute,
