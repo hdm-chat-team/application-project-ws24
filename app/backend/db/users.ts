@@ -84,10 +84,10 @@ async function insertUserWithProfile(
 	});
 }
 
-const selectUserProfile = db.query.userProfileTable
+const selectUserDataByUsername = db.query.userTable
 	.findFirst({
-		with: { owner: true },
-		where: eq(userProfileTable.userId, sql.placeholder("id")),
+		with: { profile: true },
+		where: eq(userTable.username, sql.placeholder("username")),
 	})
 	.prepare("select_user_profile");
 
@@ -129,7 +129,7 @@ export {
 	deleteUserProfileImageSchema,
 	// * User queries
 	selectUserWithProfile,
-	selectUserProfile,
+	selectUserDataByUsername,
 	selectUserChats,
 	insertUserProfileSchema,
 	// * User functions
