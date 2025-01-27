@@ -49,12 +49,17 @@ export const userRouter = createRouter()
 			const { username } = c.req.valid("param");
 
 			// ? Are there any fields we should NOT be returning?
-			const userData = await selectUserDataByUsername.execute({ username });
+			const result = await selectUserDataByUsername.execute({
+				username,
+			});
 
-			if (!userData?.profile)
+			if (!result) throw new HTTPException(404, { message: "user not found" });
+
+			const { profile, ...user } = result;
+			if (!profile)
 				throw new HTTPException(404, { message: "profile not found" });
 
-			return c.json({ data: userData });
+			return c.json({ data: { user, profile } });
 		},
 	)
 	.delete(

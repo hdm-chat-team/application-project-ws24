@@ -91,14 +91,6 @@ const selectUserDataByUsername = db.query.userTable
 	})
 	.prepare("select_user_profile");
 
-const selectUserWithProfile = db.query.userTable
-	.findFirst({
-		columns: { githubId: false },
-		with: { profile: true },
-		where: eq(userTable.id, sql.placeholder("id")),
-	})
-	.prepare("select_user_with_profile");
-
 const updateUserProfile = db
 	.update(userProfileTable)
 	.set({
@@ -128,7 +120,6 @@ export {
 	userWithProfileSchema,
 	deleteUserProfileImageSchema,
 	// * User queries
-	selectUserWithProfile,
 	selectUserDataByUsername,
 	selectUserChats,
 	insertUserProfileSchema,
