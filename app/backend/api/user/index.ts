@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import { UTApi } from "uploadthing/server";
 import { createRouter } from "#api/factory";
+import { utapi } from "#api/uploadthing/index";
 import {
 	deleteUserProfileImageSchema,
 	selectUserChats,
@@ -11,8 +11,6 @@ import {
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
-
-const utApi = new UTApi();
 
 export const userRouter = createRouter()
 	.put(
@@ -73,7 +71,7 @@ export const userRouter = createRouter()
 					message: "Invalid avatar URL",
 				});
 
-			await utApi.deleteFiles([fileKey]).catch(() => {
+			await utapi.deleteFiles([fileKey]).catch(() => {
 				throw new HTTPException(500, {
 					message: "Failed to delete avatar",
 				});

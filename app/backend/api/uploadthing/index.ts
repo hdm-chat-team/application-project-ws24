@@ -2,6 +2,7 @@ import { createId, cuidParamSchema } from "@application-project-ws24/cuid";
 import { contextStorage, getContext } from "hono/context-storage";
 import {
 	type FileRouter as FR,
+	UTApi,
 	UTFiles,
 	UploadThingError,
 	createRouteHandler,
@@ -87,6 +88,7 @@ export const uploadRouter = {
 			},
 		),
 } satisfies FR;
+export type FileRouter = typeof uploadRouter;
 
 const handlers = createRouteHandler({
 	router: uploadRouter,
@@ -99,7 +101,9 @@ export const uploadthingRouter = createRouter()
 	.use(contextStorage())
 	.mount("/", (request) => handlers(request));
 
-export type FileRouter = typeof uploadRouter;
+export const utapi = new UTApi({
+	token: env.UPLOADTHING_TOKEN,
+});
 
 // * utils
 function uploadRouterAuth() {
