@@ -20,7 +20,6 @@ export function Chat() {
 				chatId={chat.id}
 				className="m-3 flex-1 overflow-auto"
 			/>
-
 			<div className="relative border-t bg-background p-4">
 				<MessageForm chatId={chat.id} />
 			</div>

@@ -35,7 +35,7 @@ export function Message({
 					{variant === "sent" && (
 						<span className="text-xs">
 							{state === "read" ? (
-								<CheckCheck className="size-4" color="blue" />
+								<CheckCheck className="size-4 text-black dark:text-white" />
 							) : state === "delivered" ? (
 								<CheckCheck className="size-4" />
 							) : state === "sent" ? (
