@@ -20,7 +20,7 @@ export const Route = createFileRoute("/_app")({
 				<ChatProvider>
 					<Sidebar>
 						{/* Sidebar content defined by routes */}
-									<Outlet />
+						<Outlet />
 					</Sidebar>
 					<SidebarInset className="flex flex-col">
 						<ChatHeader />
