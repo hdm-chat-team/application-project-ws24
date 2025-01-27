@@ -37,12 +37,7 @@ export const uploadRouter = {
 				...profile,
 				avatarUrl: url,
 			});
-			if (!avatarUrl)
-				throw new UploadThingError({
-					code: "INTERNAL_SERVER_ERROR",
-					cause: "Database",
-					message: "Failed to update user avatar",
-				});
+			if (!avatarUrl) throw uploadthingDBError("Failed to update avatar");
 
 			return { avatarUrl };
 		}),
@@ -52,16 +47,16 @@ export const uploadRouter = {
 		pdf: { maxFileSize: "4MB", maxFileCount: 1 },
 	})
 		.input(cuidParamSchema)
-		.middleware(async ({ files, input: message }) => {
+		.middleware(async ({ files, input: { id: messageId } }) => {
 			uploadRouterAuth();
 
 			const fileOverrides = files.map((file) => ({
 				...file,
-				name: `${message.id}:attachment`,
+				name: `${messageId}:attachment`,
 				customId: createId(),
 			}));
 
-			return { [UTFiles]: fileOverrides, messageId: message.id };
+			return { [UTFiles]: fileOverrides, messageId };
 		})
 		.onUploadComplete(
 			async ({ file: { url, type }, metadata: { messageId } }) => {
