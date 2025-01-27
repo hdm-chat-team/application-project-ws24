@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => ({
 		VitePWA({
 			workbox: {
 				navigateFallbackDenylist: [/^\/api/],
+				maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // ? 3MB
 			},
 			registerType: "autoUpdate",
 			devOptions: {
@@ -59,13 +60,8 @@ export default defineConfig(({ mode }) => ({
 			},
 		}),
 	],
-	server: {
-		proxy: {
-			"/api": {
-				target: "http://localhost:3000",
-				changeOrigin: true,
-			},
-		},
+	optimizeDeps: {
+		exclude: ["@jsquash/avif"],
 	},
 	resolve: {
 		alias: {
@@ -74,9 +70,6 @@ export default defineConfig(({ mode }) => ({
 			"@server": `${__dirname}/../backend/`,
 			"@shared": `${__dirname}/../shared/`,
 		},
-	},
-	optimizeDeps: {
-		exclude: ["@jsquash/avif"],
 	},
 	build: {
 		outDir: "../dist/client",
@@ -93,4 +86,13 @@ export default defineConfig(({ mode }) => ({
 	esbuild: {
 		drop: mode === "production" ? ["console", "debugger"] : [],
 	},
+	server: {
+		proxy: {
+			"/api": {
+				target: "http://localhost:3000",
+				changeOrigin: true,
+			},
+		},
+	},
+	worker: { format: "es" },
 }));
