@@ -25,8 +25,7 @@ export default defineConfig({
 				name: "StudyConnect",
 				short_name: "SC",
 				description: "The best way to connect at HdM",
-				// TODO: Set App Color
-				theme_color: "#ffffff",
+				theme_color: "#B6001F",
 				icons: [
 					{
 						src: "pwa-64x64.png",
