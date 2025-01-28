@@ -16,18 +16,18 @@ const messageFormSchema = z.object({
 export function MessageForm({ chatId }: { chatId: string }) {
 	const { user } = useUser();
 
-	const { mutateAsync: postMessage } = usePostMessage(chatId);
+	const postMessage = usePostMessage(chatId).mutate;
 
 	const form = useForm({
 		defaultValues: {
 			body: "", // ? persist draft in local-storage/indexedDB ?
 			files: null,
 		},
-		onSubmit: async ({ value }) => {
-			const message = createMessage(chatId, user.id, value.body);
-
-			await postMessage({ message, files: Array.from(value.files ?? []) });
-
+		onSubmit: ({ value }) => {
+			postMessage({
+				message: createMessage(chatId, user.id, value.body),
+				files: Array.from(value.files ?? []),
+			});
 			form.reset();
 		},
 		validators: {
@@ -50,7 +50,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 					{(field) => (
 						<Button variant="secondary" size="icon" asChild>
 							<label htmlFor={field.name}>
-								<Paperclip className="size-5" />
+								<Paperclip size="5" />
 								<input
 									id={field.name}
 									name={field.name}
@@ -83,7 +83,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 				>
 					{([canSubmit, isSubmitting]) => (
 						<Button disabled={!canSubmit} type="submit" size="icon">
-							{isSubmitting ? "..." : <SendHorizontal className="h-5 w-5" />}
+							{isSubmitting ? "..." : <SendHorizontal size="5" />}
 						</Button>
 					)}
 				</form.Subscribe>
