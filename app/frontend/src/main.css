@@ -32,6 +32,8 @@
 		--sidebar-accent-foreground: 0 0% 0%;
 		--sidebar-border: 350, 20%, 78%;
 		--sidebar-ring: 340, 98%, 45%;
+
+		--header-height: 4rem; /* 64px */
 	}
 
 	.dark {
