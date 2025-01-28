@@ -1,24 +1,18 @@
-import { cuidParamSchema } from "@application-project-ws24/cuid";
-import { zValidator } from "@hono/zod-validator";
-import { HTTPException } from "hono/http-exception";
-import { createRouter } from "#api/factory";
-import {
-	addContact,
-	removeContact,
-	selectContactById,
-	selectUserContacts,
-} from "#db/contact";
-import { protectedRoute } from "#lib/middleware";
+import {cuidParamSchema} from "@application-project-ws24/cuid";
+import {zValidator} from "@hono/zod-validator";
+import {HTTPException} from "hono/http-exception";
+import {createRouter} from "#api/factory";
+import {addContact, removeContact, selectContactById, selectUserContacts,} from "#db/contact";
+import {protectedRoute} from "#lib/middleware";
+import {z} from "zod";
+import {selectUserByEmail} from "#db/users";
 
+const contactFormSchema = z.object({email: z.string().email()})
 export const contactRouter = createRouter()
 	.get("/", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
 		const contacts = await selectUserContacts(id);
-
-		if (!contacts || contacts.length === 0) {
-			throw new HTTPException(404, { message: "no contacts found" });
-		}
 
 		return c.json({ data: contacts });
 	})
@@ -41,15 +35,19 @@ export const contactRouter = createRouter()
 		},
 	)
 
-	.post("/", protectedRoute, async (c) => {
+	.post("/",
+		protectedRoute,
+		zValidator("form", contactFormSchema),
+		async (c) => {
 		const { id } = c.get("user");
-		const { contactId } = await c.req.json();
+		const { email } = c.req.valid("form");
 
-		if (!contactId) {
-			throw new HTTPException(400, { message: "contact id missing" });
-		}
 
-		const newContact = await addContact(id, contactId).catch((error) => {
+		const contact = await selectUserByEmail.execute({email})
+			if (!contact) {
+				throw new HTTPException(404, { message: `User with email ${email} not found` });
+			}
+		const newContact = await addContact(id, contact.id).catch((error) => {
 			throw new HTTPException(400, { message: error.message });
 		});
 

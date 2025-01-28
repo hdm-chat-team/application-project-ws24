@@ -1,15 +1,11 @@
-import { eq, sql } from "drizzle-orm";
-import {
-	createInsertSchema,
-	createSelectSchema,
-	createUpdateSchema,
-} from "drizzle-zod";
-import { z } from "zod";
-import type { GitHubUser } from "#auth/oauth";
+import {eq, sql} from "drizzle-orm";
+import {createInsertSchema, createSelectSchema, createUpdateSchema,} from "drizzle-zod";
+import {z} from "zod";
+import type {GitHubUser} from "#auth/oauth";
 import db from "#db";
-import { chatMemberTable } from "./chats.sql";
-import type { DB, Transaction } from "./types";
-import { contactsTable, userProfileTable, userTable } from "./users.sql";
+import {chatMemberTable} from "./chats.sql";
+import type {DB, Transaction} from "./types";
+import {contactsTable, userProfileTable, userTable} from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable);
 const selectUserSchema = createSelectSchema(userTable).omit({
@@ -110,6 +106,12 @@ const selectUser = db.query.userTable
 	})
 	.prepare("select_user");
 
+const selectUserByEmail = db.query.userTable
+	.findFirst({
+		where: eq(userTable.email, sql.placeholder("email")),
+	})
+	.prepare("select_user");
+
 const selectUserContacts = async (userId: string) => {
 	return db
 		.select({
@@ -172,6 +174,7 @@ export {
 	selectUserWithProfile,
 	selectUserProfile,
 	selectUser,
+	selectUserByEmail,
 	insertUser,
 	selectUserChats,
 	insertUserProfileSchema,

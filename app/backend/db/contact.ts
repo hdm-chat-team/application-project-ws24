@@ -2,15 +2,16 @@ import {and, eq} from "drizzle-orm";
 import {db} from "#db";
 import {userProfileTable} from "#db/users.sql";
 import {contactsTable, userTable} from "./users.ts";
-import {createSelectSchema} from "drizzle-zod";
-import type {z} from "zod";
+import {z} from "zod";
 
-const selectContactsSchema = createSelectSchema(contactsTable);
-export type Contacts = z.infer<typeof selectContactsSchema>;
-
+const userContactType = z.object({
+	id: z.string(), contactId: z.string(), avatarUrl: z.string().nullable(), displayName: z.string().nullable()
+})
+export type UserContact = z.infer<typeof userContactType>
 const selectUserContacts = async (userId: string) => {
 	return db
 		.select({
+			id: contactsTable.id,
 			avatarUrl: userProfileTable.avatarUrl,
 			displayName: userProfileTable.displayName,
 			contactId: contactsTable.contactId

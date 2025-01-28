@@ -4,8 +4,9 @@ import api from "@/lib/api.ts";
 
 export function usePostChatMutation() {
     const { user } = useUser();
+    const mutationKey = [api.chat.$url().pathname];
     return useMutation({
-        mutationKey: [api.chat.$url().pathname],
+        mutationKey,
         mutationFn: async (userIds: string[]) => {
             if (!user) return;
 
@@ -16,8 +17,10 @@ export function usePostChatMutation() {
             });
             if (!result.ok) {
                 throw new Error("Failed to create chat");
+            } else {
+                return result.json();
             }
         },
-    });
+    })
 }
 

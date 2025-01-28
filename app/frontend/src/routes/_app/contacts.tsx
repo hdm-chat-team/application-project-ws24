@@ -1,4 +1,4 @@
-import {createFileRoute} from '@tanstack/react-router'
+import {createFileRoute, useNavigate} from '@tanstack/react-router'
 import {SidebarContent, SidebarHeader, SidebarSeparator} from "@/components/ui/sidebar.tsx";
 import {syncContactsQueryOptions} from "@/features/contacts/queries.ts";
 import {useForm} from "@tanstack/react-form";
@@ -8,13 +8,14 @@ import {usePostChatMutation} from "@/features/chat/hooks/mutations/use-post-chat
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar.tsx";
+import {CreateContact} from "@/features/contacts/components/create-contact.tsx";
+import {useChat} from "@/features/chat/context";
 
 export const Route = createFileRoute('/_app/contacts')({
     loader: async ({ context: { queryClient } }) => {
-        const contacts = await queryClient.ensureQueryData(
+        return await queryClient.ensureQueryData(
             syncContactsQueryOptions,
         );
-        return contacts;
     },
   component: RouteComponent,
 })
@@ -25,12 +26,18 @@ const chatFormSchema = z.object({userIds: z.string().array()})
 
 function RouteComponent() {
     const contacts =Route.useLoaderData() || [];
-    const postChat = usePostChatMutation().mutate;
+    const {mutate} = usePostChatMutation();
+    const {setChatId} = useChat();
+    const navigate = useNavigate();
 
     const form = useForm({
         onSubmit: ({value}) => {
-            console.log(value);
-            postChat(value.userIds);
+             mutate(value.userIds, {onSuccess: (data) => {
+                     if(data){
+                         setChatId(data);
+                         void navigate({to: '/'})
+                     }
+                 }});
             form.reset();
         },
         defaultValues: {
@@ -46,6 +53,7 @@ function RouteComponent() {
           <SidebarHeader>Kontakte</SidebarHeader>
           <SidebarSeparator className="my-2" />
           <SidebarContent>
+              <CreateContact></CreateContact>
                 <form
                     onSubmit={async (e) => {
                         e.preventDefault()

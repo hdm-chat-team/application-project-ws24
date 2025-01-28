@@ -52,9 +52,12 @@ async function selectChatWithMembersByUserId(
 		with: { members: { columns: { userId: true } } },
 	});
 }
+export enum InsertChatErrors{
+	MUST_HAVE_TWO="A chat must have at least two members."
+}
 async function insertChatWithMembers(userIds: string[]) {
 	if (userIds.length < 2) {
-		throw new Error("A chat must have at least two members.");
+		throw new Error(InsertChatErrors.MUST_HAVE_TWO);
 	}
 	let chatType: chatTypeEnumType = 'contact';
 	if (userIds.length > 2) {
@@ -69,9 +72,8 @@ async function insertChatWithMembers(userIds: string[]) {
 		});
 
 		if (existingChat) {
-			throw new Error("Chat already exists");
-		}
-		else {
+			return existingChat.id
+		} else {
 			const result = await tx
 				.insert(chatTable)
 				.values({
