@@ -1,11 +1,11 @@
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/features/auth/hooks";
 import { Message, MessageForm } from "@/features/message/components";
 import { messagesByChatIdQueryFn } from "@/features/message/queries";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useChat } from "../context";
-
-export * from "./header";
+import { ChatHeader } from "./header";
 
 export function Chat() {
 	const { chat } = useChat();
@@ -15,13 +15,11 @@ export function Chat() {
 			Open a chat to start messaging
 		</div>
 	) : (
-		<div className="relative flex size-full flex-col justify-end">
-			<MessagesScrollArea
-				chatId={chat.id}
-				className="m-3 flex-1 overflow-auto"
-			/>
-
-			<div className="relative border-t bg-background p-4">
+		<div className="grid size-full grid-rows-[var(--header-height)_1fr_auto]">
+			<ChatHeader />
+			<Separator />
+			<MessagesScrollArea chatId={chat.id} className="m-3 overflow-auto" />
+			<div className="border-t bg-background p-4">
 				<MessageForm chatId={chat.id} />
 			</div>
 		</div>

@@ -96,9 +96,9 @@ export function Message({
 				{/* Status Icons */}
 				<div className="mt-1 flex items-center justify-end gap-1">
 					{variant === "sent" && (
-						<span className="text-xs">
+						<span className="text-xs drop-shadow">
 							{state === "read" ? (
-								<CheckCheck className="size-4" color="blue" />
+								<CheckCheck className="size-4 text-sky-500 dark:text-sky-300" />
 							) : state === "delivered" ? (
 								<CheckCheck className="size-4" />
 							) : state === "sent" ? (
