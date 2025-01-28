@@ -16,20 +16,16 @@ export function ChatHeader() {
 	*/
 
 	return (
-		chat && (
-			<header className="sticky top-0 flex h-[var(--header-height)] items-center gap-4 bg-background px-4">
-				<SidebarTrigger className="-ml-1" />
-				<div className="flex items-center gap-5">
+		<header className="sticky top-0 flex h-[var(--header-height)] items-center gap-4 bg-background px-4">
+			<SidebarTrigger className="-ml-1" />
+			{chat && (
+				<div className="flex w-full items-center gap-5">
 					<Avatar>
 						<AvatarImage src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmStm5d-komRukWTSOYWnVAhDo5i2PbrBhIA&s" />
 					</Avatar>
-					<div>
-						<p className="font-medium text-sm">{chat.name}</p>
-					</div>
-				</div>
-				<div className="ml-auto flex items-center gap-2">
+					<p className="font-medium text-sm">{chat.name}</p>
 					{isSearchOpen ? (
-						<div className="flex items-center gap-2">
+						<div className="ml-auto flex items-center gap-2">
 							<Input
 								placeholder="Search Chat..."
 								className="w-64 scale-100 transform transition-all duration-300 ease-in-out"
@@ -42,13 +38,13 @@ export function ChatHeader() {
 						</div>
 					) : (
 						<Search
-							className="scale-100 transform cursor-pointer transition-all duration-300 ease-in-out"
+							className="ml-auto scale-100 transform cursor-pointer transition-all duration-300 ease-in-out"
 							size="1.1rem"
 							onClick={() => setIsSearchOpen((prev) => !prev)}
 						/>
 					)}
 				</div>
-			</header>
-		)
+			)}
+		</header>
 	);
 }
