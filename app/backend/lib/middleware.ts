@@ -31,7 +31,6 @@ const origin = DEV
  */
 const authMiddleware = createMiddleware<Env>(async (c, next) => {
 	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
-	console.log(sessionCookieToken);
 	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
