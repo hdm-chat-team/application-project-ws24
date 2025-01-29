@@ -1,18 +1,18 @@
 import { useUser } from "@/features/auth/hooks";
 import { useMessageState } from "@/features/message/hooks";
+import type { LocalMessage } from "@/features/message/utils";
 import { cn } from "@/lib/utils";
-import type { Message as MessageType } from "@server/db/messages";
 import { MessageAttachments } from "./message-attachment";
 import { MessageStateIcon } from "./message-state-icon";
 
 export * from "./message-form";
 
 type MessageBubbleProps = {
-	value: MessageType;
+	value: LocalMessage;
 };
 
 export function Message({
-	value: { id, body, authorId, state },
+	value: { id, body, authorId, state, receivedAt },
 }: MessageBubbleProps) {
 	const ref = useMessageState({ id, authorId });
 	const { user } = useUser();
@@ -31,7 +31,10 @@ export function Message({
 			>
 				<MessageAttachments messageId={id} />
 				<p className="mt-2 break-words text-sm">{body}</p>
-				{isSent && <MessageStateIcon state={state} />}
+				<div className="mt-1 flex items-center justify-end gap-1">
+					<span className="text-muted-foreground text-xs">{receivedAt}</span>
+					{isSent && <MessageStateIcon state={state} />}
+				</div>
 			</article>
 		</div>
 	);
