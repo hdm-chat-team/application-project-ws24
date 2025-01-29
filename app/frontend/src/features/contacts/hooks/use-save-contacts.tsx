@@ -1,5 +1,5 @@
-import { db } from "@/lib/db.ts";
-import type { UserContact } from "@server/db/contact.ts";
+import { db } from "@/lib/db";
+import type { Contact } from "@server/db/contacts";
 import { useMutation } from "@tanstack/react-query";
 
 export function useSaveContacts() {

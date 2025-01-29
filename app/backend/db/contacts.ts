@@ -3,7 +3,7 @@ import { and, eq, sql } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import type { z } from "zod";
 import { db } from "#db";
-import { contactsTable } from "./users.ts";
+import { contactsTable } from "./users";
 
 const insertContactSchema = createInsertSchema(contactsTable, {
 	userId: cuidSchema,

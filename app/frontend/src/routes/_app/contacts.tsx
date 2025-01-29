@@ -2,19 +2,19 @@ import {
 	Avatar,
 	AvatarFallback,
 	AvatarImage,
-} from "@/components/ui/avatar.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { Checkbox } from "@/components/ui/checkbox.tsx";
-import { Label } from "@/components/ui/label.tsx";
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
 	SidebarContent,
 	SidebarHeader,
 	SidebarSeparator,
-} from "@/components/ui/sidebar.tsx";
+} from "@/components/ui/sidebar";
 import { useChat } from "@/features/chat/context";
-import { usePostChatMutation } from "@/features/chat/hooks/mutations/use-post-chat.tsx";
-import { CreateContact } from "@/features/contacts/components/create-contact.tsx";
-import { syncContactsQueryOptions } from "@/features/contacts/queries.ts";
+import { usePostDirectChat } from "@/features/chat/hooks/mutations/use-post-chat";
+import { CreateContact } from "@/features/contacts/components/create-contact";
+import { syncContactsQueryOptions } from "@/features/contacts/queries";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";

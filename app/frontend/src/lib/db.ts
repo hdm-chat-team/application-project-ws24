@@ -1,6 +1,6 @@
 import type { Attachment } from "@server/db/attachments";
 import type { Chat } from "@server/db/chats";
-import type { UserContact } from "@server/db/contact.ts";
+import type { Contact } from "@server/db/contacts";
 import type { Message } from "@server/db/messages";
 import type { EntityTable } from "dexie";
 import Dexie from "dexie";

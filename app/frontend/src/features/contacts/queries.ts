@@ -1,5 +1,5 @@
-import api from "@/lib/api.ts";
-import { db } from "@/lib/db.ts";
+import api from "@/lib/api";
+import { db } from "@/lib/db";
 import { queryOptions } from "@tanstack/react-query";
 
 export const contactsByUserId = (userId: string) =>

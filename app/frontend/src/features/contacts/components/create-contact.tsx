@@ -1,6 +1,6 @@
-import { Button } from "@/components/ui/button.tsx";
-import { Input } from "@/components/ui/input.tsx";
-import { usePostContactMutation } from "@/features/contacts/hooks/mutations/use-post-contact.tsx";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { usePostContactMutation } from "@/features/contacts/hooks/mutations/use-post-contact";
 import { useForm } from "@tanstack/react-form";
 import { UserPlus } from "lucide-react";
 import { z } from "zod";
