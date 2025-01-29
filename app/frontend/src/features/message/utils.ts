@@ -7,11 +7,22 @@ export interface LocalMessage extends Message {
 	receivedAt: string;
 }
 
+export function formatBerlinTime() {
+	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
+		"de-DE",
+		{
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		},
+	);
+}
+
 export function createMessage(
 	chatId: string,
 	authorId: string,
 	body: string,
-): Message {
+): LocalMessage {
 	return {
 		id: createId(),
 		createdAt: new Date().toISOString(),
@@ -20,6 +31,6 @@ export function createMessage(
 		body,
 		authorId,
 		chatId,
-		receivedAt: Temporal.Now.zonedDateTimeISO("Europe/Berlin").toString(),
-	} as LocalMessage;
+		receivedAt: formatBerlinTime(),
+	};
 }
