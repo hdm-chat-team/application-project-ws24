@@ -87,17 +87,12 @@ async function insertMessageRecipients(
 		.then((rows) => rows.map((row) => row.recipientIds));
 }
 
-async function selectMessageRecipientIdsByMessageId(
-	messageId: string,
-	trx: Transaction | DB = db,
-) {
-	return await trx.query.messageRecipientTable
-		.findMany({
-			columns: { recipientId: true },
-			where: eq(messageRecipientTable.messageId, messageId),
-		})
-		.then((rows) => rows.map((row) => row.recipientId));
-}
+const selectMessageRecipientIdsByMessageId = db.query.messageRecipientTable
+	.findMany({
+		columns: { recipientId: true },
+		where: eq(messageRecipientTable.messageId, sql.placeholder("messageId")),
+	})
+	.prepare("select_message_recipient_ids_by_message_id");
 
 async function countRecipientsByMessageState(
 	messageId: string,
@@ -149,20 +144,20 @@ async function pruneMessages(trx: Transaction | DB = db) {
 }
 
 export {
+	countRecipientsByMessageState,
 	// * Message queries
 	deleteMessage,
-	// * Message functions
-	selectMessagesToSync,
-	selectMessageRecipientIdsByMessageId,
-	insertMessageRecipients,
-	countRecipientsByMessageState,
-	updateMessageRecipientsStates,
-	updateMessageStatus,
 	insertMessage,
-	pruneMessages,
+	insertMessageRecipients,
 	// * Message schemas
 	insertMessageSchema,
+	pruneMessages,
+	selectMessageRecipientIdsByMessageId,
 	selectMessageSchema,
+	// * Message functions
+	selectMessagesToSync,
+	updateMessageRecipientsStates,
 	updateMessageSchema,
+	updateMessageStatus,
 };
 export type { Message };

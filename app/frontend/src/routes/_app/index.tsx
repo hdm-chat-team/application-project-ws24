@@ -8,11 +8,11 @@ import {
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-import {useChat} from "@/features/chat/context";
-import {chatsQueryFn} from "@/features/chat/queries";
-import {createFileRoute, useNavigate} from "@tanstack/react-router";
-import {useLiveQuery} from "dexie-react-hooks";
-import {MessageSquarePlusIcon} from "lucide-react";
+import { useChat } from "@/features/chat/context";
+import { chatsQueryFn } from "@/features/chat/queries";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useLiveQuery } from "dexie-react-hooks";
+import { MessageSquarePlusIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/")({
 	component: () => <ChatListSidebar />,
@@ -23,8 +23,8 @@ function ChatListSidebar() {
 	const { chat: currentChat, setChatId } = useChat();
 	const navigate = useNavigate();
 	const navigateToContacts = () => {
-		void navigate({to: '/contacts'})
-	}
+		void navigate({ to: "/contacts" });
+	};
 
 	/* 
 	 TODO: create proper chat list item component with avatar, name, last message, etc.
@@ -35,8 +35,8 @@ function ChatListSidebar() {
 	*/
 	return (
 		<>
-			<SidebarHeader className="flex-row">Chats <MessageSquarePlusIcon onClick={navigateToContacts} className="self-end ml-auto"/></SidebarHeader>
-			<SidebarSeparator />
+			<SidebarHeader className="flex justify-center">Chats</SidebarHeader>
+			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>

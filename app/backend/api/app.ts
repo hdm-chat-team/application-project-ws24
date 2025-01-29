@@ -5,7 +5,7 @@ import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
 import { socketRouter } from "./socket";
 import { uploadthingRouter } from "./uploadthing";
-import { profileRouter } from "./user";
+import { userRouter } from "./user";
 
 // * API
 const apiRouter = createApi();
@@ -15,7 +15,7 @@ const apiRoutes = apiRouter
 	.route("/auth", authRouter)
 	.route("/socket", socketRouter)
 	.route("/chat", chatRouter)
-	.route("/user", profileRouter)
+	.route("/user", userRouter)
 	.route("/contact", contactRouter)
 	.route("/uploadthing", uploadthingRouter)
 	.get("/", (c) => {

@@ -1,9 +1,9 @@
-import {relations} from "drizzle-orm";
-import {index, pgTable, primaryKey, varchar} from "drizzle-orm/pg-core";
-import {sessionTable} from "#db/sessions.sql";
-import {chatMemberTable} from "./chats.sql";
-import {messageTable} from "./messages.sql";
-import {id, ID_SIZE_CONFIG, timestamps} from "./utils";
+import { relations } from "drizzle-orm";
+import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+import { sessionTable } from "#db/sessions.sql";
+import { chatMemberTable } from "./chats.sql";
+import { messageTable } from "./messages.sql";
+import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
 export const userTable = pgTable(
 	"users",
@@ -62,7 +62,8 @@ export const userProfileTableRelations = relations(
 
 export const contactsTable = pgTable(
 	"contacts",
-	{	id,
+	{
+		id,
 		userId: varchar(ID_SIZE_CONFIG)
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),

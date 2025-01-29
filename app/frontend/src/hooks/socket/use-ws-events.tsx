@@ -4,6 +4,7 @@ import {
 	syncChatsQueryOptions,
 } from "@/features/chat/queries";
 import {
+	useSaveAttachment,
 	useSaveMessage,
 	useSaveMessageBatch,
 	useUpdateMessage,
@@ -14,7 +15,9 @@ import { useCallback } from "react";
 
 export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const queryClient = useQueryClient();
+
 	const saveMessage = useSaveMessage().mutate;
+	const saveAttachment = useSaveAttachment().mutate;
 	const saveMessagesByChat = useSaveMessageBatch().mutate;
 	const updateMessage = useUpdateMessage().mutate;
 	const saveChats = useSaveChats().mutate;
@@ -27,6 +30,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const handleMessage = useCallback(
 		(event: MessageEvent) => {
 			const data = wsEventDataSchema.parse(JSON.parse(event.data));
+			console.log("receiving", data);
 
 			switch (data.type) {
 				case "message_sync": {
@@ -45,6 +49,11 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 						chatByIdQueryOptions(message.chatId).queryKey,
 					);
 					if (!chatSynched) queryClient.refetchQueries(syncChatsQueryOptions);
+					break;
+				}
+				case "message_attachment": {
+					const attachment = data.payload;
+					saveAttachment(attachment);
 					break;
 				}
 				case "message_delivered": {
@@ -66,7 +75,14 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					break;
 			}
 		},
-		[queryClient, saveMessage, saveMessagesByChat, updateMessage, sendMessage],
+		[
+			queryClient,
+			saveMessage,
+			saveAttachment,
+			saveMessagesByChat,
+			updateMessage,
+			sendMessage,
+		],
 	);
 
 	return { handleOpen, handleMessage };

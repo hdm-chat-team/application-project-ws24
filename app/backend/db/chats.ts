@@ -1,9 +1,9 @@
-import {eq, sql} from "drizzle-orm";
-import {createInsertSchema, createSelectSchema} from "drizzle-zod";
-import type {z} from "zod";
+import { eq, sql } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import type { z } from "zod";
 import db from "#db";
-import {chatMemberTable, chatTable, type chatTypeEnumType} from "./chats.sql";
-import type {DB, Transaction} from "./types";
+import { chatMemberTable, chatTable, type chatTypeEnumType } from "./chats.sql";
+import type { DB, Transaction } from "./types";
 
 const insertChatSchema = createInsertSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
@@ -21,7 +21,7 @@ async function insertSelfChat(name: string, trx: Transaction | DB = db) {
 		.insert(chatTable)
 		.values({
 			name,
-			chatType: 'self'
+			chatType: "self",
 		})
 		.onConflictDoNothing()
 		.returning({ id: chatTable.id })
@@ -52,36 +52,36 @@ async function selectChatWithMembersByUserId(
 		with: { members: { columns: { userId: true } } },
 	});
 }
-export enum InsertChatErrors{
-	MUST_HAVE_TWO="A chat must have at least two members."
+export enum InsertChatErrors {
+	MUST_HAVE_TWO = "A chat must have at least two members.",
 }
 async function insertChatWithMembers(userIds: string[]) {
 	if (userIds.length < 2) {
 		throw new Error(InsertChatErrors.MUST_HAVE_TWO);
 	}
-	let chatType: chatTypeEnumType = 'contact';
+	let chatType: chatTypeEnumType = "contact";
 	if (userIds.length > 2) {
-		chatType = 'group'
+		chatType = "group";
 	}
 	return db.transaction(async (tx) => {
 		const chatName = userIds.sort().join("-");
-		let chatId: string = '';
+		let chatId = "";
 
 		const existingChat = await tx.query.chatTable.findFirst({
 			where: eq(chatTable.name, chatName),
 		});
 
 		if (existingChat) {
-			return existingChat.id
-		} else {
-			const result = await tx
-				.insert(chatTable)
-				.values({
-					name: chatName,
-					chatType: chatType
-				}).returning();
-			chatId = result[0].id;
+			return existingChat.id;
 		}
+		const result = await tx
+			.insert(chatTable)
+			.values({
+				name: chatName,
+				chatType: chatType,
+			})
+			.returning();
+		chatId = result[0].id;
 		const mappedUsers = userIds.map((id) => {
 			return {
 				chatId: chatId,

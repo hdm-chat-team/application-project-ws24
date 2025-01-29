@@ -1,13 +1,12 @@
 import api from "@/lib/api";
-import type { UserProfile } from "@server/db/users";
 import { queryOptions } from "@tanstack/react-query";
 
-export const userProfileQueryOptions = (userId: string) =>
-	queryOptions<UserProfile>({
-		queryKey: [api.user[":id"].$url().pathname, userId],
+export const userProfileQueryOptions = (username: string) =>
+	queryOptions({
+		queryKey: [api.user.username[":username"].$url().pathname, username],
 		queryFn: async () => {
-			const response = await api.user[":id"].$get({
-				param: { id: userId },
+			const response = await api.user.username[":username"].$get({
+				param: { username },
 			});
 
 			if (!response.ok) {

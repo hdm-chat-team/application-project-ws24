@@ -1,13 +1,18 @@
-import {cuidParamSchema} from "@application-project-ws24/cuid";
-import {zValidator} from "@hono/zod-validator";
-import {HTTPException} from "hono/http-exception";
-import {createRouter} from "#api/factory";
-import {addContact, removeContact, selectContactById, selectUserContacts,} from "#db/contact";
-import {protectedRoute} from "#lib/middleware";
-import {z} from "zod";
-import {selectUserByEmail} from "#db/users";
+import { cuidParamSchema } from "@application-project-ws24/cuid";
+import { zValidator } from "@hono/zod-validator";
+import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
+import { createRouter } from "#api/factory";
+import {
+	addContact,
+	removeContact,
+	selectContactById,
+	selectUserContacts,
+} from "#db/contact";
+import { selectUserByEmail } from "#db/users";
+import { protectedRoute } from "#lib/middleware";
 
-const contactFormSchema = z.object({email: z.string().email()})
+const contactFormSchema = z.object({ email: z.string().email() });
 export const contactRouter = createRouter()
 	.get("/", protectedRoute, async (c) => {
 		const { id } = c.get("user");
@@ -35,27 +40,30 @@ export const contactRouter = createRouter()
 		},
 	)
 
-	.post("/",
+	.post(
+		"/",
 		protectedRoute,
 		zValidator("form", contactFormSchema),
 		async (c) => {
-		const { id } = c.get("user");
-		const { email } = c.req.valid("form");
+			const { id } = c.get("user");
+			const { email } = c.req.valid("form");
 
-
-		const contact = await selectUserByEmail.execute({email})
+			const contact = await selectUserByEmail.execute({ email });
 			if (!contact) {
-				throw new HTTPException(404, { message: `User with email ${email} not found` });
+				throw new HTTPException(404, {
+					message: `User with email ${email} not found`,
+				});
 			}
-		const newContact = await addContact(id, contact.id).catch((error) => {
-			throw new HTTPException(400, { message: error.message });
-		});
+			const newContact = await addContact(id, contact.id).catch((error) => {
+				throw new HTTPException(400, { message: error.message });
+			});
 
-		return c.json({
-			message: "contact created",
-			data: newContact,
-		});
-	})
+			return c.json({
+				message: "contact created",
+				data: newContact,
+			});
+		},
+	)
 
 	.delete(
 		"/:id",
