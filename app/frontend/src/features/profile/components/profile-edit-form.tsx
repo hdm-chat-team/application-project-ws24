@@ -19,7 +19,7 @@ const profileFormSchema = z.object({
 });
 
 export function ProfileEditForm() {
-	const { user, profile } = useUser();
+	const { profile } = useUser();
 	const lastAvatarUrlRef = useRef(profile.avatarUrl);
 
 	const updateProfile = useUpdateProfileMutation().mutate;
@@ -28,7 +28,6 @@ export function ProfileEditForm() {
 	const form = useForm({
 		defaultValues: {
 			displayName: profile.displayName || "",
-			avatarUrl: profile.avatarUrl || "",
 		},
 		onSubmit: ({ value }) => {
 			try {
@@ -65,23 +64,7 @@ export function ProfileEditForm() {
 			<div className="space-y-4">
 				<div className="space-y-2">
 					<div className="flex w-full items-center justify-center gap-4">
-						<form.Field name="avatarUrl">
-							{(field) => (
-								<AvatarUploader
-									className="size-32"
-									avatarUrl={field.state.value}
-									fallback={user.username}
-									onClientUploadComplete={(res) => {
-										field.handleChange(res[0].url);
-										form.handleSubmit();
-									}}
-									onUploadError={(error: Error) => {
-										console.error("Upload error:", error);
-										toast.error("Upload failed");
-									}}
-								/>
-							)}
-						</form.Field>
+						<AvatarUploader className="size-32" />
 					</div>
 				</div>
 

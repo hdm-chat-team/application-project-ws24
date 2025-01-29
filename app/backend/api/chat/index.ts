@@ -48,6 +48,6 @@ export const chatRouter = createRouter().post(
 				payload: insertedMessage,
 			});
 
-		return c.json({ message: "Message sent" }, 201);
+		return c.json({ message: "Message sent", data: insertedMessage.id }, 201);
 	},
 );

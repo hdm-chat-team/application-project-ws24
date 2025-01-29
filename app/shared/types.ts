@@ -11,9 +11,16 @@ const messageSchema = z.object({
 	body: z.string().nonempty(),
 });
 
+const messageAttachmentSchema = z.object({
+	url: z.string().url().nonempty(),
+	messageId: cuidSchema,
+	type: z.string().nonempty(),
+});
+
 const wsEventDataTypeSchema = z.enum([
 	"message_sync",
 	"message_incoming",
+	"message_attachment",
 	"message_received",
 	"message_delivered",
 	"message_read",
@@ -29,6 +36,10 @@ const wsEventDataSchema = z.discriminatedUnion("type", [
 	z.object({
 		type: z.literal(wsEventDataTypeSchema.enum.message_incoming),
 		payload: messageSchema,
+	}),
+	z.object({
+		type: z.literal(wsEventDataTypeSchema.enum.message_attachment),
+		payload: messageAttachmentSchema,
 	}),
 	z.object({
 		type: z.literal(wsEventDataTypeSchema.enum.message_received),

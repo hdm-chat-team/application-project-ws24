@@ -1,5 +1,4 @@
 import { ThemeProvider } from "@/context";
-import type { LocalDatabase } from "@/lib/db";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
@@ -17,7 +16,6 @@ const TanStackRouterDevtools = import.meta.env.PROD
 
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
-	db: LocalDatabase;
 }>()({
 	// TODO: Wrap all routes in root layout
 	component: () => (

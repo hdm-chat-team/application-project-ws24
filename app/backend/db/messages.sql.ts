@@ -7,6 +7,7 @@ import {
 	text,
 	varchar,
 } from "drizzle-orm/pg-core";
+import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
@@ -54,6 +55,7 @@ export const messageTableRelations = relations(
 			references: [userTable.id],
 		}),
 		recipients: many(messageRecipientTable),
+		attachments: many(messageAttachmentTable),
 	}),
 );
 

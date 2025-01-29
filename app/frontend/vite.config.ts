@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
 	plugins: [
 		react(),
 		TanStackRouterVite(),
@@ -15,6 +15,7 @@ export default defineConfig({
 		VitePWA({
 			workbox: {
 				navigateFallbackDenylist: [/^\/api/],
+				maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // ? 3MB
 			},
 			registerType: "autoUpdate",
 			devOptions: {
@@ -58,13 +59,8 @@ export default defineConfig({
 			},
 		}),
 	],
-	server: {
-		proxy: {
-			"/api": {
-				target: "http://localhost:3000",
-				changeOrigin: true,
-			},
-		},
+	optimizeDeps: {
+		exclude: ["@jsquash/avif"],
 	},
 	resolve: {
 		alias: {
@@ -86,4 +82,16 @@ export default defineConfig({
 			},
 		},
 	},
-});
+	esbuild: {
+		drop: mode === "production" ? ["console", "debugger"] : [],
+	},
+	server: {
+		proxy: {
+			"/api": {
+				target: "http://localhost:3000",
+				changeOrigin: true,
+			},
+		},
+	},
+	worker: { format: "es" },
+}));

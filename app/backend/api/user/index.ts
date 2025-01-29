@@ -1,35 +1,29 @@
-import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import { UTApi } from "uploadthing/server";
 import { createRouter } from "#api/factory";
+import { utapi } from "#api/uploadthing/index";
 import {
 	deleteUserProfileImageSchema,
 	selectUserChats,
-	selectUserProfile,
+	selectUserDataByUsername,
+	selectUserSchema,
 	updateUserProfile,
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
-// * Create UTApi instance
-
-const utApi = new UTApi();
-
-export const profileRouter = createRouter()
+export const userRouter = createRouter()
 	.put(
 		"/profile",
 		protectedRoute,
 		zValidator("form", updateUserProfileSchema),
 		async (c) => {
-			const user = c.get("user");
-			const { displayName, avatarUrl } = c.req.valid("form");
+			const { id } = c.get("profile");
+			const formData = c.req.valid("form");
 
-			const updatedProfile = await updateUserProfile(user.id, {
-				displayName,
-				avatarUrl,
-			}).catch((error) => {
-				throw new HTTPException(400, { message: error.message });
+			const [updatedProfile] = await updateUserProfile.execute({
+				id,
+				...formData,
 			});
 
 			return c.json({
@@ -43,21 +37,29 @@ export const profileRouter = createRouter()
 
 		const chats = await selectUserChats
 			.execute({ id })
-			.then((chats) => chats.map((chat) => chat.chat));
+			.then((rows) => rows.map((row) => row.chat));
 
 		return c.json({ data: chats });
 	})
 	.get(
-		"/:id",
+		"/username/:username",
 		protectedRoute,
-		zValidator("param", cuidParamSchema),
+		zValidator("param", selectUserSchema.pick({ username: true })),
 		async (c) => {
-			const { id } = c.req.valid("param");
-			const userData = await selectUserProfile.execute({ id });
-			if (!userData) {
+			const { username } = c.req.valid("param");
+
+			// ? Are there any fields we should NOT be returning?
+			const result = await selectUserDataByUsername.execute({
+				username,
+			});
+
+			if (!result) throw new HTTPException(404, { message: "user not found" });
+
+			const { profile, ...user } = result;
+			if (!profile)
 				throw new HTTPException(404, { message: "profile not found" });
-			}
-			return c.json({ data: userData });
+
+			return c.json({ data: { user, profile } });
 		},
 	)
 	.delete(
@@ -65,20 +67,25 @@ export const profileRouter = createRouter()
 		protectedRoute,
 		zValidator("json", deleteUserProfileImageSchema),
 		async (c) => {
-			try {
-				const { avatarUrl } = c.req.valid("json");
-				const fileKey = avatarUrl.split("/").pop();
+			const { avatarUrl } = c.req.valid("json");
+			const { id } = c.get("profile");
+			const fileKey = avatarUrl.split("/").pop();
 
-				if (fileKey) {
-					await utApi.deleteFiles([fileKey], { keyType: "fileKey" });
-					return c.json({ success: true });
-				}
-
+			if (!fileKey)
 				throw new HTTPException(400, {
 					message: "Invalid avatar URL",
 				});
-			} catch (error) {
-				throw new HTTPException(500);
-			}
+
+			await utapi.deleteFiles([fileKey]).catch(() => {
+				throw new HTTPException(500, {
+					message: "Failed to delete avatar",
+				});
+			});
+			const [updatedProfile] = await updateUserProfile.execute({
+				id,
+				avatarUrl: null,
+			});
+
+			return c.json({ success: true, data: updatedProfile });
 		},
 	);
