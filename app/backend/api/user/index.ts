@@ -1,7 +1,9 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
+import type { DatabaseError } from "pg";
 import { createRouter } from "#api/factory";
 import { utapi } from "#api/uploadthing/index";
+import { selectContactsByUserId } from "#db/contacts";
 import {
 	deleteUserProfileImageSchema,
 	selectUserChats,
@@ -11,8 +13,24 @@ import {
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
+import { contactRouter } from "./contact";
 
 export const userRouter = createRouter()
+	.route("/contact", contactRouter)
+	.get("/contacts", protectedRoute, async (c) => {
+		const { id } = c.get("user");
+
+		const contacts = await selectContactsByUserId
+			.execute({ userId: id })
+			.catch((error: DatabaseError) => {
+				throw new HTTPException(400, {
+					message: error.message,
+					cause: error.cause,
+				});
+			});
+
+		return c.json({ data: contacts });
+	})
 	.put(
 		"/profile",
 		protectedRoute,
@@ -48,7 +66,6 @@ export const userRouter = createRouter()
 		async (c) => {
 			const { username } = c.req.valid("param");
 
-			// ? Are there any fields we should NOT be returning?
 			const result = await selectUserDataByUsername.execute({
 				username,
 			});

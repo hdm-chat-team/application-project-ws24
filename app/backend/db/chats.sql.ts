@@ -9,14 +9,14 @@ import {
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
-export const chatTypeEnum = pgEnum("chatType", ["self", "contact", "group"]);
-export type chatTypeEnumType = (typeof chatTypeEnum.enumValues)[number];
+export const chatTypeEnum = pgEnum("chatType", ["self", "direct", "group"]);
+export type ChatEnum = (typeof chatTypeEnum.enumValues)[number];
 
 export const chatTable = pgTable("chats", {
 	id,
 	...timestamps,
 	name: varchar({ length: 255 }),
-	chatType: chatTypeEnum().notNull(),
+	type: chatTypeEnum().notNull(),
 });
 
 export const chatRelations = relations(chatTable, ({ many }) => ({

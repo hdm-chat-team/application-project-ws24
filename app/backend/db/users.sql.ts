@@ -13,7 +13,6 @@ export const userTable = pgTable(
 		githubId: varchar({ length: 20 }).notNull().unique(),
 		username: varchar({ length: 39 }).notNull().unique(),
 		email: varchar({ length: 255 }).notNull().unique(),
-		avatarUrl: varchar("avatar_url"),
 	},
 	(table) => [
 		{
@@ -27,7 +26,12 @@ export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	sessions: many(sessionTable),
 	chats: many(chatMemberTable),
 	messages: many(messageTable),
-	contacts: many(contactsTable),
+	contactOf: many(contactsTable, {
+		relationName: "user_contacting",
+	}),
+	contacts: many(contactsTable, {
+		relationName: "user_contacted",
+	}),
 }));
 
 export const userProfileTable = pgTable(
@@ -61,9 +65,8 @@ export const userProfileTableRelations = relations(
 );
 
 export const contactsTable = pgTable(
-	"contacts",
+	"user_contacts",
 	{
-		id,
 		userId: varchar(ID_SIZE_CONFIG)
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
@@ -77,3 +80,16 @@ export const contactsTable = pgTable(
 		},
 	],
 );
+
+export const contactsTableRelations = relations(contactsTable, ({ one }) => ({
+	user: one(userTable, {
+		relationName: "user_contacting",
+		fields: [contactsTable.userId],
+		references: [userTable.id],
+	}),
+	contact: one(userTable, {
+		relationName: "user_contacted",
+		fields: [contactsTable.contactId],
+		references: [userTable.id],
+	}),
+}));

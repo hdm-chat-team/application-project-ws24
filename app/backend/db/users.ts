@@ -1,3 +1,4 @@
+import { cuidSchema } from "@application-project-ws24/cuid";
 import { eq, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
@@ -11,16 +12,25 @@ import { chatMemberTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
 import { contactsTable, userProfileTable, userTable } from "./users.sql";
 
-const insertUserSchema = createInsertSchema(userTable);
-const selectUserSchema = createSelectSchema(userTable).omit({
-	githubId: true,
+const insertUserSchema = createInsertSchema(userTable, {
+	id: cuidSchema,
+	email: z.string().email(),
 });
+
+const selectUserSchema = createSelectSchema(userTable)
+	// ? Are there any fields we should NOT be returning?
+	.omit({
+		githubId: true,
+	});
+
 type User = z.infer<typeof selectUserSchema>;
 
 const deleteUserProfileImageSchema = z.object({
 	avatarUrl: z.string().url(),
 });
-const insertUserProfileSchema = createInsertSchema(userProfileTable);
+const insertUserProfileSchema = createInsertSchema(userProfileTable, {
+	id: cuidSchema,
+});
 
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	displayName: z.string().nonempty(),
@@ -39,7 +49,6 @@ const insertUser = db
 		githubId: sql.placeholder("githubId"),
 		username: sql.placeholder("username"),
 		email: sql.placeholder("email"),
-		avatarUrl: sql.placeholder("avatarUrl"),
 	})
 	.returning({ id: userTable.id })
 	.prepare("insert_user");
@@ -69,7 +78,6 @@ async function insertUserWithProfile(
 				githubId,
 				username,
 				email: email ?? "",
-				avatarUrl: avatarUrl ?? "",
 			})
 			.onConflictDoUpdate({
 				target: userTable.githubId,
@@ -103,7 +111,7 @@ const selectUserDataByUsername = db.query.userTable
 	})
 	.prepare("select_user_profile");
 
-const selectUser = db.query.userTable
+const selectUserById = db.query.userTable
 	.findFirst({
 		where: eq(userTable.id, sql.placeholder("id")),
 	})
@@ -114,18 +122,6 @@ const selectUserByEmail = db.query.userTable
 		where: eq(userTable.email, sql.placeholder("email")),
 	})
 	.prepare("select_user");
-
-const selectUserContacts = async (userId: string) => {
-	return db
-		.select({
-			id: userTable.id,
-			avatarUrl: userTable.avatarUrl,
-		})
-		.from(userTable)
-		.innerJoin(contactsTable, eq(contactsTable.contactId, userTable.id))
-		.where(eq(contactsTable.userId, userId))
-		.execute();
-};
 
 const updateUserProfile = db
 	.update(userProfileTable)
@@ -156,8 +152,8 @@ export {
 	userWithProfileSchema,
 	deleteUserProfileImageSchema,
 	// * User queries
+	selectUserById,
 	selectUserDataByUsername,
-	selectUser,
 	selectUserByEmail,
 	insertUser,
 	selectUserChats,
@@ -165,7 +161,6 @@ export {
 	// * User functions
 	updateUserProfile,
 	insertUserWithProfile,
-	selectUserContacts,
 	contactsTable,
 	userTable,
 };

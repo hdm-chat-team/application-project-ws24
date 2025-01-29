@@ -1,8 +1,8 @@
 import { serveStatic } from "hono/bun";
 import { createApi, createRouter } from "#api/factory";
-import { contactRouter } from "#api/user/contact";
 import { authRouter } from "./auth";
 import { chatRouter } from "./chat";
+import { messageRouter } from "./message";
 import { socketRouter } from "./socket";
 import { uploadthingRouter } from "./uploadthing";
 import { userRouter } from "./user";
@@ -12,22 +12,20 @@ const apiRouter = createApi();
 
 const apiRoutes = apiRouter
 	.basePath("/api")
-	.route("/auth", authRouter)
 	.route("/socket", socketRouter)
-	.route("/chat", chatRouter)
-	.route("/user", userRouter)
-	.route("/contact", contactRouter)
+	.route("/auth", authRouter)
 	.route("/uploadthing", uploadthingRouter)
+	.route("/user", userRouter)
+	.route("/chat", chatRouter)
+	.route("/message", messageRouter)
 	.get("/", (c) => {
 		return c.text("Connected!");
 	});
 
-const app = createRouter()
+export const app = createRouter()
 	.route("/", apiRouter)
 	.get("*", serveStatic({ root: "dist/client" }))
 	.get("*", serveStatic({ path: "index.html" }));
-
-export default app;
 
 // * RPC client type
 export type ApiType = typeof apiRoutes;

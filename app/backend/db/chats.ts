@@ -1,46 +1,26 @@
-import { eq, sql } from "drizzle-orm";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { cuidSchema } from "@application-project-ws24/cuid";
+import { and, eq, sql } from "drizzle-orm";
+import {
+	createInsertSchema,
+	createSelectSchema,
+	createUpdateSchema,
+} from "drizzle-zod";
 import type { z } from "zod";
 import db from "#db";
-import { chatMemberTable, chatTable, type chatTypeEnumType } from "./chats.sql";
+import { chatMemberTable, chatTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
 
-const insertChatSchema = createInsertSchema(chatTable);
+const insertChatSchema = createInsertSchema(chatTable, { id: cuidSchema });
+const updateChatSchema = createUpdateSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
 type Chat = z.infer<typeof selectChatSchema>;
 
-const selectChatIdsByUserId = db.query.chatMemberTable
-	.findMany({
-		columns: { chatId: true },
-		where: eq(chatMemberTable.userId, sql.placeholder("id")),
-	})
-	.prepare("select_chat_ids_by_user_id");
-
-async function insertSelfChat(name: string, trx: Transaction | DB = db) {
-	return await trx
-		.insert(chatTable)
-		.values({
-			name,
-			chatType: "self",
-		})
-		.onConflictDoNothing()
-		.returning({ id: chatTable.id })
-		.then((rows) => rows[0].id);
-}
-
-async function insertSelfChatMembership(
-	chatId: string,
-	userId: string,
-	trx: Transaction | DB = db,
-) {
-	await trx
-		.insert(chatMemberTable)
-		.values({
-			chatId,
-			userId,
-		})
-		.onConflictDoNothing();
-}
+const insertChatMemberSchema = createInsertSchema(chatMemberTable, {
+	chatId: cuidSchema,
+	userId: cuidSchema,
+});
+const selectChatMemberSchema = createSelectSchema(chatMemberTable);
+type ChatMembership = z.infer<typeof selectChatMemberSchema>;
 
 async function selectChatWithMembersByUserId(
 	chatId: string,
@@ -52,57 +32,82 @@ async function selectChatWithMembersByUserId(
 		with: { members: { columns: { userId: true } } },
 	});
 }
-export enum InsertChatErrors {
-	MUST_HAVE_TWO = "A chat must have at least two members.",
-}
-async function insertChatWithMembers(userIds: string[]) {
-	if (userIds.length < 2) {
-		throw new Error(InsertChatErrors.MUST_HAVE_TWO);
-	}
-	let chatType: chatTypeEnumType = "contact";
-	if (userIds.length > 2) {
-		chatType = "group";
-	}
-	return db.transaction(async (tx) => {
-		const chatName = userIds.sort().join("-");
-		let chatId = "";
 
-		const existingChat = await tx.query.chatTable.findFirst({
-			where: eq(chatTable.name, chatName),
-		});
+const insertChat = db
+	.insert(chatTable)
+	.values({
+		id: sql.placeholder("id"),
+		name: sql.placeholder("name"),
+		type: sql.placeholder("type"),
+	})
+	.returning()
+	.prepare("insert_chat");
 
-		if (existingChat) {
-			return existingChat.id;
-		}
-		const result = await tx
-			.insert(chatTable)
-			.values({
-				name: chatName,
-				chatType: chatType,
-			})
-			.returning();
-		chatId = result[0].id;
-		const mappedUsers = userIds.map((id) => {
-			return {
-				chatId: chatId,
-				userId: id,
-			};
-		});
-		await tx.insert(chatMemberTable).values(mappedUsers);
-		return chatId;
-	});
-}
+const updateChat = db
+	.update(chatTable)
+	.set({ name: sql.placeholder("name").getSQL() })
+	.where(eq(chatTable.id, sql.placeholder("id")))
+	.returning()
+	.prepare("update_chat");
+
+const insertChatMembership = db
+	.insert(chatMemberTable)
+	.values({
+		chatId: sql.placeholder("chatId"),
+		userId: sql.placeholder("userId"),
+	})
+	.returning()
+	.prepare("insert_chat_member");
+
+const deleteChatMembership = db
+	.delete(chatMemberTable)
+	.where(
+		and(
+			eq(chatMemberTable.chatId, sql.placeholder("chatId")),
+			eq(chatMemberTable.userId, sql.placeholder("userId")),
+		),
+	)
+	.returning()
+	.prepare("delete_chat");
+
+const selectUserSelfChat = db.query.chatTable
+	.findFirst({
+		columns: { id: true },
+		where: eq(chatTable.type, "self"),
+		with: {
+			members: {
+				columns: { userId: true },
+				where: (chatMemberTable, { eq }) =>
+					eq(chatMemberTable.userId, sql.placeholder("userId")),
+			},
+		},
+	})
+	.prepare("select_user_self_chat");
+
+const selectChatMembership = db.query.chatMemberTable
+	.findFirst({
+		where: (chatMemberTable, { and, eq }) =>
+			and(
+				eq(chatMemberTable.chatId, sql.placeholder("chatId")),
+				eq(chatMemberTable.userId, sql.placeholder("userId")),
+			),
+	})
+	.prepare("select_chat_member");
 
 export {
+	deleteChatMembership,
+	// * Chat queries
+	insertChat,
+	insertChatMemberSchema,
+	insertChatMembership,
+	updateChatSchema,
+	selectUserSelfChat,
+	selectChatMembership,
 	// * Chat schemas
 	insertChatSchema,
-	// * Chat queries
-	insertSelfChat,
-	insertSelfChatMembership,
-	selectChatIdsByUserId,
+	updateChat,
 	selectChatSchema,
 	// * Chat functions
-	insertChatWithMembers,
 	selectChatWithMembersByUserId,
 };
-export type { Chat };
+export type { Chat, ChatMembership };

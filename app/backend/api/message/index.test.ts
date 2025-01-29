@@ -3,7 +3,7 @@ import { createId } from "@application-project-ws24/cuid";
 import { testClient } from "hono/testing";
 import { createApi } from "#api/factory";
 import type { Message } from "#db/messages";
-import { messageRouter } from "./message.ts";
+import { messageRouter } from "./index.ts";
 
 const { chat } = testClient(createApi().route("/chat", messageRouter));
 
