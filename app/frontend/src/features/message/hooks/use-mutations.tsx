@@ -1,3 +1,4 @@
+import type { LocalMessage } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
@@ -16,7 +17,7 @@ export function usePostMessage(chatId: string) {
 		mutationFn: async ({
 			message,
 			files,
-		}: { message: Message; files: File[] }) => {
+		}: { message: LocalMessage; files: File[] }) => {
 			// * send message
 			const result = await api.chat.$post({ form: message });
 			if (!result.ok) throw new Error("Failed to send message");
@@ -41,7 +42,7 @@ export function usePostMessage(chatId: string) {
 export function useSaveMessage() {
 	return useMutation({
 		mutationKey: ["db/save-message"],
-		mutationFn: async (message: Message) => {
+		mutationFn: async (message: LocalMessage) => {
 			await db.messages.put(message);
 		},
 	});
@@ -50,10 +51,9 @@ export function useSaveMessage() {
 export function useSaveMessageBatch() {
 	return useMutation({
 		mutationKey: ["db/save-message-batch"],
-		mutationFn: async (messages: Message[]) => {
+		mutationFn: async (messages: LocalMessage[]) => {
 			if (messages.length === 0) return;
 			const keys = messages.map((message) => message.id);
-
 			await db.messages.bulkAdd(messages, keys);
 		},
 	});
