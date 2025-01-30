@@ -14,27 +14,10 @@ import {
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 import { contactRouter } from "./contact";
+import { profileRouter } from "./profile";
 
 export const userRouter = createRouter()
-	.route("/contact", contactRouter)
-	.get("/contacts", protectedRoute, async (c) => {
-		const { id } = c.get("user");
-
-		const contacts = await selectContactsByUserId
-			.execute({ userId: id })
-			.catch((error: DatabaseError) => {
-				throw new HTTPException(400, {
-					message: error.message,
-					cause: error.cause,
-				});
-			});
-
-		return c.json({ data: contacts });
-	})
-	.put(
-		"/profile",
-		protectedRoute,
-		zValidator("form", updateUserProfileSchema),
+	.route("/profile", profileRouter)
 		async (c) => {
 			const { id } = c.get("profile");
 			const formData = c.req.valid("form");
