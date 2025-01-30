@@ -1,5 +1,5 @@
 {
-  "lockfileVersion": 0,
+  "lockfileVersion": 1,
   "workspaces": {
     "": {
       "devDependencies": {
@@ -10,7 +10,7 @@
     "app": {
       "name": "@application-project-ws24/backend",
       "dependencies": {
-        "@application-project-ws24/cuid": "packages/cuid",
+        "@application-project-ws24/cuid": "workspace:*",
         "@hono/zod-validator": "^0.4.2",
         "arctic": "^3.2.1",
         "drizzle-orm": "^0.38.4",
@@ -21,7 +21,7 @@
         "zod": "^3.24.1",
       },
       "devDependencies": {
-        "@application-project-ws24/tsconfig": "packages/tsconfig",
+        "@application-project-ws24/tsconfig": "workspace:*",
         "@types/bun": "^1.2.0",
         "@types/pg": "^8.11.11",
         "drizzle-kit": "^0.30.2",
@@ -31,7 +31,7 @@
       "name": "@application-project-ws24/frontend",
       "version": "0.0.0",
       "dependencies": {
-        "@application-project-ws24/cuid": "packages/cuid",
+        "@application-project-ws24/cuid": "workspace:*",
         "@js-temporal/polyfill": "^0.4.4",
         "@jsquash/avif": "^2.0.0",
         "@radix-ui/react-avatar": "^1.1.2",
@@ -61,7 +61,7 @@
         "zod": "^3.24.1",
       },
       "devDependencies": {
-        "@application-project-ws24/tsconfig": "packages/tsconfig",
+        "@application-project-ws24/tsconfig": "workspace:*",
         "@tanstack/router-devtools": "^1.97.26",
         "@tanstack/router-plugin": "^1.97.26",
         "@types/react": "^19.0.8",
@@ -84,7 +84,7 @@
         "zod": "^3.24.1",
       },
       "devDependencies": {
-        "@application-project-ws24/tsconfig": "packages/tsconfig",
+        "@application-project-ws24/tsconfig": "workspace:*",
         "@types/bun": "latest",
       },
     },
@@ -107,13 +107,13 @@
 
     "@apideck/better-ajv-errors": ["@apideck/better-ajv-errors@0.3.6", "", { "dependencies": { "json-schema": "^0.4.0", "jsonpointer": "^5.0.0", "leven": "^3.1.0" }, "peerDependencies": { "ajv": ">=8" } }, "sha512-P+ZygBLZtkp0qqOAJJVX4oX/sFo5JR3eBWwwuqHHhK0GIgQOKWrAfiAaWX0aArHkRWHMuggFEgAZNxVPwPZYaA=="],
 
-    "@application-project-ws24/backend": ["@application-project-ws24/backend@workspace:app", { "dependencies": { "@application-project-ws24/cuid": "packages/cuid", "@hono/zod-validator": "^0.4.2", "arctic": "^3.2.1", "drizzle-orm": "^0.38.4", "drizzle-zod": "^0.6.1", "hono": "^4.6.19", "pg": "^8.13.1", "uploadthing": "^7.4.4", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@types/bun": "^1.2.0", "@types/pg": "^8.11.11", "drizzle-kit": "^0.30.2" } }],
+    "@application-project-ws24/backend": ["@application-project-ws24/backend@workspace:app"],
 
-    "@application-project-ws24/cuid": ["@application-project-ws24/cuid@workspace:packages/cuid", { "dependencies": { "@paralleldrive/cuid2": "latest", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@types/bun": "latest" } }],
+    "@application-project-ws24/cuid": ["@application-project-ws24/cuid@workspace:packages/cuid"],
 
-    "@application-project-ws24/frontend": ["@application-project-ws24/frontend@workspace:app/frontend", { "dependencies": { "@application-project-ws24/cuid": "packages/cuid", "@js-temporal/polyfill": "^0.4.4", "@jsquash/avif": "^2.0.0", "@radix-ui/react-avatar": "^1.1.2", "@radix-ui/react-dialog": "^1.1.5", "@radix-ui/react-dropdown-menu": "^2.1.5", "@radix-ui/react-label": "^2.1.1", "@radix-ui/react-scroll-area": "^1.2.2", "@radix-ui/react-separator": "^1.1.1", "@radix-ui/react-slot": "^1.1.1", "@radix-ui/react-tooltip": "^1.1.7", "@tanstack/react-form": "^0.41.3", "@tanstack/react-query": "^5.65.1", "@tanstack/react-query-devtools": "^5.65.1", "@tanstack/react-router": "^1.97.26", "@uploadthing/react": "^7.1.5", "class-variance-authority": "^0.7.1", "clsx": "^2.1.1", "dexie": "^4.0.11", "dexie-react-hooks": "^1.1.7", "hono": "^4.6.19", "lucide-react": "^0.474.0", "react": "^19.0.0", "react-dom": "^19.0.0", "sonner": "^1.7.2", "tailwind-merge": "^2.6.0", "tailwindcss-animate": "^1.0.7", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@tanstack/router-devtools": "^1.97.26", "@tanstack/router-plugin": "^1.97.26", "@types/react": "^19.0.8", "@types/react-dom": "^19.0.3", "@vite-pwa/assets-generator": "^0.2.6", "@vitejs/plugin-react-swc": "^3.7.2", "autoprefixer": "^10.4.20", "globals": "^15.14.0", "postcss": "^8.5.1", "rollup-plugin-visualizer": "^5.14.0", "tailwindcss": "^3.4.17", "vite": "^6.0.11", "vite-plugin-pwa": "^0.21.1" } }],
+    "@application-project-ws24/frontend": ["@application-project-ws24/frontend@workspace:app/frontend"],
 
-    "@application-project-ws24/tsconfig": ["@application-project-ws24/tsconfig@workspace:packages/tsconfig", {}],
+    "@application-project-ws24/tsconfig": ["@application-project-ws24/tsconfig@workspace:packages/tsconfig"],
 
     "@babel/code-frame": ["@babel/code-frame@7.26.2", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.25.9", "js-tokens": "^4.0.0", "picocolors": "^1.0.0" } }, "sha512-RJlIHRueQgwWitWgF8OdFYGZX328Ax5BCemNGlqHfplnRT9ESi8JkFlvaVYbS+UubVY6dpv87Fs2u5M29iNFVQ=="],
 
