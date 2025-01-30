@@ -13,6 +13,7 @@
 	},
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
+		"@js-temporal/polyfill": "^0.4.4",
 		"@jsquash/avif": "^2.0.0",
 		"@radix-ui/react-avatar": "^1.1.2",
 		"@radix-ui/react-dialog": "^1.1.5",
