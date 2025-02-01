@@ -1,3 +1,4 @@
+import { cuidSchema } from "@application-project-ws24/cuid";
 import { and, asc, eq, inArray, not, or, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
@@ -13,7 +14,9 @@ import {
 } from "./messages.sql";
 import type { DB, Transaction } from "./types";
 
-const insertMessageSchema = createInsertSchema(messageTable);
+const insertMessageSchema = createInsertSchema(messageTable, {
+	id: cuidSchema,
+});
 const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;

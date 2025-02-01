@@ -7,8 +7,11 @@ import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import db from "#db";
-import { insertSelfChat, insertSelfChatMembership } from "#db/chats";
+import {
+	insertChat,
+	insertChatMembership,
+	selectUserSelfChat,
+} from "#db/chats";
 import { insertUserWithProfile } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
@@ -71,21 +74,21 @@ export const githubRouter = createRouter()
 			});
 			const githubUser = (await githubResponse.json()) as GitHubUser;
 
-			const user = await db
-				.transaction(async (trx) => {
-					const user = await insertUserWithProfile(githubUser, trx);
+			const user = await insertUserWithProfile(githubUser);
 
-					// TODO: Fix it creating a chat every time
-					const insertedChatId = await insertSelfChat(user.username, trx);
-					await insertSelfChatMembership(insertedChatId, user.id, trx);
+			const hasChat = await selectUserSelfChat
+				.execute({ userId: user.id })
+				.then((result) => !!result);
 
-					return user;
-				})
-				.catch((error: Error) => {
-					throw new HTTPException(500, {
-						message: error.message,
-					});
+			if (!hasChat) {
+				const [{ id: insertedChatId }] = await insertChat.execute({
+					type: "self",
 				});
+				await insertChatMembership.execute({
+					chatId: insertedChatId,
+					userId: user.id,
+				});
+			}
 
 			await createAndSetSessionCookie(c, user.id);
 			return c.redirect(oauth_redirect_to || REDIRECT_URL);

@@ -3,12 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/features/auth/hooks";
-import {
-	useDeleteAvatarMutation,
-	useUpdateProfileMutation,
-} from "@/features/profile/hooks";
+import { useUpdateProfileMutation } from "@/features/profile/hooks";
 import { useForm } from "@tanstack/react-form";
-import { useRef } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { AvatarUploader } from "./avatar-uploader";
@@ -20,10 +16,8 @@ const profileFormSchema = z.object({
 
 export function ProfileEditForm() {
 	const { profile } = useUser();
-	const lastAvatarUrlRef = useRef(profile.avatarUrl);
 
 	const updateProfile = useUpdateProfileMutation().mutate;
-	const deleteAvatar = useDeleteAvatarMutation().mutate;
 
 	const form = useForm({
 		defaultValues: {
@@ -33,16 +27,8 @@ export function ProfileEditForm() {
 			try {
 				updateProfile({
 					displayName: value.displayName,
-					avatarUrl: value.avatarUrl || "",
+					avatarUrl: profile.avatarUrl || "",
 				});
-
-				const avatarChanged = value.avatarUrl !== lastAvatarUrlRef.current;
-				if (lastAvatarUrlRef.current && avatarChanged) {
-					deleteAvatar(lastAvatarUrlRef.current);
-					lastAvatarUrlRef.current = value.avatarUrl || null;
-				}
-
-				toast.success("Profile updated");
 			} catch (error: unknown) {
 				console.error(error);
 				toast.error("Failed to update profile");
