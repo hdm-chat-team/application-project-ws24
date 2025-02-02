@@ -1,13 +1,8 @@
 import type { Config } from "tailwindcss";
-import { withUt } from "uploadthing/tw";
 
-const config = withUt({
+const config = {
 	darkMode: ["class"],
-	content: [
-		"./index.html",
-		"./src/**/*.{js,ts,jsx,tsx}",
-		"../../node_modules/@uploadthing/react/dist/**/*.{js,ts,jsx,tsx}",
-	],
+	content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {
 			borderRadius: {
@@ -70,6 +65,6 @@ const config = withUt({
 		},
 	},
 	plugins: [require("tailwindcss-animate")],
-} satisfies Config);
+} satisfies Config;
 
 export default config;

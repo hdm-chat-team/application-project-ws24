@@ -21,21 +21,19 @@ const deleteUserProfileImageSchema = z.object({
 	avatarUrl: z.string().url(),
 });
 const insertUserProfileSchema = createInsertSchema(userProfileTable);
+
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	displayName: z.string().nonempty(),
 	avatarUrl: z.string().url().optional(),
-}).omit({
-	userId: true,
-	createdAt: true,
-	id: true,
-	updatedAt: true,
-	htmlUrl: true,
+}).pick({
+	displayName: true,
+	avatarUrl: true,
 });
+
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
 
-const userWithProfileSchema = z.object({
-	...selectUserSchema.shape,
+const userWithProfileSchema = selectUserSchema.extend({
 	profile: selectUserProfileSchema,
 });
 type UserWithProfile = z.infer<typeof userWithProfileSchema>;
@@ -86,40 +84,22 @@ async function insertUserWithProfile(
 	});
 }
 
-const selectUserProfile = db.query.userProfileTable
+const selectUserDataByUsername = db.query.userTable
 	.findFirst({
-		with: { owner: true },
-		where: eq(userProfileTable.userId, sql.placeholder("id")),
+		with: { profile: true },
+		where: eq(userTable.username, sql.placeholder("username")),
 	})
 	.prepare("select_user_profile");
 
-const selectUserWithProfile = db.query.userTable
-	.findFirst({
-		columns: { githubId: false },
-		with: { profile: true },
-		where: eq(userTable.id, sql.placeholder("id")),
+const updateUserProfile = db
+	.update(userProfileTable)
+	.set({
+		avatarUrl: sql.placeholder("avatarUrl").getSQL(),
+		displayName: sql.placeholder("displayName").getSQL(),
 	})
-	.prepare("select_user_with_profile");
-
-async function updateUserProfile(
-	userId: string,
-	newValues: { displayName: string; avatarUrl?: string },
-) {
-	const { displayName, avatarUrl } = newValues;
-	return await db
-		.insert(userProfileTable)
-		.values({
-			userId: userId,
-			displayName,
-			avatarUrl,
-		})
-		.onConflictDoUpdate({
-			target: userProfileTable.userId,
-			set: { displayName, avatarUrl },
-		})
-		.returning()
-		.then((rows) => rows[0]);
-}
+	.where(eq(userProfileTable.id, sql.placeholder("id")))
+	.returning()
+	.prepare("update_profile_avatar");
 
 const selectUserChats = db.query.chatMemberTable
 	.findMany({
@@ -140,8 +120,7 @@ export {
 	userWithProfileSchema,
 	deleteUserProfileImageSchema,
 	// * User queries
-	selectUserWithProfile,
-	selectUserProfile,
+	selectUserDataByUsername,
 	selectUserChats,
 	insertUserProfileSchema,
 	// * User functions

@@ -1,54 +1,41 @@
+import { useUser } from "@/features/auth/hooks";
+import { useMessageState } from "@/features/message/hooks";
+import type { LocalMessage } from "@/features/message/utils";
 import { cn } from "@/lib/utils";
-import type { Message as MessageType } from "@server/db/messages";
-import { Check, CheckCheck, ClockArrowUp } from "lucide-react";
-import { useMessageState } from "../hooks";
+import { MessageAttachments } from "./message-attachment";
+import { MessageStateIcon } from "./message-state-icon";
+
+export * from "./message-form";
 
 type MessageBubbleProps = {
-	value: MessageType;
-	variant?: "received" | "sent";
+	value: LocalMessage;
 };
 
 export function Message({
-	value: { id, body, authorId, state },
-	variant = "received",
+	value: { id, body, authorId, state, receivedAt },
 }: MessageBubbleProps) {
 	const ref = useMessageState({ id, authorId });
+	const { user } = useUser();
+	const isSent = user?.id === authorId;
 
 	return (
 		<div
 			ref={ref}
-			className={cn(
-				"mb-4 flex",
-				variant === "sent" ? "justify-end" : "justify-start",
-			)}
+			className={cn("mb-4 flex", isSent ? "justify-end" : "justify-start")}
 		>
-			<div
+			<article
 				className={cn(
 					"max-w-[70%] rounded-lg p-3",
-					variant === "sent"
-						? "bg-primary text-primary-foreground"
-						: "bg-muted",
+					isSent ? "bg-primary text-primary-foreground" : "bg-muted",
 				)}
 			>
-				<div className="break-words text-sm">{body}</div>
+				<MessageAttachments messageId={id} />
+				<p className="mt-2 break-words text-sm">{body}</p>
 				<div className="mt-1 flex items-center justify-end gap-1">
-					{variant === "sent" && (
-						<span className="text-xs">
-							{state === "read" ? (
-								<CheckCheck className="size-4" color="blue" />
-							) : state === "delivered" ? (
-								<CheckCheck className="size-4" />
-							) : state === "sent" ? (
-								<Check className="size-4" />
-							) : (
-								<ClockArrowUp className="size-4" />
-							)}
-						</span>
-					)}
+					<span className="text-muted-foreground text-xs">{receivedAt}</span>
+					{isSent && <MessageStateIcon state={state} />}
 				</div>
-			</div>
+			</article>
 		</div>
 	);
 }
-
-export * from "./message-form";

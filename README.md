@@ -15,19 +15,20 @@ You will also need [Node.js](https://nodejs.org/en/download).
 
 ## 🏗️ Project structure
 
-We use 🚀 [Turborepo](https://turbo.build) for managing our apps/packages.
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+We are using [Bun workspaces](https://bun.sh/docs/install/workspaces) to separate packages.
+Each package is 100% [TypeScript](https://www.typescriptlang.org/).
 
 ### 🌐 Apps
 
 - `/app`: a monorepo-style app
-  - `/backend`: a 🔥 [Hono](https://hono.dev) server providing api routes and serving the frontend
+  - `/backend`: a 🔥 [Hono](https://hono.dev) server providing api and static routes
     - 🔐 Cookie based authentication using the [lucia-auth](https://lucia-auth.com/) guide.
     - 🔌 [Websockets](https://bun.sh/docs/api/websockets) for real time features.
   - `/frontend`: a ⚡ [Vite](https://vite.dev) SPA using
     - ⚛️ [React](https://react.dev) as the frontend framework.
     - 🏝️ [Tanstack Router](https://tanstack.com/router/) for managing SPA routes.
     - 🏝️ [Tanstack react-query](https://tanstack.com/query) for managing server state on the client
+    - 🏝️ [Tanstack react-form](https://tanstack.com/form) for form validation
 
 ### 📦 Packages
 
@@ -38,7 +39,7 @@ Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
 - [TypeScript](https://www.typescriptlang.org/) for static type checking
 - [Biome](https://biomejs.dev/) for code linting/formatting
-  - use `bun check` to lint/check formatting
+  - use `bun check` to check for typescript errors
   - use `bun check:fix` to fix most linting errors and apply formatting
 - [PWA-assets generator](https://vite-pwa-org.netlify.app/assets-generator)
   - use `bun assets`  to generate PWA assets from `public/logo.svg`
@@ -92,7 +93,7 @@ To start all development servers, run the following command:
 bun dev
 ```
 
-Both Tanstack libraries will render development tools to debug their features.
+Tanstack router and react-query will render development tools to debug their features.
 
 To use Drizzle-kit CLI [commands](https://orm.drizzle.team/docs/kit-overview) run:
 

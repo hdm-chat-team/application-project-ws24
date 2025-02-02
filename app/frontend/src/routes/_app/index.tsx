@@ -30,8 +30,8 @@ function ChatListSidebar() {
 	*/
 	return (
 		<>
-			<SidebarHeader>Chats</SidebarHeader>
-			<SidebarSeparator />
+			<SidebarHeader className="flex justify-center">Chats</SidebarHeader>
+			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>

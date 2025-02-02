@@ -1,5 +1,4 @@
 import { QueryClientProvider, RouterProvider } from "@/context";
-import { AuthProvider } from "@/features/auth/context";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./main.css";
@@ -13,9 +12,7 @@ if (!rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<QueryClientProvider>
-				<AuthProvider>
-					<RouterProvider />
-				</AuthProvider>
+				<RouterProvider />
 			</QueryClientProvider>
 		</StrictMode>,
 	);

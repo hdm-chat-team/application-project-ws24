@@ -1,47 +1,12 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useUploadThing } from "@/features/uploadthing/hooks";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/features/auth/hooks";
 import { cn } from "@/lib/utils";
-import type { FileRouter } from "@server/api/uploadthing";
-import type { UseUploadthingProps } from "@uploadthing/react";
 import { Upload } from "lucide-react";
-import type { ClientUploadedFileData } from "uploadthing/types";
+import { useUploadUserAvatar } from "../hooks";
 
-type UploadAvatarProps = Omit<
-	UseUploadthingProps<FileRouter["avatar"], FileRouter>,
-	"onClientUploadComplete"
-> & {
-	avatarUrl?: string;
-	fallback: string;
-	className?: string;
-	onClientUploadComplete?: (
-		res: ClientUploadedFileData<FileRouter["avatar"]["$types"]["output"]>[],
-	) => void;
-};
-
-export function AvatarUploader({
-	avatarUrl,
-	fallback,
-	className,
-	headers,
-	signal,
-	onBeforeUploadBegin,
-	onUploadBegin,
-	onUploadProgress,
-	onUploadError,
-	onClientUploadComplete,
-}: UploadAvatarProps) {
-	const { startUpload, isUploading } = useUploadThing(
-		(routeRegistry) => routeRegistry.avatar,
-		{
-			headers,
-			signal,
-			onBeforeUploadBegin,
-			onUploadBegin,
-			onUploadProgress,
-			onUploadError,
-			onClientUploadComplete,
-		},
-	);
+export function AvatarUploader({ className }: { className?: string }) {
+	const { profile } = useUser();
+	const { mutate: startUpload, isPending } = useUploadUserAvatar();
 
 	return (
 		<div className={cn("flex w-full justify-center", className)}>
@@ -51,13 +16,11 @@ export function AvatarUploader({
 			>
 				<Avatar className="h-full w-full border border-gray-200 dark:border-gray-800">
 					<AvatarImage
-						src={avatarUrl}
-						alt={fallback}
+						src={profile.avatarUrl ?? undefined}
 						className="size-full rounded-full object-cover"
 					/>
-					<AvatarFallback>{fallback}</AvatarFallback>
 				</Avatar>
-				<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+				<div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity md:hover:opacity-100">
 					<Upload className="size-1/3 text-white" />
 				</div>
 				<div className="absolute right-0 bottom-0 flex size-1/4 items-center justify-center rounded-full bg-black/50 md:hidden">
@@ -70,11 +33,9 @@ export function AvatarUploader({
 				accept="image/*"
 				className="hidden"
 				onChange={(event) => {
-					if (event.target.files) {
-						startUpload(Array.from(event.target.files));
-					}
+					if (event.target.files) startUpload(Array.from(event.target.files));
 				}}
-				disabled={isUploading}
+				disabled={isPending}
 			/>
 		</div>
 	);
