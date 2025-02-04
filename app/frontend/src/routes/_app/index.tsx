@@ -1,3 +1,4 @@
+import ChatListItem from "@/components/sidebar/chat-list-item";
 import {
 	SidebarContent,
 	SidebarGroup,
@@ -20,7 +21,8 @@ export const Route = createFileRoute("/_app/")({
 function ChatListSidebar() {
 	const chats = useLiveQuery(chatsQueryFn, []);
 	const { chat: currentChat, setChatId } = useChat();
-
+	console.log("-----------------");
+	console.log(chats);
 	/* 
 	 TODO: create proper chat list item component with avatar, name, last message, etc.
 	 TODO: add sorting by last message time
@@ -35,15 +37,24 @@ function ChatListSidebar() {
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>
-						{chats?.map(({ id, name }) => (
+						{chats?.map(({ id, name, updatedAt }) => (
 							<SidebarMenuItem key={id}>
-								<div className="flex">
+								<div className="flex ">
 									<SidebarMenuButton
 										value={id}
 										onClick={(event) => setChatId(event.currentTarget.value)}
 										isActive={id === currentChat?.id}
+										className="border border-slate-200 rounded-md py-6"
 									>
-										{name}
+										<ChatListItem
+											name={name || ""}
+											id="1"
+											lastMessage="Hello their"
+											onClick={() => console.log("hello")}
+											avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmStm5d-komRukWTSOYWnVAhDo5i2PbrBhIA&s"
+											lastMessageTime={updatedAt}
+											//allRead={false}
+										/>
 									</SidebarMenuButton>
 								</div>
 							</SidebarMenuItem>
