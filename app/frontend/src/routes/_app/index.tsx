@@ -21,10 +21,9 @@ export const Route = createFileRoute("/_app/")({
 function ChatListSidebar() {
 	const chats = useLiveQuery(chatsQueryFn, []);
 	const { chat: currentChat, setChatId } = useChat();
-	console.log("-----------------");
-	console.log(chats);
+	
 	/* 
-	 TODO: create proper chat list item component with avatar, name, last message, etc.
+	 Done: create proper chat list item component with avatar, name, last message, etc.
 	 TODO: add sorting by last message time
 	 TODO: add unread message count badge
 	 TODO: add sorting chips (all, unread)
@@ -53,7 +52,7 @@ function ChatListSidebar() {
 											onClick={() => console.log("hello")}
 											avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmStm5d-komRukWTSOYWnVAhDo5i2PbrBhIA&s"
 											lastMessageTime={updatedAt}
-											//allRead={false}
+											// allRead={false}
 										/>
 									</SidebarMenuButton>
 								</div>

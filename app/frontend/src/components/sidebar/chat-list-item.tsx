@@ -5,10 +5,10 @@ interface ChatListItemProps {
 	avatar: string;
 	name: string;
 	lastMessage?: string;
-	isActive?: boolean; // Indicates if the chat is currently open
+	isActive?: boolean; 
 	onClick: (id: string) => void;
-	allRead?: boolean; // Indicates if all messages are read
-	lastMessageTime?: string; // Time of the last message
+	allRead?: boolean; 
+	lastMessageTime?: string; 
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({
@@ -21,7 +21,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 	allRead = true,
 	lastMessageTime = "",
 }) => {
-	// Handle key press events (Enter or Space)
+	
 	const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === "Enter" || event.key === " ") {
 			onClick(id);
@@ -30,13 +30,13 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 
 	return (
 		<div
-			className={` cursor-pointer flex items-center justify-between ${
+			className={` cursor-pointer flex items-center justify-between w-full  ${
 				isActive ? "bg-blue-100" : ""
 			}`}
 			onClick={() => onClick(id)}
 			onKeyPress={handleKeyPress}
 		>
-			{/* User Info */}
+			
 			<div className="flex items-center my-5 mr-2">
 				<Avatar>
 					<AvatarImage src={avatar} />
@@ -50,35 +50,33 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 				</div>
 			</div>
 
-			{/* Message Status */}
+	
 			<div className="flex items-center space-x-2">
-				{/* Last message time */}
 				{lastMessageTime && (
 					<span className="text-xs text-gray-400">
 						{(() => {
 							const messageDate = new Date(lastMessageTime);
 							const today = new Date();
 
-							// Check if the message is from today
+					
 							if (
 								messageDate.getDate() === today.getDate() &&
 								messageDate.getMonth() === today.getMonth() &&
 								messageDate.getFullYear() === today.getFullYear()
 							) {
-								// Return time in HH:MM format
 								return messageDate.toLocaleTimeString([], {
 									hour: "2-digit",
 									minute: "2-digit",
 								});
-							} else {
-								// Return date in "DD MMM" format (e.g., "4 NOV")
-								return messageDate
-									.toLocaleDateString("en-US", {
-										day: "numeric",
-										month: "short",
-									})
-									.toUpperCase();
 							}
+
+							
+							return messageDate
+								.toLocaleDateString("en-US", {
+									day: "numeric",
+									month: "short",
+								})
+								.toUpperCase();
 						})()}
 					</span>
 				)}
@@ -86,7 +84,9 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 					<span
 						className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-semibold"
 						title="Unread messages"
-					></span>
+					>
+						{""}
+					</span>
 				)}
 			</div>
 		</div>
