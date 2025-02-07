@@ -13,13 +13,13 @@ export function usePostMessage(chatId: string) {
 	);
 
 	return useMutation({
-		mutationKey: [api.chat.$url().pathname, chatId],
+		mutationKey: ["POST", api.message.$url().pathname, chatId],
 		mutationFn: async ({
 			message,
 			files,
 		}: { message: LocalMessage; files: File[] }) => {
 			// * send message
-			const result = await api.chat.$post({ form: message });
+			const result = await api.message.$post({ form: message });
 			if (!result.ok) throw new Error("Failed to send message");
 			const messageId = (await result.json()).data;
 
@@ -62,11 +62,9 @@ export function useSaveMessageBatch() {
 export function useUpdateMessage() {
 	return useMutation({
 		mutationKey: ["db/update-message"],
-		mutationFn: async ({
-			messageId,
-			state,
-		}: { messageId: Message["id"]; state: Message["state"] }) => {
-			await db.messages.update(messageId, { state });
+		mutationFn: async (options: Pick<Message, "id" | "state">) => {
+			const { id, state } = options;
+			await db.messages.update(id, { state });
 		},
 	});
 }

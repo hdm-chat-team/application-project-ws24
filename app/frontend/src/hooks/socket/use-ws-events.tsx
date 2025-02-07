@@ -66,14 +66,14 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				}
 				case "message_delivered": {
 					updateMessage({
-						messageId: data.payload,
+						id: data.payload,
 						state: "delivered",
 					});
 					break;
 				}
 				case "message_completed": {
 					updateMessage({
-						messageId: data.payload,
+						id: data.payload,
 						state: "read",
 					});
 					break;
