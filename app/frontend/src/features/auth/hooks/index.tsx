@@ -7,11 +7,11 @@ import { authQueryOptions } from "../queries";
  * Must be used within an AuthProvider component context.
  *
  * @returns An object containing:
- * - user: The authenticated user's data or null
- * - isSignedIn: A boolean indicating if the user is authenticated
+ * - user: The authenticated user
+ * - profile: The authenticated user's profile
  * - Additional properties from the auth context's query
  *
- * @throws {Error} If used outside of an AuthProvider context
+ * @throws {Error} Redirects to the sign-in page if the user is not authenticated
  */
 export function useUser() {
 	const { data, ...rest } = useQuery(authQueryOptions);

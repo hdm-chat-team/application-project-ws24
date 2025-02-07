@@ -8,8 +8,8 @@ import { createRouter } from "#api/factory";
 import { type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
 import {
-	insertChat,
 	insertChatMembership,
+	insertSelfChat,
 	selectUserSelfChat,
 } from "#db/chats";
 import { insertUserWithProfile } from "#db/users";
@@ -74,23 +74,21 @@ export const githubRouter = createRouter()
 			});
 			const githubUser = (await githubResponse.json()) as GitHubUser;
 
-			const user = await insertUserWithProfile(githubUser);
+			const insertedUser = await insertUserWithProfile(githubUser);
 
 			const hasChat = await selectUserSelfChat
-				.execute({ userId: user.id })
+				.execute({ userId: insertedUser.id })
 				.then((result) => !!result);
 
 			if (!hasChat) {
-				const [{ id: insertedChatId }] = await insertChat.execute({
-					type: "self",
-				});
+				const [{ id: insertedChatId }] = await insertSelfChat.execute();
 				await insertChatMembership.execute({
 					chatId: insertedChatId,
-					userId: user.id,
+					userId: insertedUser.id,
 				});
 			}
 
-			await createAndSetSessionCookie(c, user.id);
+			await createAndSetSessionCookie(c, insertedUser.id);
 			return c.redirect(oauth_redirect_to || REDIRECT_URL);
 		},
 	);
