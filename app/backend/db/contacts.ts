@@ -23,6 +23,7 @@ const insertContact = db
 
 const selectContactsByUserId = db.query.contactsTable
 	.findMany({
+		columns: { contactId: true },
 		where: eq(contactsTable.userId, sql.placeholder("userId")),
 	})
 	.prepare("select_contacts_by_user_id");

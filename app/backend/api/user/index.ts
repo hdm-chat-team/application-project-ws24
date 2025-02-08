@@ -1,9 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import type { DatabaseError } from "pg";
 import { createRouter } from "#api/factory";
 import { utapi } from "#api/uploadthing/index";
-import { selectContactsByUserId } from "#db/contacts";
 import {
 	deleteUserProfileImageSchema,
 	selectUserChats,
@@ -13,11 +11,16 @@ import {
 	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
-import { contactRouter } from "./contact";
+import { contactsRouter } from "./contact";
 import { profileRouter } from "./profile";
 
 export const userRouter = createRouter()
+	.route("/contacts", contactsRouter)
 	.route("/profile", profileRouter)
+	.put(
+		"/",
+		protectedRoute,
+		zValidator("form", updateUserProfileSchema),
 		async (c) => {
 			const { id } = c.get("profile");
 			const formData = c.req.valid("form");
