@@ -12,7 +12,7 @@ import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
 
-export const messageStateEnum = pgEnum("state", [
+export const messageStateEnum = pgEnum("message_state", [
 	"pending",
 	"sent",
 	"delivered",
