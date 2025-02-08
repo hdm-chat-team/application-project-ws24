@@ -1,115 +1,64 @@
 import {
-	Avatar,
-	AvatarFallback,
-	AvatarImage,
-} from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
 	SidebarContent,
+	SidebarGroup,
 	SidebarHeader,
+	SidebarMenu,
+	SidebarMenuButton,
+	SidebarMenuItem,
 	SidebarSeparator,
 } from "@/components/ui/sidebar";
+
 import { useChat } from "@/features/chat/context";
-import { usePostDirectChat } from "@/features/chat/hooks/mutations/use-post-chat";
-import { CreateContact } from "@/features/contacts/components/create-contact";
-import { syncContactsQueryOptions } from "@/features/contacts/queries";
-import { useForm } from "@tanstack/react-form";
+import { selfChatQueryFn } from "@/features/chat/queries";
+import { contactsQueryFn } from "@/features/contacts/queries";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { z } from "zod";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export const Route = createFileRoute("/_app/contacts")({
-	loader: async ({ context: { queryClient } }) => {
-		return await queryClient.ensureQueryData(syncContactsQueryOptions);
-	},
 	component: RouteComponent,
 });
 
-const chatFormSchema = z.object({ userIds: z.string().array() });
-
 function RouteComponent() {
-	const contacts = Route.useLoaderData() || [];
-	const { mutate } = usePostChatMutation();
 	const { setChatId } = useChat();
 	const navigate = useNavigate();
 
-	const form = useForm({
-		onSubmit: ({ value }) => {
-			mutate(value.userIds, {
-				onSuccess: (data) => {
-					if (data) {
-						setChatId(data);
-						void navigate({ to: "/" });
-					}
-				},
-			});
-			form.reset();
-		},
-		defaultValues: {
-			userIds: [],
-		},
-		validators: {
-			onSubmit: chatFormSchema,
-		},
-	});
+	const selfChat = useLiveQuery(selfChatQueryFn, []);
+	const contactIds = useLiveQuery(contactsQueryFn, []);
 
 	return (
 		<>
-			<SidebarHeader>Kontakte</SidebarHeader>
-			<SidebarSeparator className="my-2" />
+			<SidebarHeader className="flex flex-row items-center justify-between">
+				Contacts
+			</SidebarHeader>
+			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
-				<CreateContact />
-				<form
-					onSubmit={async (e) => {
-						e.preventDefault();
-						e.stopPropagation();
-						await form.handleSubmit();
-					}}
-				>
-					{contacts.map((contact) => (
-						<div
-							key={contact.contactId}
-							className="flex items-center space-x-3"
-						>
-							<form.Field key={contact.contactId} name="userIds">
-								{(field) => {
-									const isChecked =
-										field.state.value?.includes(contact.contactId) || false;
-
-									return (
-										<div className="flex w-full items-center gap-2 p-2">
-											<Avatar>
-												<AvatarImage src={contact.avatarUrl as string} />
-												<AvatarFallback>
-													{contact.displayName?.[0]}
-												</AvatarFallback>
-											</Avatar>
-											<Label htmlFor={`option-${contact.contactId}`}>
-												{contact.displayName}
-											</Label>
-											<Checkbox
-												className="ml-auto"
-												id={`option-${contact.contactId}`}
-												checked={isChecked}
-												onCheckedChange={async (checked) => {
-													if (checked) {
-														field.pushValue(contact.contactId);
-													} else {
-														await field.removeValue(
-															field.state.value?.indexOf(contact.contactId),
-														);
-													}
-												}}
-											/>
-										</div>
-									);
-								}}
-							</form.Field>
-						</div>
-					))}
-					<Button type="submit">Create chat</Button>
-				</form>
+				{selfChat && (
+					<SidebarGroup id="self">
+						<SidebarMenu>
+							<SidebarMenuItem>
+								<SidebarMenuButton
+									onClick={() => {
+										setChatId(selfChat.id);
+										navigate({ to: "/" });
+									}}
+								>
+									Me
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarMenu>
+					</SidebarGroup>
+				)}
+				{contactIds && (
+					<SidebarGroup id="contacts">
+						<SidebarMenu>
+							{contactIds.map((contact) => (
+								<SidebarMenuItem key={contact}>
+									<SidebarMenuButton>{contact}</SidebarMenuButton>
+								</SidebarMenuItem>
+							))}
+						</SidebarMenu>
+					</SidebarGroup>
+				)}
 			</SidebarContent>
 		</>
 	);

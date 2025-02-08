@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import {
 	SidebarContent,
 	SidebarGroup,
@@ -10,7 +11,7 @@ import {
 
 import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { MessageSquarePlusIcon } from "lucide-react";
 
@@ -21,10 +22,6 @@ export const Route = createFileRoute("/_app/")({
 function ChatListSidebar() {
 	const chats = useLiveQuery(chatsQueryFn, []);
 	const { chat: currentChat, setChatId } = useChat();
-	const navigate = useNavigate();
-	const navigateToContacts = () => {
-		void navigate({ to: "/contacts" });
-	};
 
 	/* 
 	 TODO: create proper chat list item component with avatar, name, last message, etc.
@@ -35,7 +32,14 @@ function ChatListSidebar() {
 	*/
 	return (
 		<>
-			<SidebarHeader className="flex justify-center">Chats</SidebarHeader>
+			<SidebarHeader className="flex flex-row items-center justify-between">
+				Chats
+				<Button variant="ghost" size="icon" asChild>
+					<Link to="/contacts">
+						<MessageSquarePlusIcon />
+					</Link>
+				</Button>
+			</SidebarHeader>
 			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
 				<SidebarGroup>
