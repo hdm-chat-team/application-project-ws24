@@ -4,8 +4,8 @@ import type { DatabaseError } from "pg";
 import { createRouter } from "#api/factory";
 import {
 	deleteChatMembership,
-	insertChatMemberSchema,
 	insertChatMembership,
+	insertChatMembershipSchema,
 } from "#db/chats";
 import { protectedRoute } from "#lib/middleware";
 
@@ -13,7 +13,7 @@ export const chatMemberRouter = createRouter()
 	.post(
 		"/",
 		protectedRoute,
-		zValidator("form", insertChatMemberSchema),
+		zValidator("form", insertChatMembershipSchema),
 		async (c) => {
 			const membership = c.req.valid("form");
 
@@ -32,7 +32,7 @@ export const chatMemberRouter = createRouter()
 	.delete(
 		"/",
 		protectedRoute,
-		zValidator("form", insertChatMemberSchema),
+		zValidator("form", insertChatMembershipSchema),
 		async (c) => {
 			const membership = c.req.valid("form");
 

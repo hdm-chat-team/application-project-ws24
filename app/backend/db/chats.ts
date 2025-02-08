@@ -15,12 +15,12 @@ const updateChatSchema = createUpdateSchema(chatTable);
 const selectChatSchema = createSelectSchema(chatTable);
 type Chat = z.infer<typeof selectChatSchema>;
 
-const insertChatMemberSchema = createInsertSchema(chatMemberTable, {
+const insertChatMembershipSchema = createInsertSchema(chatMemberTable, {
 	chatId: cuidSchema,
 	userId: cuidSchema,
 });
-const selectChatMemberSchema = createSelectSchema(chatMemberTable);
-type ChatMembership = z.infer<typeof selectChatMemberSchema>;
+const selectChatMembershipSchema = createSelectSchema(chatMemberTable);
+type ChatMembership = z.infer<typeof selectChatMembershipSchema>;
 
 async function selectChatWithMembersByUserId(
 	chatId: string,
