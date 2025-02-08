@@ -3,9 +3,9 @@ import { Temporal } from "@js-temporal/polyfill";
 import type { Message } from "@server/db/messages";
 
 // * extends server message with receivedAt
-export interface LocalMessage extends Message {
+export type LocalMessage = Message & {
 	receivedAt: string;
-}
+};
 
 export function formatBerlinTime() {
 	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
