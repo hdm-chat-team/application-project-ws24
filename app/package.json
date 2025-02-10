@@ -25,8 +25,8 @@
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
 		"arctic": "^3.2.1",
-		"drizzle-orm": "^0.38.4",
-		"drizzle-zod": "^0.6.1",
+		"drizzle-orm": "^0.39.3",
+		"drizzle-zod": "^0.7.0",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
 		"uploadthing": "^7.4.4",
@@ -36,6 +36,6 @@
 		"@application-project-ws24/tsconfig": "workspace:*",
 		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.11",
-		"drizzle-kit": "^0.30.2"
+		"drizzle-kit": "^0.30.4"
 	}
 }
