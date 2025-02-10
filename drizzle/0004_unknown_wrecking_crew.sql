@@ -1,1 +1,0 @@
-ALTER TABLE "contacts" ADD COLUMN "id" varchar(15) PRIMARY KEY NOT NULL;
