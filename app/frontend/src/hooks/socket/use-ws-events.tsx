@@ -37,7 +37,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				case "message_sync": {
 					const localMessages = data.payload.map((message) => ({
 						...message,
-						receivedAt: formatBerlinTime(),
+						receivedAt: formatBerlinTime(message.updatedAt),
 					}));
 					saveMessagesByChat(localMessages);
 					break;
@@ -45,7 +45,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				case "message_incoming": {
 					const localMessage = {
 						...data.payload,
-						receivedAt: formatBerlinTime(),
+						receivedAt: formatBerlinTime(data.payload.updatedAt),
 					};
 					saveMessage(localMessage);
 					sendMessage({

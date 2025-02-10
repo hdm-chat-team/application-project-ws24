@@ -7,22 +7,22 @@ export type LocalMessage = Message & {
 	receivedAt: string;
 };
 
-export function formatBerlinTime() {
-	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
-		"de-DE",
-		{
-			hour: "2-digit",
-			minute: "2-digit",
-			hour12: false,
-		},
-	);
+export function formatBerlinTime(isoString: string) {
+	const berlinTime =
+		Temporal.Instant.from(isoString).toZonedDateTimeISO("Europe/Berlin");
+
+	return berlinTime.toLocaleString("de-DE", {
+		hour: "2-digit",
+		minute: "2-digit",
+		hour12: false,
+	});
 }
 
 export function createMessage(
 	chatId: string,
 	authorId: string,
 	body: string,
-): LocalMessage {
+): Message {
 	return {
 		id: createId(),
 		createdAt: new Date().toISOString(),
@@ -31,6 +31,5 @@ export function createMessage(
 		body,
 		authorId,
 		chatId,
-		receivedAt: formatBerlinTime(),
 	};
 }

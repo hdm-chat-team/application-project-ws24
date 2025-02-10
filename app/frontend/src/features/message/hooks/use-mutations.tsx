@@ -1,4 +1,4 @@
-import type { LocalMessage } from "@/features/message/utils";
+import { type LocalMessage, formatBerlinTime } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
@@ -17,7 +17,7 @@ export function usePostMessage(chatId: string) {
 		mutationFn: async ({
 			message,
 			files,
-		}: { message: LocalMessage; files: File[] }) => {
+		}: { message: Message; files: File[] }) => {
 			// * send message
 			const result = await api.message.$post({ form: message });
 			if (!result.ok) throw new Error("Failed to send message");
@@ -34,7 +34,12 @@ export function usePostMessage(chatId: string) {
 			);
 			await startUpload(processedFiles, { id: messageId });
 		},
-		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
+		onMutate: ({ message }) =>
+			db.messages.add({
+				...message,
+				state: "sent",
+				receivedAt: formatBerlinTime(message.createdAt),
+			}),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
 	});
 }
