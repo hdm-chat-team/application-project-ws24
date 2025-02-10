@@ -3,7 +3,7 @@ import { pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { messageTable } from "./messages.sql";
 import { cuid } from "./utils";
 
-export const messageAttachmentTable = pgTable("message_attachments", {
+export const messageAttachmentTable = pgTable("messages_attachments", {
 	url: varchar({ length: 255 }).primaryKey(),
 	type: text().notNull(),
 	messageId: cuid()

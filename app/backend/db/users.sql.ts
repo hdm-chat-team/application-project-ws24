@@ -1,7 +1,7 @@
 import { relations } from "drizzle-orm";
-import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 import { sessionTable } from "#db/sessions.sql";
-import { chatMemberTable } from "./chats.sql";
+import { chatMembershipTable, chatTable } from "./chats.sql";
 import { messageTable } from "./messages.sql";
 import { cuid, id, timestamps } from "./utils";
 
@@ -15,27 +15,22 @@ export const userTable = pgTable(
 		email: varchar({ length: 255 }).notNull().unique(),
 	},
 	(table) => [
-		{
-			idIndex: index().on(table.id),
-		},
+		uniqueIndex().on(table.id),
+		uniqueIndex().on(table.username),
+		uniqueIndex().on(table.email),
 	],
 );
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	profile: one(userProfileTable),
 	sessions: many(sessionTable),
-	chats: many(chatMemberTable),
+	ownedChats: many(chatTable),
+	chatMemberships: many(chatMembershipTable),
 	messages: many(messageTable),
-	contactOf: many(contactsTable, {
-		relationName: "user_contacting",
-	}),
-	contacts: many(contactsTable, {
-		relationName: "user_contacted",
-	}),
 }));
 
 export const userProfileTable = pgTable(
-	"user_profiles",
+	"users_profiles",
 	{
 		id,
 		...timestamps,
@@ -48,9 +43,9 @@ export const userProfileTable = pgTable(
 		htmlUrl: varchar({ length: 255 }),
 	},
 	(table) => [
-		{
-			userIdIndex: index().on(table.userId),
-		},
+		uniqueIndex().on(table.id),
+		uniqueIndex().on(table.userId),
+		index().on(table.displayName),
 	],
 );
 
@@ -63,29 +58,3 @@ export const userProfileTableRelations = relations(
 		}),
 	}),
 );
-
-export const contactsTable = pgTable(
-	"user_contacts",
-	{
-		userId: cuid()
-			.notNull()
-			.references(() => userTable.id, { onDelete: "cascade" }),
-		contactId: cuid()
-			.notNull()
-			.references(() => userTable.id, { onDelete: "cascade" }),
-	},
-	(table) => [primaryKey({ columns: [table.userId, table.contactId] })],
-);
-
-export const contactsTableRelations = relations(contactsTable, ({ one }) => ({
-	user: one(userTable, {
-		relationName: "user_contacting",
-		fields: [contactsTable.userId],
-		references: [userTable.id],
-	}),
-	contact: one(userTable, {
-		relationName: "user_contacted",
-		fields: [contactsTable.contactId],
-		references: [userTable.id],
-	}),
-}));

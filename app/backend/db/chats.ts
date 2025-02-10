@@ -5,21 +5,23 @@ import {
 	createSelectSchema,
 	createUpdateSchema,
 } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 import db from "#db";
-import { chatMemberTable, chatTable } from "./chats.sql";
+import { chatMembershipTable, chatTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
 
 const insertChatSchema = createInsertSchema(chatTable, { id: cuidSchema });
-const updateChatSchema = createUpdateSchema(chatTable);
+const updateChatSchema = createUpdateSchema(chatTable, {
+	name: z.string().nonempty(),
+});
 const selectChatSchema = createSelectSchema(chatTable);
 type Chat = z.infer<typeof selectChatSchema>;
 
-const insertChatMembershipSchema = createInsertSchema(chatMemberTable, {
+const insertChatMembershipSchema = createInsertSchema(chatMembershipTable, {
 	chatId: cuidSchema,
 	userId: cuidSchema,
 });
-const selectChatMembershipSchema = createSelectSchema(chatMemberTable);
+const selectChatMembershipSchema = createSelectSchema(chatMembershipTable);
 type ChatMembership = z.infer<typeof selectChatMembershipSchema>;
 
 async function selectChatWithMembersByUserId(
@@ -28,7 +30,7 @@ async function selectChatWithMembersByUserId(
 ) {
 	return await trx.query.chatTable.findFirst({
 		columns: { id: true },
-		where: (chatTable, { eq }) => eq(chatTable.id, chatId),
+		where: eq(chatTable.id, chatId),
 		with: { members: { columns: { userId: true } } },
 	});
 }
@@ -39,6 +41,8 @@ const insertChat = db
 		id: sql.placeholder("id"),
 		name: sql.placeholder("name"),
 		type: sql.placeholder("type"),
+		createdAt: sql.placeholder("createdAt"),
+		updatedAt: sql.placeholder("updatedAt"),
 	})
 	.returning()
 	.prepare("insert_chat");
@@ -50,25 +54,13 @@ const updateChat = db
 	.returning()
 	.prepare("update_chat");
 
-const insertChatMembership = db
-	.insert(chatMemberTable)
+const insertSelfChat = db
+	.insert(chatTable)
 	.values({
-		chatId: sql.placeholder("chatId"),
-		userId: sql.placeholder("userId"),
+		type: "self",
 	})
-	.returning()
-	.prepare("insert_chat_member");
-
-const deleteChatMembership = db
-	.delete(chatMemberTable)
-	.where(
-		and(
-			eq(chatMemberTable.chatId, sql.placeholder("chatId")),
-			eq(chatMemberTable.userId, sql.placeholder("userId")),
-		),
-	)
-	.returning()
-	.prepare("delete_chat");
+	.returning({ id: chatTable.id })
+	.prepare("insert_self_chat");
 
 const selectUserSelfChat = db.query.chatTable
 	.findFirst({
@@ -76,37 +68,56 @@ const selectUserSelfChat = db.query.chatTable
 		where: eq(chatTable.type, "self"),
 		with: {
 			members: {
-				columns: { userId: true },
-				where: (chatMemberTable, { eq }) =>
-					eq(chatMemberTable.userId, sql.placeholder("userId")),
+				where: eq(chatMembershipTable.userId, sql.placeholder("userId")),
 			},
 		},
 	})
 	.prepare("select_user_self_chat");
 
-const selectChatMembership = db.query.chatMemberTable
-	.findFirst({
-		where: (chatMemberTable, { and, eq }) =>
-			and(
-				eq(chatMemberTable.chatId, sql.placeholder("chatId")),
-				eq(chatMemberTable.userId, sql.placeholder("userId")),
-			),
+const insertChatMembership = db
+	.insert(chatMembershipTable)
+	.values({
+		chatId: sql.placeholder("chatId"),
+		userId: sql.placeholder("userId"),
 	})
-	.prepare("select_chat_member");
+	.returning()
+	.prepare("insert_chat_membership");
+
+const selectChatMembership = db.query.chatMembershipTable
+	.findFirst({
+		where: and(
+			eq(chatMembershipTable.chatId, sql.placeholder("chatId")),
+			eq(chatMembershipTable.userId, sql.placeholder("userId")),
+		),
+	})
+	.prepare("select_chat_membership");
+
+const deleteChatMembership = db
+	.delete(chatMembershipTable)
+	.where(
+		and(
+			eq(chatMembershipTable.chatId, sql.placeholder("chatId")),
+			eq(chatMembershipTable.userId, sql.placeholder("userId")),
+		),
+	)
+	.returning()
+	.prepare("delete_chat_membership");
 
 export {
-	deleteChatMembership,
 	// * Chat queries
 	insertChat,
-	insertChatMemberSchema,
+	insertSelfChat,
+	updateChat,
+	deleteChatMembership,
 	insertChatMembership,
 	updateChatSchema,
 	selectUserSelfChat,
 	selectChatMembership,
 	// * Chat schemas
 	insertChatSchema,
-	updateChat,
 	selectChatSchema,
+	insertChatMembershipSchema,
+	selectChatMembershipSchema,
 	// * Chat functions
 	selectChatWithMembersByUserId,
 };

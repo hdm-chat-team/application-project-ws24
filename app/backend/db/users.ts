@@ -8,9 +8,9 @@ import {
 import { z } from "zod";
 import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
-import { chatMemberTable } from "./chats.sql";
+import { chatMembershipTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
-import { contactsTable, userProfileTable, userTable } from "./users.sql";
+import { userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable, {
 	id: cuidSchema,
@@ -133,10 +133,10 @@ const updateUserProfile = db
 	.returning()
 	.prepare("update_profile_avatar");
 
-const selectUserChats = db.query.chatMemberTable
+const selectUserChats = db.query.chatMembershipTable
 	.findMany({
 		columns: {},
-		where: eq(chatMemberTable.userId, sql.placeholder("id")),
+		where: eq(chatMembershipTable.userId, sql.placeholder("id")),
 		with: {
 			chat: true,
 		},
@@ -148,6 +148,7 @@ export {
 	insertUserSchema,
 	selectUserSchema,
 	selectUserProfileSchema,
+	insertUserProfileSchema,
 	updateUserProfileSchema,
 	userWithProfileSchema,
 	deleteUserProfileImageSchema,
@@ -157,11 +158,8 @@ export {
 	selectUserByEmail,
 	insertUser,
 	selectUserChats,
-	insertUserProfileSchema,
-	// * User functions
 	updateUserProfile,
+	// * User functions
 	insertUserWithProfile,
-	contactsTable,
-	userTable,
 };
 export type { User, UserProfile, UserWithProfile };

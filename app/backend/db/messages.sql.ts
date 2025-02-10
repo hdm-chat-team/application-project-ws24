@@ -1,11 +1,18 @@
 import { relations } from "drizzle-orm";
-import { index, pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import {
+	index,
+	pgEnum,
+	pgTable,
+	primaryKey,
+	text,
+	uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
 import { cuid, id, timestamps } from "./utils";
 
-export const messageStateEnum = pgEnum("message_state", [
+export const messageStateEnum = pgEnum("messages_state", [
 	"pending",
 	"sent",
 	"delivered",
@@ -26,7 +33,11 @@ export const messageTable = pgTable(
 		state: messageStateEnum().notNull(),
 		body: text().notNull(),
 	},
-	(table) => [index().on(table.id), index().on(table.authorId)],
+	(table) => [
+		uniqueIndex().on(table.id),
+		index().on(table.chatId),
+		index().on(table.authorId),
+	],
 );
 
 export const messageTableRelations = relations(
@@ -46,7 +57,7 @@ export const messageTableRelations = relations(
 );
 
 export const messageRecipientTable = pgTable(
-	"message_recipients",
+	"messages_recipients",
 	{
 		messageId: cuid()
 			.notNull()
