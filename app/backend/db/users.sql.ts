@@ -3,7 +3,7 @@ import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
 import { sessionTable } from "#db/sessions.sql";
 import { chatMemberTable } from "./chats.sql";
 import { messageTable } from "./messages.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import { cuid, id, timestamps } from "./utils";
 
 export const userTable = pgTable(
 	"users",
@@ -39,7 +39,7 @@ export const userProfileTable = pgTable(
 	{
 		id,
 		...timestamps,
-		userId: varchar(ID_SIZE_CONFIG)
+		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" })
 			.unique(),
@@ -67,18 +67,14 @@ export const userProfileTableRelations = relations(
 export const contactsTable = pgTable(
 	"user_contacts",
 	{
-		userId: varchar(ID_SIZE_CONFIG)
+		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
-		contactId: varchar(ID_SIZE_CONFIG)
+		contactId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
 	},
-	(table) => [
-		{
-			pk: primaryKey({ columns: [table.userId, table.contactId] }),
-		},
-	],
+	(table) => [primaryKey({ columns: [table.userId, table.contactId] })],
 );
 
 export const contactsTableRelations = relations(contactsTable, ({ one }) => ({

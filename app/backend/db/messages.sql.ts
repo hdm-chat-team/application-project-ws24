@@ -1,16 +1,9 @@
 import { relations } from "drizzle-orm";
-import {
-	index,
-	pgEnum,
-	pgTable,
-	primaryKey,
-	text,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import { cuid, id, timestamps } from "./utils";
 
 export const messageStateEnum = pgEnum("message_state", [
 	"pending",
@@ -24,33 +17,26 @@ export const messageTable = pgTable(
 	{
 		id,
 		...timestamps,
-		chatId: varchar(ID_SIZE_CONFIG)
+		chatId: cuid()
 			.notNull()
 			.references(() => chatTable.id),
-		authorId: varchar(ID_SIZE_CONFIG)
+		authorId: cuid()
 			.notNull()
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
 		body: text().notNull(),
 	},
-	(table) => [
-		{
-			idIdx: index().on(table.id),
-			authorIdIdx: index().on(table.authorId),
-		},
-	],
+	(table) => [index().on(table.id), index().on(table.authorId)],
 );
 
 export const messageTableRelations = relations(
 	messageTable,
 	({ one, many }) => ({
 		chat: one(chatTable, {
-			relationName: "chat",
 			fields: [messageTable.chatId],
 			references: [chatTable.id],
 		}),
 		author: one(userTable, {
-			relationName: "author",
 			fields: [messageTable.authorId],
 			references: [userTable.id],
 		}),
@@ -62,21 +48,18 @@ export const messageTableRelations = relations(
 export const messageRecipientTable = pgTable(
 	"message_recipients",
 	{
-		messageId: varchar(ID_SIZE_CONFIG)
+		messageId: cuid()
 			.notNull()
 			.references(() => messageTable.id, { onDelete: "cascade" }),
-		recipientId: varchar(ID_SIZE_CONFIG)
+		recipientId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
 		state: messageStateEnum().notNull(),
 		...timestamps,
 	},
 	(table) => [
-		{
-			pk: primaryKey({ columns: [table.messageId, table.recipientId] }),
-			messageIdIdx: index().on(table.messageId),
-			recipientIdIdx: index().on(table.recipientId),
-		},
+		primaryKey({ columns: [table.messageId, table.recipientId] }),
+		index().on(table.messageId),
 	],
 );
 

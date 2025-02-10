@@ -7,7 +7,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { userTable } from "./users.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import { cuid, id, timestamps } from "./utils";
 
 export const chatTypeEnum = pgEnum("chat_type", ["self", "direct", "group"]);
 
@@ -25,18 +25,16 @@ export const chatRelations = relations(chatTable, ({ many }) => ({
 export const chatMemberTable = pgTable(
 	"chat_members",
 	{
-		chatId: varchar(ID_SIZE_CONFIG)
+		chatId: cuid()
 			.notNull()
 			.references(() => chatTable.id, { onDelete: "cascade" }),
-		userId: varchar(ID_SIZE_CONFIG)
+		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
 	},
 	(table) => [
-		{
-			pk: primaryKey({ columns: [table.chatId, table.userId] }),
-			chatMemberIdIndex: index().on(table.userId),
-		},
+		primaryKey({ columns: [table.chatId, table.userId] }),
+		index().on(table.userId),
 	],
 );
 
