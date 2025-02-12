@@ -1,7 +1,6 @@
 import type { LocalMessage } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
-import { compressToAvif } from "@/lib/compression";
 import { db } from "@/lib/db";
 import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
@@ -23,16 +22,8 @@ export function usePostMessage(chatId: string) {
 			if (!result.ok) throw new Error("Failed to send message");
 			const messageId = (await result.json()).data;
 
-			// * compress and upload attachments
 			if (files.length === 0) return;
-			const processedFiles = await Promise.all(
-				files.map(async (file) => {
-					if (!file.type.startsWith("image/")) return file;
-					const compressedFile = await compressToAvif(file);
-					return compressedFile.size < file.size ? compressedFile : file;
-				}),
-			);
-			await startUpload(processedFiles, { id: messageId });
+			await startUpload(files, { id: messageId });
 		},
 		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
