@@ -19,17 +19,31 @@ import { publish } from "#lib/utils";
 
 const routeBuilder = createUploadthing();
 
-async function compressImage(file: File) {
-	const buffer = await file.arrayBuffer();
-	const image = await sharp(buffer);
-	const compressed = await image
-		.resize(1200, 1200, {
-			fit: "inside",
-			withoutEnlargement: true,
-		})
-		.jpeg({ quality: 80 })
-		.toBuffer();
-	return new File([compressed], file.name, { type: "image/jpeg" });
+async function handleImageUpload(file: { url: string; key: string }) {
+	try {
+		// * download the image
+		const buffer = await fetch(file.url)
+			.then((res) => res.arrayBuffer())
+			.then(Buffer.from);
+
+		// * compress the image
+		const compressed = await sharp(buffer)
+			.resize(800, 800, { fit: "inside", withoutEnlargement: true })
+			.jpeg({ quality: 80 })
+			.toBuffer();
+
+		// * upload the compressed image
+		const [{ data }] = await utapi.uploadFiles([
+			new File([compressed], file.key, { type: "image/jpeg" }),
+		]);
+
+		// * delete the uncompressed image
+		await utapi.deleteFiles([file.key]);
+
+		return data?.url;
+	} catch {
+		throw new Error("Image processing failed");
+	}
 }
 
 export const uploadRouter = {
