@@ -1,5 +1,6 @@
 import { createId, cuidParamSchema } from "@application-project-ws24/cuid";
 import { contextStorage, getContext } from "hono/context-storage";
+import sharp from "sharp";
 import {
 	type FileRouter as FR,
 	UTApi,
@@ -17,6 +18,19 @@ import env from "#env";
 import { publish } from "#lib/utils";
 
 const routeBuilder = createUploadthing();
+
+async function compressImage(file: File) {
+	const buffer = await file.arrayBuffer();
+	const image = await sharp(buffer);
+	const compressed = await image
+		.resize(1200, 1200, {
+			fit: "inside",
+			withoutEnlargement: true,
+		})
+		.jpeg({ quality: 80 })
+		.toBuffer();
+	return new File([compressed], file.name, { type: "image/jpeg" });
+}
 
 export const uploadRouter = {
 	avatar: routeBuilder({
