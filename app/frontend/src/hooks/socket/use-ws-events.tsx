@@ -9,7 +9,7 @@ import {
 	useSaveMessageBatch,
 	useUpdateMessage,
 } from "@/features/message/hooks";
-import { formatBerlinTime } from "@/features/message/utils";
+import { formatBerlinTime } from "@server/lib/utils";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
