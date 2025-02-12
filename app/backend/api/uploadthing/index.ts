@@ -61,13 +61,14 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides, profile };
 		})
-		.onUploadComplete(async ({ file: { url }, metadata: { profile } }) => {
+		.onUploadComplete(async ({ file, metadata: { profile } }) => {
+			const url = await handleImageUpload(file);
+			
 			const [{ avatarUrl }] = await updateUserProfile.execute({
 				...profile,
 				avatarUrl: url,
 			});
 			if (!avatarUrl) throw uploadthingDBError("Failed to update avatar");
-
 			return { avatarUrl };
 		}),
 	attachment: routeBuilder({
