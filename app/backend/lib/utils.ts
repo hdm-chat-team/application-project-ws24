@@ -1,7 +1,7 @@
+import { Temporal } from "@js-temporal/polyfill";
 import type { Server, ServerWebSocket, ServerWebSocketSendStatus } from "bun";
 import type { WSContext } from "hono/ws";
 import { type WSEventData, wsEventDataSchema } from "#shared/types";
-
 let serverInstance: Server;
 
 export function setServer(server: Server) {
@@ -48,4 +48,19 @@ export function send(
 ) {
 	wsEventDataSchema.parse(data);
 	return socket.send(JSON.stringify(data), compress);
+}
+
+/**
+ * Formats the current time in Berlin timezone to a string in the format "HH:mm"
+ * @returns {string} The formatted time string
+ */
+export function formatBerlinTime() {
+	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
+		"de-DE",
+		{
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		},
+	);
 }
