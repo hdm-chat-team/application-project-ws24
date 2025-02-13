@@ -36,6 +36,7 @@
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
+		"@faker-js/faker": "^9.5.0",
 		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.11",
 		"drizzle-kit": "^0.30.2"

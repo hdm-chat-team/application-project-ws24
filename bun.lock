@@ -23,6 +23,7 @@
       },
       "devDependencies": {
         "@application-project-ws24/tsconfig": "packages/tsconfig",
+        "@faker-js/faker": "^9.5.0",
         "@types/bun": "^1.2.0",
         "@types/pg": "^8.11.11",
         "drizzle-kit": "^0.30.2",
@@ -108,7 +109,7 @@
 
     "@apideck/better-ajv-errors": ["@apideck/better-ajv-errors@0.3.6", "", { "dependencies": { "json-schema": "^0.4.0", "jsonpointer": "^5.0.0", "leven": "^3.1.0" }, "peerDependencies": { "ajv": ">=8" } }, "sha512-P+ZygBLZtkp0qqOAJJVX4oX/sFo5JR3eBWwwuqHHhK0GIgQOKWrAfiAaWX0aArHkRWHMuggFEgAZNxVPwPZYaA=="],
 
-    "@application-project-ws24/backend": ["@application-project-ws24/backend@workspace:app", { "dependencies": { "@application-project-ws24/cuid": "packages/cuid", "@hono/zod-validator": "^0.4.2", "arctic": "^3.2.1", "drizzle-orm": "^0.38.4", "drizzle-seed": "^0.3.1", "drizzle-zod": "^0.6.1", "hono": "^4.6.19", "pg": "^8.13.1", "uploadthing": "^7.4.4", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@types/bun": "^1.2.0", "@types/pg": "^8.11.11", "drizzle-kit": "^0.30.2" } }],
+    "@application-project-ws24/backend": ["@application-project-ws24/backend@workspace:app", { "dependencies": { "@application-project-ws24/cuid": "packages/cuid", "@hono/zod-validator": "^0.4.2", "arctic": "^3.2.1", "drizzle-orm": "^0.38.4", "drizzle-seed": "^0.3.1", "drizzle-zod": "^0.6.1", "hono": "^4.6.19", "pg": "^8.13.1", "uploadthing": "^7.4.4", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@faker-js/faker": "^9.5.0", "@types/bun": "^1.2.0", "@types/pg": "^8.11.11", "drizzle-kit": "^0.30.2" } }],
 
     "@application-project-ws24/cuid": ["@application-project-ws24/cuid@workspace:packages/cuid", { "dependencies": { "@paralleldrive/cuid2": "latest", "zod": "^3.24.1" }, "devDependencies": { "@application-project-ws24/tsconfig": "packages/tsconfig", "@types/bun": "latest" } }],
 
@@ -373,6 +374,8 @@
     "@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.19.12", "", { "os": "win32", "cpu": "ia32" }, "sha512-+ZOE6pUkMOJfmxmBZElNOx72NKpIa/HFOMGzu8fqzQJ5kgf6aTGrcJaFsNiVMH4JKpMipyK+7k0n2UXN7a8YKQ=="],
 
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.19.12", "", { "os": "win32", "cpu": "x64" }, "sha512-T1QyPSDCyMXaO3pzBkF96E8xMkiRYbUEZADd29SyPGabqxMViNoii+NcK7eWJAEoU6RZyEm5lVSIjTmcdoB9HA=="],
+
+    "@faker-js/faker": ["@faker-js/faker@9.5.0", "", {}, "sha512-3qbjLv+fzuuCg3umxc9/7YjrEXNaKwHgmig949nfyaTx8eL4FAsvFbu+1JcFUj1YAXofhaDn6JdEUBTYuk0Ssw=="],
 
     "@floating-ui/core": ["@floating-ui/core@1.6.9", "", { "dependencies": { "@floating-ui/utils": "^0.2.9" } }, "sha512-uMXCuQ3BItDUbAMhIXw7UPXRfAlOAvZzdK9BWpE60MCn+Svt3aLn9jsPTi/WNGlRUu2uI0v5S7JiIUsbsvh3fw=="],
 
