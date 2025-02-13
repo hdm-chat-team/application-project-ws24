@@ -1,44 +1,42 @@
 import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import type { DatabaseError } from "pg";
 import { createRouter } from "#api/factory";
 import {
-	deleteContact,
-	insertContact,
-	insertContactSchema,
-	selectContactsByUserId,
-	selectUserContactByContactId,
-} from "#db/contacts";
+	deleteUserContact,
+	insertUserContact,
+	insertUserContactSchema,
+	selectUserContactsByUserId,
+} from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 
 export const contactsRouter = createRouter()
 	.get("/", protectedRoute, async (c) => {
 		const { id: userId } = c.get("user");
 
-		const contactIds = await selectContactsByUserId
+		const contactIds = await selectUserContactsByUserId
 			.execute({ userId })
-			.catch((error: DatabaseError) => {
+			.catch((error) => {
 				throw new HTTPException(500, {
 					message: error.message,
 					cause: error.cause,
 				});
 			})
-			.then((rows) => rows.map((row) => row.contactId));
+			.then((rows) => rows.map(({ contactOf, ...userId }) => userId));
 
 		return c.json({ data: contactIds });
 	})
 	.post(
 		"/",
 		protectedRoute,
-		zValidator("form", insertContactSchema.pick({ contactId: true })),
+		zValidator("json", insertUserContactSchema),
 		async (c) => {
-			const { id: userId } = c.get("user");
-			const { contactId } = c.req.valid("form");
+			const { id: contactorId } = c.get("user");
+			const { contactId } = c.req.valid("json");
 
-			const [newContact] = await insertContact
-				.execute({ userId, contactId })
-				.catch((error: DatabaseError) => {
+			const [newContact] = await insertUserContact
+				.execute({ contactorId, contactId })
+				.catch((error) => {
 					throw new HTTPException(500, {
 						message: error.message,
 						cause: error.cause,
@@ -54,50 +52,17 @@ export const contactsRouter = createRouter()
 			);
 		},
 	)
-	.get(
-		"/:id",
-		protectedRoute,
-		zValidator("param", cuidParamSchema),
-		async (c) => {
-			const { id: contactId } = c.req.valid("param");
-			const { id: userId } = c.get("user");
-
-			const contactData = await selectUserContactByContactId
-				.execute({ contactId, userId })
-				.catch((error: DatabaseError) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				})
-				.then((row) => {
-					if (!row?.contact) return null;
-					const { profile, ...user } = row.contact;
-					return { user, profile };
-				});
-
-			if (!contactData)
-				throw new HTTPException(404, { message: "no contact found" });
-
-			const { user, profile } = contactData;
-
-			if (!profile)
-				throw new HTTPException(404, { message: "no profile found" });
-
-			return c.json({ data: { user, profile } });
-		},
-	)
 	.delete(
 		"/:id",
 		protectedRoute,
 		zValidator("param", cuidParamSchema),
 		async (c) => {
-			const { id: contactId } = c.req.valid("param");
-			const { id: userId } = c.get("user");
+			const contactorId = c.get("user").id;
+			const contactId = c.req.valid("param").id;
 
-			const [deletedContact] = await deleteContact
-				.execute({ userId, contactId })
-				.catch((error: DatabaseError) => {
+			const [deletedContact] = await deleteUserContact
+				.execute({ contactorId, contactId })
+				.catch((error) => {
 					throw new HTTPException(500, {
 						message: error.message,
 						cause: error.cause,

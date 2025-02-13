@@ -1,14 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
-import { utapi } from "#api/uploadthing/index";
 import {
-	deleteUserProfileImageSchema,
 	selectUserChats,
 	selectUserDataByUsername,
 	selectUserSchema,
-	updateUserProfile,
-	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 import { contactsRouter } from "./contact";
@@ -17,25 +13,12 @@ import { profileRouter } from "./profile";
 export const userRouter = createRouter()
 	.route("/contacts", contactsRouter)
 	.route("/profile", profileRouter)
-	.put(
-		"/",
-		protectedRoute,
-		zValidator("form", updateUserProfileSchema),
-		async (c) => {
-			const { id } = c.get("profile");
-			const formData = c.req.valid("form");
+	.get("/", async (c) => {
+		const user = c.get("user");
+		const profile = c.get("profile");
 
-			const [updatedProfile] = await updateUserProfile.execute({
-				id,
-				...formData,
-			});
-
-			return c.json({
-				message: "profile updated!",
-				data: updatedProfile,
-			});
-		},
-	)
+		return c.json({ data: { user, profile } });
+	})
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
@@ -47,7 +30,6 @@ export const userRouter = createRouter()
 	})
 	.get(
 		"/username/:username",
-		protectedRoute,
 		zValidator("param", selectUserSchema.pick({ username: true })),
 		async (c) => {
 			const { username } = c.req.valid("param");
@@ -60,35 +42,8 @@ export const userRouter = createRouter()
 
 			const { profile, ...user } = result;
 			if (!profile)
-				throw new HTTPException(404, { message: "profile not found" });
+				throw new HTTPException(404, { message: "user profile not found" });
 
 			return c.json({ data: { user, profile } });
-		},
-	)
-	.delete(
-		"/avatar",
-		protectedRoute,
-		zValidator("json", deleteUserProfileImageSchema),
-		async (c) => {
-			const { avatarUrl } = c.req.valid("json");
-			const { id } = c.get("profile");
-			const fileKey = avatarUrl.split("/").pop();
-
-			if (!fileKey)
-				throw new HTTPException(400, {
-					message: "Invalid avatar URL",
-				});
-
-			await utapi.deleteFiles([fileKey]).catch(() => {
-				throw new HTTPException(500, {
-					message: "Failed to delete avatar",
-				});
-			});
-			const [updatedProfile] = await updateUserProfile.execute({
-				id,
-				avatarUrl: null,
-			});
-
-			return c.json({ success: true, data: updatedProfile });
 		},
 	);

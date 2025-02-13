@@ -1,6 +1,5 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
-import type { DatabaseError } from "pg";
 import { createRouter } from "#api/factory";
 import {
 	deleteChatMembership,
@@ -19,7 +18,7 @@ export const chatMemberRouter = createRouter()
 
 			const [insertedMembership] = await insertChatMembership
 				.execute(membership)
-				.catch((error: DatabaseError) => {
+				.catch((error) => {
 					throw new HTTPException(500, {
 						message: error.message,
 						cause: error.cause,
@@ -38,7 +37,7 @@ export const chatMemberRouter = createRouter()
 
 			const [deletedMembership] = await deleteChatMembership
 				.execute(membership)
-				.catch((error: DatabaseError) => {
+				.catch((error) => {
 					throw new HTTPException(500, {
 						message: error.message,
 						cause: error.cause,

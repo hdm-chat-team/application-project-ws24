@@ -2,13 +2,12 @@ import api from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 
 export function usePostContactMutation() {
-	const mutationKey = [api.contact.$url().pathname];
 	return useMutation({
-		mutationKey: mutationKey,
-		mutationFn: async (email: string) => {
-			const result = await api.contact.$post({
-				form: {
-					email,
+		mutationKey: ["POST", api.user.contacts.$url().pathname],
+		mutationFn: async (contactId: string) => {
+			const result = await api.user.contacts.$post({
+				json: {
+					contactId,
 				},
 			});
 			if (!result.ok) {

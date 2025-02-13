@@ -1,5 +1,5 @@
 import { cuidSchema } from "@application-project-ws24/cuid";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -10,7 +10,7 @@ import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { chatMembershipTable } from "./chats.sql";
 import type { DB, Transaction } from "./types";
-import { userProfileTable, userTable } from "./users.sql";
+import { userContactTable, userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable, {
 	id: cuidSchema,
@@ -25,16 +25,13 @@ const selectUserSchema = createSelectSchema(userTable)
 
 type User = z.infer<typeof selectUserSchema>;
 
-const deleteUserProfileImageSchema = z.object({
-	avatarUrl: z.string().url(),
-});
 const insertUserProfileSchema = createInsertSchema(userProfileTable, {
 	id: cuidSchema,
 });
 
 const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 	displayName: z.string().nonempty(),
-	avatarUrl: z.string().url().optional(),
+	avatarUrl: z.string().url(),
 }).pick({
 	displayName: true,
 	avatarUrl: true,
@@ -42,6 +39,12 @@ const updateUserProfileSchema = createUpdateSchema(userProfileTable, {
 
 const selectUserProfileSchema = createSelectSchema(userProfileTable);
 type UserProfile = z.infer<typeof selectUserProfileSchema>;
+
+const insertUserContactSchema = createInsertSchema(userContactTable).pick({
+	contactId: true,
+});
+const selectUserContactSchema = createSelectSchema(userContactTable);
+type UserContact = z.infer<typeof selectUserContactSchema>;
 
 const insertUser = db
 	.insert(userTable)
@@ -109,19 +112,19 @@ const selectUserDataByUsername = db.query.userTable
 		with: { profile: true },
 		where: eq(userTable.username, sql.placeholder("username")),
 	})
-	.prepare("select_user_profile");
+	.prepare("select_user_by_profile_username");
 
 const selectUserById = db.query.userTable
 	.findFirst({
 		where: eq(userTable.id, sql.placeholder("id")),
 	})
-	.prepare("select_user");
+	.prepare("select_user_by_id");
 
 const selectUserByEmail = db.query.userTable
 	.findFirst({
 		where: eq(userTable.email, sql.placeholder("email")),
 	})
-	.prepare("select_user");
+	.prepare("select_user_by_email");
 
 const updateUserProfile = db
 	.update(userProfileTable)
@@ -143,6 +146,40 @@ const selectUserChats = db.query.chatMembershipTable
 	})
 	.prepare("select_user_chats");
 
+const insertUserContact = db
+	.insert(userContactTable)
+	.values({
+		contactorId: sql.placeholder("contactorId"),
+		contactId: sql.placeholder("contactId"),
+	})
+	.returning()
+	.prepare("insert_user_contact");
+
+const selectUserContactsByUserId = db.query.userTable
+	.findMany({
+		columns: {
+			id: true,
+		},
+		with: {
+			contactOf: {
+				columns: {},
+				where: eq(userContactTable.contactorId, sql.placeholder("userId")),
+			},
+		},
+	})
+	.prepare("select_user_contacts_by_user_id");
+
+const deleteUserContact = db
+	.delete(userContactTable)
+	.where(
+		and(
+			eq(userContactTable.contactorId, sql.placeholder("contactorId")),
+			eq(userContactTable.contactId, sql.placeholder("contactId")),
+		),
+	)
+	.returning()
+	.prepare("delete_user_contact");
+
 export {
 	// * User schemas
 	insertUserSchema,
@@ -151,7 +188,8 @@ export {
 	insertUserProfileSchema,
 	updateUserProfileSchema,
 	userWithProfileSchema,
-	deleteUserProfileImageSchema,
+	insertUserContactSchema,
+	selectUserContactSchema,
 	// * User queries
 	selectUserById,
 	selectUserDataByUsername,
@@ -159,7 +197,10 @@ export {
 	insertUser,
 	selectUserChats,
 	updateUserProfile,
+	insertUserContact,
+	deleteUserContact,
+	selectUserContactsByUserId,
 	// * User functions
 	insertUserWithProfile,
 };
-export type { User, UserProfile, UserWithProfile };
+export type { User, UserProfile, UserWithProfile, UserContact };
