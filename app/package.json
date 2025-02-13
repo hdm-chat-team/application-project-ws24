@@ -19,13 +19,15 @@
 		"preview": "NODE_ENV=production bun run dist/index.js",
 		"start": "NODE_ENV=production bun run dist/index.js",
 		"test": "bun test --coverage",
-		"test:watch": "bun test --watch"
+		"test:watch": "bun test --watch",
+		"db:seed": "bun run backend/db/scripts/seed.ts"
 	},
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
 		"arctic": "^3.2.1",
 		"drizzle-orm": "^0.38.4",
+		"drizzle-seed": "^0.3.1",
 		"drizzle-zod": "^0.6.1",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
