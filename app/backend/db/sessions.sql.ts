@@ -1,6 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { index, uniqueIndex } from "drizzle-orm/pg-core";
-import { pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
+import { index, pgTable, timestamp, varchar } from "drizzle-orm/pg-core";
 import { userTable } from "./users.sql";
 import { cuid } from "./utils";
 
@@ -18,7 +17,7 @@ export const sessionTable = pgTable(
 			.notNull()
 			.$default(() => sql`now() + interval '30 days'`),
 	},
-	(table) => [uniqueIndex().on(table.token), index().on(table.userId)],
+	(table) => [index().on(table.userId)],
 );
 
 export const sessionTableRelations = relations(sessionTable, ({ one }) => ({

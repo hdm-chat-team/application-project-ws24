@@ -1,12 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-	index,
-	pgEnum,
-	pgTable,
-	primaryKey,
-	text,
-	uniqueIndex,
-} from "drizzle-orm/pg-core";
+import { index, pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
@@ -33,11 +26,7 @@ export const messageTable = pgTable(
 		state: messageStateEnum().notNull(),
 		body: text().notNull(),
 	},
-	(table) => [
-		uniqueIndex().on(table.id),
-		index().on(table.chatId),
-		index().on(table.authorId),
-	],
+	(table) => [index().on(table.chatId, table.chatId)],
 );
 
 export const messageTableRelations = relations(

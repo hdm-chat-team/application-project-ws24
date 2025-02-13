@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-	index,
 	pgEnum,
 	pgTable,
 	primaryKey,
@@ -46,13 +45,9 @@ export const chatMembershipTable = pgTable(
 			.notNull()
 			.references(() => chatTable.id, { onDelete: "cascade" }),
 		role: chatMembershipRoleEnum().default("member"),
-		joinedAt: timestamp().notNull().defaultNow(),
+		joinedAt: timestamp({ mode: "string" }).notNull().defaultNow(),
 	},
-	(table) => [
-		primaryKey({ columns: [table.userId, table.chatId] }),
-		index().on(table.userId),
-		index().on(table.chatId),
-	],
+	(table) => [primaryKey({ columns: [table.userId, table.chatId] })],
 );
 
 export const chatMembershipTableRelations = relations(
