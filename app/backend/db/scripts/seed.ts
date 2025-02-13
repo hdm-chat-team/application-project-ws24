@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker/locale/de";
 import { db } from "#db";
 import { userTable } from "../users.sql";
 
+// run with "bun:db seed" in app folder
 const userIdPool = Array.from({ length: 1000 }, () => createId());
 
 try {
