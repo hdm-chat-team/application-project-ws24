@@ -45,9 +45,6 @@ function getCompressionStrategy(fileSize: number) {
 }
 
 async function handleImageUpload(file: { url: string; key: string }) {
-	const startTime =
-		process.env.NODE_ENV === "development" ? performance.now() : 0;
-
 	try {
 		const buffer = await fetch(file.url)
 			.then((res) => res.arrayBuffer())
@@ -74,10 +71,7 @@ async function handleImageUpload(file: { url: string; key: string }) {
 				(compressed.length / buffer.length) *
 				100
 			).toFixed(1);
-			const processingTime = (performance.now() - startTime).toFixed(0);
-			console.log(
-				`Compressed ${file.key}: ${compressionRatio}% of original in ${processingTime}ms`,
-			);
+			console.log(`Compressed ${file.key}: ${compressionRatio}% of original`);
 		}
 
 		return data?.url;
@@ -104,7 +98,7 @@ export const uploadRouter = {
 		})
 		.onUploadComplete(async ({ file, metadata: { profile } }) => {
 			const url = await handleImageUpload(file);
-			
+
 			const [{ avatarUrl }] = await updateUserProfile.execute({
 				...profile,
 				avatarUrl: url,
