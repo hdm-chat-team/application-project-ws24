@@ -9,19 +9,19 @@ export const profileRouter = createRouter()
 	.put(
 		"/",
 		protectedRoute,
-		zValidator("form", updateUserProfileSchema),
+		zValidator("form", updateUserProfileSchema.pick({ displayName: true })),
 		async (c) => {
 			const {
 				id,
 				avatarUrl: currentAvatarUrl,
 				displayName: currentDisplayName,
 			} = c.get("profile");
-			const { avatarUrl, displayName } = c.req.valid("form");
+			const { displayName } = c.req.valid("form");
 
 			const [updatedProfile] = await updateUserProfile
 				.execute({
 					id,
-					avatarUrl: avatarUrl ?? currentAvatarUrl,
+					avatarUrl: currentAvatarUrl,
 					displayName: displayName ?? currentDisplayName,
 				})
 				.catch((error) => {
