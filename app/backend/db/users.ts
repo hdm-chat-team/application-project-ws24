@@ -162,7 +162,7 @@ const selectUserContactsByUserId = db.query.userTable
 		},
 		with: {
 			contactOf: {
-				columns: {},
+				columns: { contactId: true },
 				where: eq(userContactTable.contactorId, sql.placeholder("userId")),
 			},
 		},
