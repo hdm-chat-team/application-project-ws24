@@ -8,7 +8,7 @@ export function useUploadUserAvatar() {
 		(routeRegistry) => routeRegistry.avatar,
 	);
 	return useMutation({
-		mutationKey: ["api/uploadthing/avatar"],
+		mutationKey: ["POST", "api/uploadthing/avatar"],
 		mutationFn: async (files: File[]) => {
 			const result = await startUpload(files);
 			return result;
