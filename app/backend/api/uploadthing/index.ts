@@ -19,6 +19,7 @@ import { publish } from "#lib/utils";
 
 const routeBuilder = createUploadthing();
 
+// TODO: move getCompressionStrategy and handleImageUpload to lib/compression.ts
 const KB = 1024;
 const MB = 1024 * KB;
 
