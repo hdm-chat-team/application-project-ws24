@@ -78,7 +78,7 @@ export function useSaveAttachment() {
 	return useMutation({
 		mutationKey: ["db", "save", "attachment"],
 		mutationFn: async (attachment: Attachment) => {
-			await db.attachments.add(attachment);
+			await db.messageAttachments.add(attachment);
 		},
 		onMutate: async ({ url }) => {
 			const blob = await fetch(url)
@@ -91,6 +91,7 @@ export function useSaveAttachment() {
 
 			return blob;
 		},
-		onSuccess: (_, { url }, blob) => db.attachments.update(url, { blob }),
+		onSuccess: (_, { url }, blob) =>
+			db.messageAttachments.update(url, { blob }),
 	});
 }

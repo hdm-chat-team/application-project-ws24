@@ -1,26 +1,31 @@
 import type { LocalMessage } from "@/features/message/utils";
 import type { Attachment } from "@server/db/attachments";
-import type { Chat } from "@server/db/chats";
-import type { Contact } from "@server/db/contacts";
-import type { Message } from "@server/db/messages";
+import type { Chat, ChatMembership } from "@server/db/chats";
+import type { User, UserContact, UserProfile } from "@server/db/users";
 import type { EntityTable } from "dexie";
 import Dexie from "dexie";
 
 export type LocalDatabase = Dexie & {
-	messages: EntityTable<LocalMessage, "id">;
+	users: EntityTable<User, "id">;
+	userContacts: EntityTable<UserContact, "contactorId", "contactId">;
+	userProfiles: EntityTable<UserProfile, "id">;
 	chats: EntityTable<Chat, "id">;
-	contacts: EntityTable<UserContact, "id">;
-	attachments: EntityTable<Attachment & { blob?: Blob }, "url">;
+	chatMemberships: EntityTable<ChatMembership, "chatId", "userId">;
+	messages: EntityTable<LocalMessage, "id">;
+	messageAttachments: EntityTable<Attachment & { blob?: Blob }, "url">;
 };
 
 const db = new Dexie("database") as LocalDatabase;
 
-db.version(14).stores({
+db.version(16).stores({
+	users: "id, username, email",
+	userContacts: "[userId+contactId], userId, contactId",
+	userProfiles: "id, userId, displayName",
+	chats: "id, name, type, createdAt, updatedAt",
+	chatMemberships: "[chatId+userId], chatId, userId",
 	messages:
 		"id, body, state, chatId, authorId, createdAt, updatedAt, receivedAt",
-	chats: "id, name, createdAt, updatedAt",
-	contacts: "id, contactId, avatarUrl, displayName",
-	attachments: "url, messageId, type",
+	messageAttachments: "url, messageId, type",
 });
 
 export default db;
