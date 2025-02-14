@@ -25,7 +25,7 @@
 		"@application-project-ws24/cuid": "workspace:*",
 		"@hono/zod-validator": "^0.4.2",
 		"arctic": "^3.2.1",
-		"drizzle-orm": "^0.38.4",
+		"drizzle-orm": "^0.39.3",
 		"drizzle-zod": "^0.6.1",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
