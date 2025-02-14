@@ -45,7 +45,15 @@ function getCompressionStrategy(fileSize: number) {
 	};
 }
 
-async function handleImageUpload(file: { url: string; key: string }) {
+async function handleImageUpload(file: {
+	url: string;
+	key: string;
+	type: string;
+}) {
+	if (!file.type.startsWith("image/")) {
+		return file.url;
+	}
+
 	try {
 		const buffer = await fetch(file.url)
 			.then((res) => res.arrayBuffer())
@@ -124,34 +132,33 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides, messageId };
 		})
-		.onUploadComplete(
-			async ({ file: { url, type }, metadata: { messageId } }) => {
-				const [attachment] = await insertAttachment
-					.execute({
-						url,
-						type,
-						messageId,
-					})
-					.catch(() => {
-						throw uploadthingDBError("Failed to insert attachment");
-					});
+		.onUploadComplete(async ({ file, metadata: { messageId } }) => {
+			const url = await handleImageUpload(file);
+			const [attachment] = await insertAttachment
+				.execute({
+					url,
+					type: file.type,
+					messageId,
+				})
+				.catch(() => {
+					throw uploadthingDBError("Failed to insert attachment");
+				});
 
-				const recipientIds = await selectMessageRecipientIdsByMessageId
-					.execute({ messageId })
-					.catch(() => {
-						throw uploadthingDBError("Failed to select recipient IDs");
-					})
-					.then((rows) => rows.map(({ recipientId }) => recipientId));
+			const recipientIds = await selectMessageRecipientIdsByMessageId
+				.execute({ messageId })
+				.catch(() => {
+					throw uploadthingDBError("Failed to select recipient IDs");
+				})
+				.then((rows) => rows.map(({ recipientId }) => recipientId));
 
-				for (const recipientId of recipientIds)
-					publish(recipientId, {
-						type: "message_attachment",
-						payload: attachment,
-					});
+			for (const recipientId of recipientIds)
+				publish(recipientId, {
+					type: "message_attachment",
+					payload: attachment,
+				});
 
-				return attachment;
-			},
-		),
+			return attachment;
+		}),
 } satisfies FR;
 export type FileRouter = typeof uploadRouter;
 
