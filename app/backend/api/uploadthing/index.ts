@@ -19,7 +19,7 @@ import { publish } from "#lib/utils";
 
 const routeBuilder = createUploadthing();
 
-// TODO: move getCompressionStrategy and handleImageUpload to lib/compression.ts
+// TODO: move getCompressionStrategy and handleImageUpload to lib/compression.ts & delete frontend compression file
 const KB = 1024;
 const MB = 1024 * KB;
 
