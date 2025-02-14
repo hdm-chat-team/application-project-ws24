@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { testClient } from "hono/testing";
-import app, { type ApiType } from "./app";
+import { type ApiType, app } from "./app";
 
 const { api } = testClient(app as ApiType);
 

@@ -3,21 +3,21 @@ import { createId } from "@application-project-ws24/cuid";
 import { testClient } from "hono/testing";
 import { createApi } from "#api/factory";
 import type { Message } from "#db/messages";
-import { chatRouter } from ".";
+import { messageRouter } from ".";
 
-const { chat } = testClient(createApi().route("/chat", chatRouter));
+const { chat } = testClient(createApi().route("/chat", messageRouter));
 
-const mockMessage: Message = {
-	id: createId(),
-	createdAt: new Date().toISOString(),
-	updatedAt: new Date().toISOString(),
-	state: "pending",
-	body: "test",
-	authorId: createId(),
-	chatId: createId(),
-};
+describe("/api/chat/messages", () => {
+	const mockMessage: Message = {
+		id: createId(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		state: "pending",
+		body: "test",
+		authorId: createId(),
+		chatId: createId(),
+	};
 
-describe("/api/chat", () => {
 	describe("POST /", () => {
 		test("returns 401 when not authorized", async () => {
 			const res = chat.$post({
