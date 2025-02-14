@@ -3,7 +3,7 @@ name: Test
 on:
     push:
         branches: [ main ]
-    pull_request:
+    pull_request_target:
         branches: [ main ]
     workflow_dispatch:
 
@@ -27,5 +27,5 @@ jobs:
                 CLIENT_SECRET_GITHUB: ${{ secrets.CLIENT_SECRET_GITHUB }}
                 CALLBACK_URL_GITHUB: ${{ vars.CALLBACK_URL_GITHUB }}
                 DATABASE_URL: ${{ vars.DATABASE_URL }}
-                UPLOADTHING_TOKEN: ${{ vars.UPLOADTHING_TOKEN }}
+                UPLOADTHING_TOKEN: ${{ secrets.UPLOADTHING_TOKEN }}
               run: bun run test
