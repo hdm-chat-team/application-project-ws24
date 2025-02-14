@@ -3,7 +3,7 @@ import { seed } from "drizzle-seed";
 import { db } from "#db";
 import { userTable } from "../users.sql";
 
-// run with "bun:db seed" in app folder
+// run with "bun db:seed" in app folder
 async function main() {
 	try {
 		const userIdPool = Array.from({ length: 1000 }, () => createId());
