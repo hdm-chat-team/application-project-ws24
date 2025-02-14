@@ -27,7 +27,6 @@
 		"@hono/zod-validator": "^0.4.2",
 		"arctic": "^3.2.1",
 		"drizzle-orm": "^0.38.4",
-		"drizzle-seed": "^0.3.1",
 		"drizzle-zod": "^0.6.1",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
@@ -36,9 +35,9 @@
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
-		"@faker-js/faker": "^9.5.0",
 		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.11",
-		"drizzle-kit": "^0.30.2"
+		"drizzle-kit": "^0.30.2",
+		"drizzle-seed": "^0.3.1"
 	}
 }
