@@ -9,6 +9,7 @@
 		"preview": "bun --filter=\"*\" run preview",
 		"db": "cd app && bun db",
 		"db:prod": "cd app && bun db:prod",
+		"db:reset": "bun --filter=\"*\" run db:reset",
 		"ui": "cd app/frontend && bun ui",
 		"assets": "bun --bun --filter=\"*\" run assets",
 		"test": "bun --env-file=./app/.env test",

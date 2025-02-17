@@ -18,6 +18,7 @@
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"preview": "NODE_ENV=production bun run dist/index.js",
 		"start": "NODE_ENV=production bun run dist/index.js",
+		"db:reset": "bun --bun backend/db/scripts/reset.ts",
 		"test": "bun test --coverage",
 		"test:watch": "bun test --watch",
 		"db:seed": "bun run backend/db/scripts/seed.ts"
