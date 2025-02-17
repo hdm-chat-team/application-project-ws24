@@ -10,6 +10,7 @@
 		"db": "cd app && bun db",
 		"db:prod": "cd app && bun db:prod",
 		"db:reset": "bun --filter=\"*\" run db:reset",
+		"db:seed": "bun --filter=\"*\" run db:seed",
 		"ui": "cd app/frontend && bun ui",
 		"assets": "bun --bun --filter=\"*\" run assets",
 		"test": "bun --env-file=./app/.env test",
