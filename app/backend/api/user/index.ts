@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
 import {
-	selectUserChats,
+	selectChatsByMemberUserId,
 	selectUserDataByUsername,
 	selectUserSchema,
 } from "#db/users";
@@ -22,9 +22,9 @@ export const userRouter = createRouter()
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
-		const chats = await selectUserChats
-			.execute({ id })
-			.then((rows) => rows.map((row) => row.chat));
+		const chats = await selectChatsByMemberUserId
+			.execute({ userId: id })
+			.then((rows) => rows.map(({ members, ...chat }) => chat));
 
 		return c.json({ data: chats });
 	})

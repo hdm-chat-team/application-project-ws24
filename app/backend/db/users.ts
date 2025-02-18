@@ -136,15 +136,15 @@ const updateUserProfile = db
 	.returning()
 	.prepare("update_profile_avatar");
 
-const selectUserChats = db.query.chatMembershipTable
+const selectChatsByMemberUserId = db.query.chatTable
 	.findMany({
-		columns: {},
-		where: eq(chatMembershipTable.userId, sql.placeholder("id")),
 		with: {
-			chat: true,
+			members: {
+				where: eq(chatMembershipTable.userId, sql.placeholder("userId")),
+			},
 		},
 	})
-	.prepare("select_user_chats");
+	.prepare("select_chats_by_member_user_id");
 
 const insertUserContact = db
 	.insert(userContactTable)
@@ -195,7 +195,7 @@ export {
 	selectUserDataByUsername,
 	selectUserByEmail,
 	insertUser,
-	selectUserChats,
+	selectChatsByMemberUserId,
 	updateUserProfile,
 	insertUserContact,
 	deleteUserContact,
