@@ -85,6 +85,7 @@ export const githubRouter = createRouter()
 				await insertChatMembership.execute({
 					chatId: insertedChatId,
 					userId: insertedUser.id,
+					role: "owner",
 				});
 			}
 

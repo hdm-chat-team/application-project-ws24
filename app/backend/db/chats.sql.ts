@@ -44,7 +44,7 @@ export const chatMembershipTable = pgTable(
 		chatId: cuid()
 			.notNull()
 			.references(() => chatTable.id, { onDelete: "cascade" }),
-		role: chatMembershipRoleEnum().default("member"),
+		role: chatMembershipRoleEnum().notNull(),
 		joinedAt: timestamp({ mode: "string" }).notNull().defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.userId, table.chatId] })],
