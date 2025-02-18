@@ -71,19 +71,14 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
  */
 export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
-		const user = c.get("user");
-		const profile = c.get("profile");
-		const session = c.get("session");
+		const { session, user, profile } = c.var;
 
-		if (!session || !user || !profile)
+		if (!(session && user && profile))
 			throw new HTTPException(401, {
 				message: "Unauthorized",
 				cause: "Missing session or user",
 			});
 
-		c.set("user", user);
-		c.set("profile", profile);
-		c.set("session", session);
 		return next();
 	},
 );
