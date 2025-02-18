@@ -9,7 +9,7 @@ import {
 	useSaveMessageBatch,
 	useUpdateMessage,
 } from "@/features/message/hooks";
-import { formatBerlinTime } from "@/features/message/utils";
+import { localeTime } from "@/features/message/utils";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
@@ -37,7 +37,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				case "message_sync": {
 					const localMessages = data.payload.map((message) => ({
 						...message,
-						receivedAt: formatBerlinTime(message.updatedAt),
+						receivedAt: localeTime(),
 					}));
 					saveMessagesByChat(localMessages);
 					break;
@@ -45,7 +45,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				case "message_incoming": {
 					const localMessage = {
 						...data.payload,
-						receivedAt: formatBerlinTime(data.payload.updatedAt),
+						receivedAt: localeTime(),
 					};
 					saveMessage(localMessage);
 					sendMessage({

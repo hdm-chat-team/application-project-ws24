@@ -7,15 +7,15 @@ export type LocalMessage = Message & {
 	receivedAt: string;
 };
 
-export function formatBerlinTime(isoString: string) {
-	const berlinTime =
-		Temporal.Instant.from(isoString).toZonedDateTimeISO("Europe/Berlin");
-
-	return berlinTime.toLocaleString("de-DE", {
-		hour: "2-digit",
-		minute: "2-digit",
-		hour12: false,
-	});
+export function localeTime() {
+	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
+		"de-DE",
+		{
+			hour: "2-digit",
+			minute: "2-digit",
+			hour12: false,
+		},
+	);
 }
 
 export function createMessage(

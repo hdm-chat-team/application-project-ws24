@@ -1,4 +1,4 @@
-import { type LocalMessage, formatBerlinTime } from "@/features/message/utils";
+import { type LocalMessage, localeTime } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
@@ -38,7 +38,7 @@ export function usePostMessage(chatId: string) {
 			db.messages.add({
 				...message,
 				state: "sent",
-				receivedAt: formatBerlinTime(message.createdAt),
+				receivedAt: localeTime(),
 			}),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
 	});
