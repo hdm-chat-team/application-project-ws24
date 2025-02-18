@@ -58,6 +58,8 @@ const insertSelfChat = db
 	.insert(chatTable)
 	.values({
 		type: "self",
+		createdAt: sql`now()`,
+		updatedAt: sql`now()`,
 	})
 	.returning({ id: chatTable.id })
 	.prepare("insert_self_chat");

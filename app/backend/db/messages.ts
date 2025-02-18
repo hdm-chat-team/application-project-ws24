@@ -88,6 +88,8 @@ async function insertMessageRecipients(
 				messageId,
 				recipientId,
 				state: "pending" as Message["state"],
+				createdAt: sql`now()`,
+				updatedAt: sql`now()`,
 			})),
 		)
 		.returning({ recipientIds: messageRecipientTable.recipientId })

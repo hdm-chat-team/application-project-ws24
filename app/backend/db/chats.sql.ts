@@ -4,25 +4,21 @@ import {
 	pgTable,
 	primaryKey,
 	timestamp,
-	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { messageTable } from "./messages.sql";
 import { userTable } from "./users.sql";
-import { cuid, id, timestamps } from "./utils";
+import { cuid, id } from "./utils";
 
 export const chatTypeEnum = pgEnum("chat_type", ["self", "direct", "group"]);
 
-export const chatTable = pgTable(
-	"chats",
-	{
-		id,
-		...timestamps,
-		name: varchar({ length: 255 }),
-		type: chatTypeEnum().notNull(),
-	},
-	(table) => [uniqueIndex().on(table.id)],
-);
+export const chatTable = pgTable("chats", {
+	id,
+	name: varchar({ length: 255 }),
+	type: chatTypeEnum().notNull(),
+	createdAt: timestamp({ mode: "string" }).notNull(),
+	updatedAt: timestamp({ mode: "string" }).notNull(),
+});
 
 export const chatTableRelations = relations(chatTable, ({ many }) => ({
 	members: many(chatMembershipTable),
@@ -45,7 +41,7 @@ export const chatMembershipTable = pgTable(
 			.notNull()
 			.references(() => chatTable.id, { onDelete: "cascade" }),
 		role: chatMembershipRoleEnum().notNull(),
-		joinedAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+		joinedAt: timestamp({ mode: "string" }).notNull(),
 	},
 	(table) => [primaryKey({ columns: [table.userId, table.chatId] })],
 );

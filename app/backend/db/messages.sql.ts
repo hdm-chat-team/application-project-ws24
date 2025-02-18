@@ -1,9 +1,16 @@
 import { relations } from "drizzle-orm";
-import { index, pgEnum, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import {
+	index,
+	pgEnum,
+	pgTable,
+	primaryKey,
+	text,
+	timestamp,
+} from "drizzle-orm/pg-core";
 import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
 import { userTable } from "./users.sql";
-import { cuid, id, timestamps } from "./utils";
+import { cuid, id } from "./utils";
 
 export const messageStateEnum = pgEnum("messages_state", [
 	"pending",
@@ -16,7 +23,6 @@ export const messageTable = pgTable(
 	"messages",
 	{
 		id,
-		...timestamps,
 		chatId: cuid()
 			.notNull()
 			.references(() => chatTable.id),
@@ -25,6 +31,8 @@ export const messageTable = pgTable(
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
 		body: text().notNull(),
+		createdAt: timestamp({ mode: "string" }).notNull(),
+		updatedAt: timestamp({ mode: "string" }).notNull(),
 	},
 	(table) => [index().on(table.chatId, table.chatId)],
 );
@@ -55,7 +63,8 @@ export const messageRecipientTable = pgTable(
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
 		state: messageStateEnum().notNull(),
-		...timestamps,
+		createdAt: timestamp({ mode: "string" }).notNull(),
+		updatedAt: timestamp({ mode: "string" }).notNull(),
 	},
 	(table) => [
 		primaryKey({ columns: [table.messageId, table.recipientId] }),

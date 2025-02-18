@@ -3,19 +3,24 @@ import {
 	index,
 	pgTable,
 	primaryKey,
+	timestamp,
 	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { sessionTable } from "#db/sessions.sql";
 import { chatMembershipTable } from "./chats.sql";
 import { messageTable } from "./messages.sql";
-import { createdAt, cuid, id, timestamps } from "./utils";
+import { cuid, id } from "./utils";
 
 export const userTable = pgTable(
 	"users",
 	{
 		id,
-		...timestamps,
+		createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+		updatedAt: timestamp({ mode: "string" })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date().toISOString()),
 		githubId: varchar({ length: 20 }).notNull().unique(),
 		username: varchar({ length: 39 }).notNull().unique(),
 		email: varchar({ length: 255 }).notNull().unique(),
@@ -36,7 +41,6 @@ export const userProfileTable = pgTable(
 	"users_profiles",
 	{
 		id,
-		...timestamps,
 		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" })
@@ -44,6 +48,11 @@ export const userProfileTable = pgTable(
 		displayName: varchar({ length: 255 }),
 		avatarUrl: varchar({ length: 255 }),
 		htmlUrl: varchar({ length: 255 }),
+		createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+		updatedAt: timestamp({ mode: "string" })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date().toISOString()),
 	},
 	(table) => [index().on(table.displayName)],
 );
@@ -67,7 +76,6 @@ export const userContactTable = pgTable(
 		contactId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
-		createdAt,
 	},
 	(table) => [primaryKey({ columns: [table.contactorId, table.contactId] })],
 );
