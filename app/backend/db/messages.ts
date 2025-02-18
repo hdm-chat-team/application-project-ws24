@@ -21,15 +21,19 @@ const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
 
-const insertMessage = async (
-	message: z.infer<typeof insertMessageSchema>,
-	trx: Transaction | DB = db,
-) =>
-	await trx
-		.insert(messageTable)
-		.values(message)
-		.returning()
-		.then((rows) => rows[0]);
+const insertMessage = db
+	.insert(messageTable)
+	.values({
+		id: sql.placeholder("id"),
+		authorId: sql.placeholder("authorId"),
+		chatId: sql.placeholder("chatId"),
+		body: sql.placeholder("body"),
+		createdAt: sql.placeholder("createdAt"),
+		updatedAt: sql.placeholder("updatedAt"),
+		state: "sent",
+	})
+	.returning()
+	.prepare("insert_message");
 
 const selectUnDeliveredMessagesByUserId = db.query.messageTable
 	.findMany({
@@ -83,7 +87,7 @@ async function insertMessageRecipients(
 			recipientIds.map((recipientId) => ({
 				messageId,
 				recipientId,
-				state: "pending" as const,
+				state: "pending" as Message["state"],
 			})),
 		)
 		.returning({ recipientIds: messageRecipientTable.recipientId })
