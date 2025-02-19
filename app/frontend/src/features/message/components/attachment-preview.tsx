@@ -62,17 +62,15 @@ export function AttachmentPreview({
 
 					{file.type === "application/pdf" && (
 						<div className="flex flex-col items-center">
-							<div className="relative aspect-[3/4] max-h-[400px] w-full overflow-hidden rounded-lg bg-white shadow-lg">
+							<div className="relative aspect-[3/4] max-h-[400px] w-full overflow-hidden">
 								<embed
 									src={fileUrl}
 									type="application/pdf"
 									className="h-full w-full"
 								/>
 								<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent p-4">
-									<div className="flex items-center gap-2 text-white">
-										<FileText size={20} />
-										<span className="font-medium">{file.name}</span>
-									</div>
+									<FileText size={20} />
+									<span className="font-medium">{file.name}</span>
 								</div>
 							</div>
 						</div>
