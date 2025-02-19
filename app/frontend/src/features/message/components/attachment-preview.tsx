@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileText, SendHorizontal, X } from "lucide-react";
+import { useMemo } from "react";
 import { toast } from "sonner";
 
 type AttachmentPreviewProps = {
@@ -18,6 +19,8 @@ export function AttachmentPreview({
 	onCaptionChange,
 	handleSubmit,
 }: AttachmentPreviewProps) {
+	const fileUrl = useMemo(() => URL.createObjectURL(file), [file]);
+
 	const onSubmit = () => {
 		if (!caption.trim()) {
 			toast.error("Please add a caption");
@@ -41,7 +44,7 @@ export function AttachmentPreview({
 				<div className="w-full">
 					{file.type.startsWith("image/") && (
 						<img
-							src={URL.createObjectURL(file)}
+							src={fileUrl}
 							alt="Preview"
 							className="max-h-[400px] w-full rounded-lg object-contain"
 						/>
@@ -49,7 +52,7 @@ export function AttachmentPreview({
 
 					{file.type.startsWith("video/") && (
 						<video
-							src={URL.createObjectURL(file)}
+							src={fileUrl}
 							controls
 							className="max-h-[400px] w-full rounded-lg object-contain"
 						>
@@ -61,7 +64,7 @@ export function AttachmentPreview({
 						<div className="flex flex-col items-center">
 							<div className="relative aspect-[3/4] max-h-[400px] w-full overflow-hidden rounded-lg bg-white shadow-lg">
 								<embed
-									src={URL.createObjectURL(file)}
+									src={fileUrl}
 									type="application/pdf"
 									className="h-full w-full"
 								/>
