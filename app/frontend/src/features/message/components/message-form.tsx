@@ -48,7 +48,6 @@ export function MessageForm({ chatId }: { chatId: string }) {
 				{({ files, body }) =>
 					files && (
 						<AttachmentPreview
-							// * Attachment Preview
 							file={files[0]}
 							onRemove={() => form.setFieldValue("files", null)}
 							caption={body || ""}
