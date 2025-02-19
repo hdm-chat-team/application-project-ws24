@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileText, X } from "lucide-react";
+import { FileText, SendHorizontal, X } from "lucide-react";
 
 type AttachmentPreviewProps = {
 	file: File;
@@ -68,12 +68,12 @@ export function AttachmentPreview({
 					)}
 				</div>
 
-				<div className="mt-6 w-full max-w-2xl">
+				<div className="mt-6 flex w-full max-w-2xl items-center gap-2">
 					{/* Input field to add a caption */}
 					<Input
 						value={caption}
 						onChange={(e) => onCaptionChange(e.target.value)}
-						placeholder="Add a caption... (Press Enter to send)"
+						placeholder="Add a caption"
 						className="w-full bg-muted/50 py-6 text-lg"
 						onKeyDown={(e) => {
 							if (e.key === "Enter" && !e.shiftKey) {
@@ -82,6 +82,13 @@ export function AttachmentPreview({
 							}
 						}}
 					/>
+					<Button
+						onClick={onSubmit}
+						size="icon"
+						className="h-14 w-14 rounded-full bg-red-600 hover:bg-red-700"
+					>
+						<SendHorizontal size={20} />
+					</Button>
 				</div>
 			</div>
 		</div>
