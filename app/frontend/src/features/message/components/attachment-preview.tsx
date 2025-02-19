@@ -19,6 +19,7 @@ export function AttachmentPreview({
 }: AttachmentPreviewProps) {
 	return (
 		<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm">
+			{/* Button to remove the attachment */}
 			<Button
 				variant="secondary"
 				size="icon"
@@ -27,8 +28,8 @@ export function AttachmentPreview({
 			>
 				<X size={16} />
 			</Button>
-
 			<div className="flex w-full max-w-lg flex-col items-center p-8">
+				{/* Preview of the attachment */}
 				<div className="w-full">
 					{file.type.startsWith("image/") && (
 						<img
@@ -68,6 +69,7 @@ export function AttachmentPreview({
 				</div>
 
 				<div className="mt-6 w-full max-w-2xl">
+					{/* Input field to add a caption */}
 					<Input
 						value={caption}
 						onChange={(e) => onCaptionChange(e.target.value)}
