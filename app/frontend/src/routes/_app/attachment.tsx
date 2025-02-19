@@ -8,5 +8,10 @@ export const Route = createFileRoute("/_app/attachment")({
 	component: AttachmentPage,
 });
 
+const attachmentFormSchema = z.object({
+	body: z.string(),
+	file: z.instanceof(File, { message: "Eine Datei ist erforderlich" }),
+});
+
 function AttachmentPage() {
 }
