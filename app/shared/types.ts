@@ -17,7 +17,7 @@ const messageAttachmentSchema = z.object({
 	type: z.string().nonempty(),
 });
 
-const wsEventDataSchema = z.discriminatedUnion("type", [
+export const wsEventDataSchema = z.discriminatedUnion("type", [
 	z
 		.object({
 			type: z.literal("message_sync"),
@@ -65,7 +65,12 @@ const wsEventDataSchema = z.discriminatedUnion("type", [
 			"The client receives a message completion(read by all recipients) confirmation from the server.",
 		),
 ]);
-type WSEventData = z.infer<typeof wsEventDataSchema>;
+export type WSEventData = z.infer<typeof wsEventDataSchema>;
 
-export { wsEventDataSchema };
-export type { WSEventData };
+export const userSearchQuerySchema = z.object({
+	search: z.string().default(""),
+	page: z.number().nonnegative().default(1),
+	pagesize: z.number().nonnegative().default(20),
+});
+
+export type UserSearchQueryInput = z.input<typeof userSearchQuerySchema>;

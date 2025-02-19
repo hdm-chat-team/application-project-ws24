@@ -2,11 +2,13 @@ import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
 import {
+	searchUsersByUsernameOrEmail,
 	selectChatsByMemberUserId,
 	selectUserDataByUsername,
 	selectUserSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
+import { userSearchQuerySchema } from "#shared/types";
 import { contactsRouter } from "./contact";
 import { profileRouter } from "./profile";
 
@@ -46,4 +48,15 @@ export const userRouter = createRouter()
 
 			return c.json({ data: { user, profile } });
 		},
-	);
+	)
+	.get("/search", zValidator("json", userSearchQuerySchema), async (c) => {
+		const { search, page, pagesize } = c.req.valid("json");
+
+		const searchResults = await searchUsersByUsernameOrEmail.execute({
+			search: `%${search}%`,
+			offset: (page - 1) * pagesize,
+			limit: pagesize,
+		});
+
+		return c.json({ data: searchResults });
+	});

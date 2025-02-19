@@ -107,6 +107,20 @@ async function insertUserWithProfile(
 	});
 }
 
+const searchUsersByUsernameOrEmail = db.query.userTable
+	.findMany({
+		columns: { githubId: false },
+		with: { profile: true },
+		orderBy: asc(userTable.username),
+		offset: sql.placeholder("offset"),
+		limit: sql.placeholder("limit"),
+		where: or(
+			ilike(userTable.username, sql.placeholder("search")),
+			ilike(userTable.email, sql.placeholder("search")),
+		),
+	})
+	.prepare("search_users_by_username_or_email");
+
 const selectUserDataByUsername = db.query.userTable
 	.findFirst({
 		with: { profile: true },
