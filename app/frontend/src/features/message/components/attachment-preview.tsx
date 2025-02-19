@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileText, SendHorizontal, X } from "lucide-react";
+import { toast } from "sonner";
 
 type AttachmentPreviewProps = {
 	file: File;
 	onRemove: () => void;
 	caption: string;
 	onCaptionChange: (value: string) => void;
-	onSubmit: () => void;
+	handleSubmit: () => void;
 };
 
 export function AttachmentPreview({
@@ -15,8 +16,15 @@ export function AttachmentPreview({
 	onRemove,
 	caption,
 	onCaptionChange,
-	onSubmit,
+	handleSubmit,
 }: AttachmentPreviewProps) {
+	const onSubmit = () => {
+		if (!caption.trim()) {
+			toast.error("Please add a caption");
+			return;
+		}
+		handleSubmit();
+	};
 	return (
 		<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm">
 			{/* Button to remove the attachment */}
