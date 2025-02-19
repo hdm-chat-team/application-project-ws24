@@ -7,6 +7,7 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { usePostMessage } from "../hooks";
 import { createMessage } from "../utils";
+import { AttachmentPreview } from "./attachment-preview";
 
 const messageFormSchema = z.object({
 	body: z.string().trim().nonempty(),
@@ -37,6 +38,26 @@ export function MessageForm({ chatId }: { chatId: string }) {
 
 	return (
 		<div className="space-y-2">
+			{/* Attachment Preview */}
+			<form.Subscribe
+				selector={(state) => ({
+					files: state.values.files,
+					body: state.values.body,
+				})}
+			>
+				{({ files, body }) =>
+					files && (
+						<AttachmentPreview
+							// * Attachment Preview
+							file={files[0]}
+							onRemove={() => form.setFieldValue("files", null)}
+							caption={body || ""}
+							onCaptionChange={(value) => form.setFieldValue("body", value)}
+							onSubmit={form.handleSubmit}
+						/>
+					)
+				}
+			</form.Subscribe>
 			<form
 				className="flex gap-2"
 				autoComplete="off"
