@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FileIcon, X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 
 type AttachmentPreviewProps = {
 	file: File;
@@ -19,7 +19,6 @@ export function AttachmentPreview({
 }: AttachmentPreviewProps) {
 	return (
 		<div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm">
-			{/* X-Button */}
 			<Button
 				variant="secondary"
 				size="icon"
@@ -29,54 +28,51 @@ export function AttachmentPreview({
 				<X size={16} />
 			</Button>
 
-			{/* Preview Container */}
-			<div className="w-full max-w-4xl p-8">
-				{file.type.startsWith("image/") && (
-					<div className="relative max-h-[80vh] w-auto overflow-hidden rounded-lg bg-muted">
+			<div className="flex w-full max-w-lg flex-col items-center p-8">
+				<div className="w-full">
+					{file.type.startsWith("image/") && (
 						<img
 							src={URL.createObjectURL(file)}
 							alt="Preview"
-							className="h-full w-full object-contain"
+							className="max-h-[400px] w-full rounded-lg object-contain"
 						/>
-					</div>
-				)}
-				{file.type.startsWith("video/") && (
-					<div className="relative max-h-[50vh] w-full overflow-hidden rounded-lg bg-black">
+					)}
+
+					{file.type.startsWith("video/") && (
 						<video
 							src={URL.createObjectURL(file)}
 							controls
-							className="h-full w-full"
-							preload="metadata"
-							style={{
-								objectFit: "contain",
-								maxHeight: "80vh",
-								width: "100%",
-							}}
+							className="max-h-[400px] w-full rounded-lg object-contain"
 						>
 							<track kind="captions" />
 						</video>
-					</div>
-				)}
-				{file.type.startsWith("application/") && (
-					<div className="mx-auto flex w-full max-w-md items-center gap-3 rounded-lg bg-muted p-6">
-						<div className="rounded-full bg-primary/10 p-4">
-							<FileIcon className="size-8" />
+					)}
+
+					{file.type === "application/pdf" && (
+						<div className="flex flex-col items-center">
+							<div className="relative aspect-[3/4] max-h-[400px] w-full overflow-hidden rounded-lg bg-white shadow-lg">
+								<embed
+									src={URL.createObjectURL(file)}
+									type="application/pdf"
+									className="h-full w-full"
+								/>
+								<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/50 to-transparent p-4">
+									<div className="flex items-center gap-2 text-white">
+										<FileText size={20} />
+										<span className="font-medium">{file.name}</span>
+									</div>
+								</div>
+							</div>
 						</div>
-						<div className="flex flex-col">
-							<span className="font-medium text-lg">{file.name}</span>
-							<span className="text-muted-foreground text-sm">
-								{(file.size / (1024 * 1024)).toFixed(2)} MB
-							</span>
-						</div>
-					</div>
-				)}
-				{/* Caption Input*/}
-				<div className="mx-auto mt-4 max-w-md">
+					)}
+				</div>
+
+				<div className="mt-6 w-full max-w-2xl">
 					<Input
 						value={caption}
 						onChange={(e) => onCaptionChange(e.target.value)}
 						placeholder="Add a caption... (Press Enter to send)"
-						className="w-full bg-muted/50"
+						className="w-full bg-muted/50 py-6 text-lg"
 						onKeyDown={(e) => {
 							if (e.key === "Enter" && !e.shiftKey) {
 								e.preventDefault();
