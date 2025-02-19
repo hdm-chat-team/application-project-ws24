@@ -4,6 +4,7 @@ import { Paperclip, SendHorizontal } from "lucide-react";
 
 import { useUser } from "@/features/auth/hooks";
 import { useForm } from "@tanstack/react-form";
+import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { usePostMessage } from "../hooks";
 import { createMessage } from "../utils";
@@ -16,7 +17,7 @@ const messageFormSchema = z.object({
 
 export function MessageForm({ chatId }: { chatId: string }) {
 	const { user } = useUser();
-
+	const navigate = useNavigate();
 	const postMessage = usePostMessage(chatId).mutate;
 
 	const form = useForm({
@@ -67,22 +68,19 @@ export function MessageForm({ chatId }: { chatId: string }) {
 				}}
 			>
 				<form.Field name="files">
-					{(field) => (
-						<Button variant="secondary" size="icon" asChild>
-							<label htmlFor={field.name}>
-								<Paperclip size="5" />
-								<input
-									id={field.name}
-									name={field.name}
-									className="hidden"
-									type="file"
-									accept="image/*,video/*,audio/*,.pdf"
-									onChange={(event) => {
-										field.handleChange(event.target.files);
-										console.log({ files: event.target.files });
-									}}
-								/>
-							</label>
+					{() => (
+						<Button
+							variant="secondary"
+							size="icon"
+							onClick={() =>
+								navigate({
+									to: "/attachment",
+									search: { chatId },
+								})
+							}
+							type="button"
+						>
+							<Paperclip size="5" />
 						</Button>
 					)}
 				</form.Field>
