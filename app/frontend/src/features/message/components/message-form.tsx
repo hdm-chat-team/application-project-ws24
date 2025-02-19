@@ -52,7 +52,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 							onRemove={() => form.setFieldValue("files", null)}
 							caption={body || ""}
 							onCaptionChange={(value) => form.setFieldValue("body", value)}
-							onSubmit={form.handleSubmit}
+							handleSubmit={form.handleSubmit}
 						/>
 					)
 				}
