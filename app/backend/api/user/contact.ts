@@ -27,19 +27,15 @@ export const contactsRouter = createRouter()
 			const { id: contactorId } = c.get("user");
 			const { contactId } = c.req.valid("json");
 
-			const [newContact] = await insertUserContact
-				.execute({ contactorId, contactId })
-				.catch((error) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				});
+			const [insertedContact] = await insertUserContact.execute({
+				contactorId,
+				contactId,
+			});
 
 			return c.json(
 				{
 					message: "contact created",
-					data: newContact,
+					data: { contact: insertedContact },
 				},
 				201,
 			);

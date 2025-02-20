@@ -10,6 +10,7 @@ import {
 
 import { useChat } from "@/features/chat/context";
 import { selfChatQueryFn } from "@/features/chat/queries";
+import { usePostContact } from "@/features/contacts/hooks/use-post-contact";
 import {
 	contactsQueryFn,
 	searchUsersQueryOptions,
@@ -34,6 +35,7 @@ function RouteComponent() {
 	const search = useDebounce(searchTerm, 500);
 
 	const { data } = useQuery(searchUsersQueryOptions({ search }));
+	const postContact = usePostContact().mutate;
 
 	return (
 		<>
@@ -57,9 +59,17 @@ function RouteComponent() {
 				</SidebarMenu>
 				{data && (
 					<SidebarMenu id="search-results">
-						{data.map(({ username, profile: { displayName } }) => (
+						{data.map(({ id, username, profile: { displayName } }) => (
 							<SidebarMenuItem key={username}>
-								<SidebarMenuButton>{displayName}</SidebarMenuButton>
+								<SidebarMenuButton
+									value={id}
+									onClick={(event) => {
+										postContact(event.currentTarget.value);
+										setSearchTerm("");
+									}}
+								>
+									{displayName}
+								</SidebarMenuButton>
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>
