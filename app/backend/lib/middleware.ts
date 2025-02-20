@@ -12,6 +12,8 @@ import { validateSessionToken } from "#auth/session";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
+const SESSION_COOKIE_NAME = "auth_session";
+
 const origin = DEV
 	? [env.APP_URL, `http://localhost:${env.PORT}`, "http://localhost:5173"]
 	: [env.APP_URL];
@@ -30,19 +32,22 @@ const origin = DEV
  * - session: Session object or null
  */
 const authMiddleware = createMiddleware<Env>(async (c, next) => {
-	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
+	const sessionCookieToken = getCookie(c, SESSION_COOKIE_NAME) ?? null;
+
 	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
+		c.set("profile", null);
 		return next();
 	}
+
 	const { session, user, profile, fresh } =
 		await validateSessionToken(sessionCookieToken);
 
 	if (!session) {
-		deleteCookie(c, "auth_session");
+		deleteCookie(c, SESSION_COOKIE_NAME);
 	} else if (fresh) {
-		setCookie(c, "auth_session", session.token, {
+		setCookie(c, SESSION_COOKIE_NAME, session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
