@@ -68,9 +68,7 @@ export const wsEventDataSchema = z.discriminatedUnion("type", [
 export type WSEventData = z.infer<typeof wsEventDataSchema>;
 
 export const userSearchQuerySchema = z.object({
-	search: z.string().default(""),
-	page: z.number().nonnegative().default(1),
-	pagesize: z.number().nonnegative().default(20),
+	search: z.string().nonempty(),
 });
 
-export type UserSearchQueryInput = z.input<typeof userSearchQuerySchema>;
+export type UserSearchQuery = z.infer<typeof userSearchQuerySchema>;

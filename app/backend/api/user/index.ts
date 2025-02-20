@@ -2,8 +2,9 @@ import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
 import {
-	searchUsersByUsernameOrEmail,
+	type UserWithProfile,
 	selectChatsByMemberUserId,
+	selectUserByUsernameOrEmail,
 	selectUserDataByUsername,
 	selectUserSchema,
 } from "#db/users";
@@ -49,14 +50,15 @@ export const userRouter = createRouter()
 			return c.json({ data: { user, profile } });
 		},
 	)
-	.get("/search", zValidator("json", userSearchQuerySchema), async (c) => {
-		const { search, page, pagesize } = c.req.valid("json");
+	.get("/search", zValidator("query", userSearchQuerySchema), async (c) => {
+		const { search } = c.req.valid("query");
 
-		const searchResults = await searchUsersByUsernameOrEmail.execute({
-			search: `%${search}%`,
-			offset: (page - 1) * pagesize,
-			limit: pagesize,
+		const result = await selectUserByUsernameOrEmail.execute({
+			search,
 		});
 
-		return c.json({ data: searchResults });
+		return c.json({
+			data: result as UserWithProfile[],
+			// ? TS can't infer the type properly even if manually checked before, so we just cast it
+		});
 	});

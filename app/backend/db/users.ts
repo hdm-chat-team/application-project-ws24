@@ -1,5 +1,5 @@
 import { cuidSchema } from "@application-project-ws24/cuid";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, or, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -107,19 +107,16 @@ async function insertUserWithProfile(
 	});
 }
 
-const searchUsersByUsernameOrEmail = db.query.userTable
+const selectUserByUsernameOrEmail = db.query.userTable
 	.findMany({
 		columns: { githubId: false },
 		with: { profile: true },
-		orderBy: asc(userTable.username),
-		offset: sql.placeholder("offset"),
-		limit: sql.placeholder("limit"),
 		where: or(
-			ilike(userTable.username, sql.placeholder("search")),
-			ilike(userTable.email, sql.placeholder("search")),
+			eq(userTable.username, sql.placeholder("search")),
+			eq(userTable.email, sql.placeholder("search")),
 		),
 	})
-	.prepare("search_users_by_username_or_email");
+	.prepare("select_user_by_username_or_email");
 
 const selectUserDataByUsername = db.query.userTable
 	.findFirst({
@@ -195,26 +192,27 @@ const deleteUserContact = db
 	.prepare("delete_user_contact");
 
 export {
+	deleteUserContact,
+	insertUser,
+	insertUserContact,
+	insertUserContactSchema,
+	insertUserProfileSchema,
 	// * User schemas
 	insertUserSchema,
-	selectUserSchema,
-	selectUserProfileSchema,
-	insertUserProfileSchema,
-	updateUserProfileSchema,
-	userWithProfileSchema,
-	insertUserContactSchema,
-	selectUserContactSchema,
-	// * User queries
-	selectUserById,
-	selectUserDataByUsername,
-	selectUserByEmail,
-	insertUser,
-	selectChatsByMemberUserId,
-	updateUserProfile,
-	insertUserContact,
-	deleteUserContact,
-	selectUserContactsByUserId,
 	// * User functions
 	insertUserWithProfile,
+	// * User queries
+	selectUserByUsernameOrEmail,
+	selectChatsByMemberUserId,
+	selectUserByEmail,
+	selectUserById,
+	selectUserContactsByUserId,
+	selectUserContactSchema,
+	selectUserDataByUsername,
+	selectUserProfileSchema,
+	selectUserSchema,
+	updateUserProfile,
+	updateUserProfileSchema,
+	userWithProfileSchema,
 };
-export type { User, UserProfile, UserWithProfile, UserContact };
+export type { User, UserContact, UserProfile, UserWithProfile };

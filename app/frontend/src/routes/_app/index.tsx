@@ -35,7 +35,7 @@ function ChatListSidebar() {
 			<SidebarHeader className="flex flex-row items-center justify-between">
 				Chats
 				<Button variant="ghost" size="icon" asChild>
-					<Link to="/contacts">
+					<Link to="/new">
 						<MessageSquarePlusIcon />
 					</Link>
 				</Button>
