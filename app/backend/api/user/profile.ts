@@ -11,25 +11,14 @@ export const profileRouter = createRouter()
 		protectedRoute,
 		zValidator("form", updateUserProfileSchema.pick({ displayName: true })),
 		async (c) => {
-			const {
-				id,
-				avatarUrl: currentAvatarUrl,
-				displayName: currentDisplayName,
-			} = c.get("profile");
+			const profile = c.get("profile");
 			const { displayName } = c.req.valid("form");
 
-			const [updatedProfile] = await updateUserProfile
-				.execute({
-					id,
-					avatarUrl: currentAvatarUrl,
-					displayName: displayName ?? currentDisplayName,
-				})
-				.catch((error) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				});
+			const [updatedProfile] = await updateUserProfile.execute({
+				id: profile.id,
+				avatarUrl: profile.avatarUrl,
+				displayName: displayName ?? profile.displayName,
+			});
 
 			return c.json({
 				message: "profile updated!",
@@ -52,11 +41,8 @@ export const profileRouter = createRouter()
 					message: "Invalid avatar URL",
 				});
 
-			await utapi.deleteFiles([fileKey]).catch(() => {
-				throw new HTTPException(500, {
-					message: "Failed to delete avatar",
-				});
-			});
+			await utapi.deleteFiles([fileKey]);
+			
 			const [updatedProfile] = await updateUserProfile.execute({
 				id,
 				avatarUrl: null,

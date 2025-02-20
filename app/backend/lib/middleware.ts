@@ -122,15 +122,11 @@ export const utilityMiddlewares = every(
  * @returns A `Response` object with a status code and message based on the error type.
  */
 export async function onError(error: Error | HTTPResponseError) {
-	let response: Response;
-	if (!(error instanceof HTTPException)) {
-		console.error(error);
-		response = new Response(error.message, {
-			status: 500,
-			statusText: `Internal error: ${error.cause}`,
-		});
-	} else {
-		response = error.getResponse();
-	}
-	return response;
+	console.error(error);
+	return !(error instanceof HTTPException)
+		? new Response(error.message, {
+				status: 500,
+				statusText: `Internal error: ${error.cause}`,
+			})
+		: error.getResponse();
 }

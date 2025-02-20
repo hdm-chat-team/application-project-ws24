@@ -63,7 +63,6 @@ export const githubRouter = createRouter()
 			try {
 				tokens = await github.validateAuthorizationCode(code);
 			} catch (error) {
-				console.error("OAuth flow error:", error);
 				throw new HTTPException(400, {
 					message: "Invalid OAuth request",
 				});
