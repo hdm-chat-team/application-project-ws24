@@ -73,13 +73,9 @@ export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
 		const { session, user, profile } = c.var;
 
-		if (!(session && user && profile))
-			throw new HTTPException(401, {
-				message: "Unauthorized",
-				cause: "Missing session or user",
-			});
-
-		return next();
+		return !(session && user && profile)
+			? c.json({ message: "Unauthorized" }, 401)
+			: next();
 	},
 );
 
