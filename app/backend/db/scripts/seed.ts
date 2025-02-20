@@ -8,7 +8,7 @@ import env from "#env";
 * Number of users to seed
 ? should this be a command line argument? 
 */
-const USER_COUNT = 1000;
+const USER_COUNT = 10000;
 
 // * Tables to seed
 const { userTable, userProfileTable } = schema;
