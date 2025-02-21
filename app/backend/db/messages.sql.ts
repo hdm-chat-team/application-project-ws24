@@ -6,6 +6,7 @@ import {
 	primaryKey,
 	text,
 	varchar,
+	boolean,
 } from "drizzle-orm/pg-core";
 import { messageAttachmentTable } from "./attachments.sql";
 import { chatTable } from "./chats.sql";
@@ -32,6 +33,7 @@ export const messageTable = pgTable(
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
 		body: text().notNull(),
+		hasFile: boolean().notNull().default(false),
 	},
 	(table) => [
 		{
