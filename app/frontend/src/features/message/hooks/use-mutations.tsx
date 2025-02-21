@@ -19,8 +19,15 @@ export function usePostMessage(chatId: string) {
 			files,
 		}: { message: LocalMessage; files: File[] }) => {
 			// * send message
-			const result = await api.chat.$post({ form: message });
+			const formData = {
+				...message,
+				hasFile: String(files.length > 0),
+			};
+
+			const result = await api.chat.$post({ form: formData });
+
 			if (!result.ok) throw new Error("Failed to send message");
+
 			const messageId = (await result.json()).data;
 
 			// * compress and upload attachments
