@@ -10,8 +10,9 @@ const REDIRECT_URL = "http://localhost:5173";
 
 export const authRouter = createRouter()
 	.route("/github", githubRouter)
-	.get("/", protectedRoute, async (c) => {
+	.get("/", protectedRoute, (c) => {
 		return c.json({
+			message: "Authenticated",
 			data: {
 				user: c.get("user"),
 				profile: c.get("profile"),

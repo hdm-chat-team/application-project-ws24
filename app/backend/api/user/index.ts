@@ -16,11 +16,17 @@ import { profileRouter } from "./profile";
 export const userRouter = createRouter()
 	.route("/contacts", contactsRouter)
 	.route("/profile", profileRouter)
-	.get("/", async (c) => {
-		const user = c.get("user");
-		const profile = c.get("profile");
+	.get("/", (c) => {
+		const { user, profile } = c.var;
+		const signedIn = !!(user && profile);
 
-		return c.json({ data: { user, profile } });
+		return c.json(
+			{
+				message: `signed ${signedIn ? "in" : "out"}`,
+				data: { user, profile },
+			},
+			signedIn ? 200 : 404,
+		);
 	})
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
