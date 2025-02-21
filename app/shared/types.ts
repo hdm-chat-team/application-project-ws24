@@ -9,6 +9,7 @@ const messageSchema = z.object({
 	updatedAt: z.string().nonempty(),
 	state: z.enum(["pending", "sent", "delivered", "read"]),
 	body: z.string().nonempty(),
+	hasFile: z.boolean().default(false),
 });
 
 const messageAttachmentSchema = z.object({
