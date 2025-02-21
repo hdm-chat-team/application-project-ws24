@@ -1,7 +1,7 @@
 import api from "@/lib/api";
 import { db } from "@/lib/db";
 import type { UserWithProfile } from "@server/db/users";
-import type { UserSearchQuery } from "@shared/types";
+import { type UserSearchQuery, userSearchQuerySchema } from "@shared/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const contactsQueryFn = () =>
@@ -19,10 +19,12 @@ export const syncContactsQueryOptions = queryOptions({
 	},
 });
 
-export const searchUsersQueryOptions = (query: UserSearchQuery) => {
-	return queryOptions<UserWithProfile[]>({
+export const searchUsersQueryOptions = (query: UserSearchQuery) =>
+	queryOptions<UserWithProfile[]>({
 		queryKey: ["GET", api.user.search.$url().pathname, query.search],
 		queryFn: async () => {
+			const { error } = userSearchQuerySchema.safeParse(query);
+			if (error) return [];
 			const localResults = await userSearchQueryFn(query);
 
 			if (localResults.length > 0) return localResults;
@@ -32,7 +34,6 @@ export const searchUsersQueryOptions = (query: UserSearchQuery) => {
 			return (await response.json()).data;
 		},
 	});
-};
 
 export const userSearchQueryFn = ({ search }: UserSearchQuery) =>
 	db.transaction("r", db.users, db.userProfiles, async () => {
