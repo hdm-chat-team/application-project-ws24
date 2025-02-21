@@ -163,6 +163,7 @@ const insertUserContact = db
 		contactorId: sql.placeholder("contactorId"),
 		contactId: sql.placeholder("contactId"),
 	})
+	.onConflictDoNothing()
 	.returning()
 	.prepare("insert_user_contact");
 
