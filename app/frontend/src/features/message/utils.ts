@@ -33,6 +33,6 @@ export function createMessage(
 		authorId,
 		chatId,
 		receivedAt: formatBerlinTime(),
-		hasFile
+		hasFile,
 	};
 }
