@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Paperclip, SendHorizontal } from "lucide-react";
-
 import { useUser } from "@/features/auth/hooks";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 import { usePostMessage } from "../hooks";
 import { createMessage } from "../utils";
-import { AttachmentPreview } from "./attachment-preview";
 
 const messageFormSchema = z.object({
-	body: z.string().trim().nonempty(), // normal messages needs a body
+	body: z.string().trim().nonempty(), // normal messages needs a message
 	files: z.instanceof(FileList).nullable(),
 });
 
@@ -38,74 +36,53 @@ export function MessageForm({ chatId }: { chatId: string }) {
 	});
 
 	return (
-		<div className="space-y-2">
-			{/* Attachment Preview */}
+		<form
+			className="flex gap-2"
+			autoComplete="off"
+			onSubmit={(event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				form.handleSubmit();
+			}}
+		>
+			<form.Field name="files">
+				{() => (
+					<Button
+						variant="secondary"
+						size="icon"
+						onClick={() =>
+							navigate({
+								to: "/attachment",
+								search: { chatId },
+							})
+						}
+						type="button"
+					>
+						<Paperclip size="5" />
+					</Button>
+				)}
+			</form.Field>
+			<form.Field name="body">
+				{(field) => (
+					<Input
+						className="flex-1"
+						id={field.name}
+						name={field.name}
+						value={field.state.value}
+						type="text"
+						onChange={(event) => field.handleChange(event.target.value)}
+					/>
+				)}
+			</form.Field>
 			<form.Subscribe
-				selector={(state) => ({
-					files: state.values.files,
-					body: state.values.body,
-				})}
+				selector={(state) => [state.canSubmit, state.isSubmitting]}
 			>
-				{({ files, body }) =>
-					files && (
-						<AttachmentPreview
-							file={files[0]}
-							onRemove={() => form.setFieldValue("files", null)}
-							caption={body || ""}
-							onCaptionChange={(value) => form.setFieldValue("body", value)}
-							handleSubmit={form.handleSubmit}
-						/>
-					)
-				}
+				{([canSubmit, isSubmitting]) => (
+					<Button disabled={!canSubmit} type="submit" size="icon">
+						{isSubmitting ? "..." : <SendHorizontal size="5" />}
+					</Button>
+				)}
 			</form.Subscribe>
-			<form
-				className="flex gap-2"
-				autoComplete="off"
-				onSubmit={(event) => {
-					event.preventDefault();
-					event.stopPropagation();
-					form.handleSubmit();
-				}}
-			>
-				<form.Field name="files">
-					{() => (
-						<Button
-							variant="secondary"
-							size="icon"
-							onClick={() =>
-								navigate({
-									to: "/attachment",
-									search: { chatId },
-								})
-							}
-							type="button"
-						>
-							<Paperclip size="5" />
-						</Button>
-					)}
-				</form.Field>
-				<form.Field name="body">
-					{(field) => (
-						<Input
-							className="flex-1"
-							id={field.name}
-							name={field.name}
-							value={field.state.value}
-							type="text"
-							onChange={(event) => field.handleChange(event.target.value)}
-						/>
-					)}
-				</form.Field>
-				<form.Subscribe
-					selector={(state) => [state.canSubmit, state.isSubmitting]}
-				>
-					{([canSubmit, isSubmitting]) => (
-						<Button disabled={!canSubmit} type="submit" size="icon">
-							{isSubmitting ? "..." : <SendHorizontal size="5" />}
-						</Button>
-					)}
-				</form.Subscribe>
-			</form>
-		</div>
+		</form>
 	);
 }
