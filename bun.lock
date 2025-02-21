@@ -16,7 +16,7 @@
         "arctic": "^3.2.1",
         "drizzle-orm": "^0.39.3",
         "drizzle-zod": "^0.7.0",
-        "hono": "^4.6.19",
+        "hono": "^4.7.2",
         "pg": "^8.13.1",
         "uploadthing": "^7.4.4",
         "zod": "^3.24.1",
@@ -54,7 +54,7 @@
         "clsx": "^2.1.1",
         "dexie": "^4.0.11",
         "dexie-react-hooks": "^1.1.7",
-        "hono": "^4.6.19",
+        "hono": "^4.7.2",
         "lucide-react": "^0.475.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -993,7 +993,7 @@
 
     "hasown": ["hasown@2.0.2", "", { "dependencies": { "function-bind": "^1.1.2" } }, "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ=="],
 
-    "hono": ["hono@4.7.1", "", {}, "sha512-V3eWoPkBxoNgFCkSc5Y5rpLF6YoQQx1pkYO4qrF6YfOw8RZbujUNlJLZCxh0z9gZct70+je2Ih7Zrdpv21hP9w=="],
+    "hono": ["hono@4.7.2", "", {}, "sha512-8V5XxoOF6SI12jkHkzX/6aLBMU5GEF5g387EjVSQipS0DlxWgWGSMeEayY3CRBjtTUQYwLHx9JYouWqKzy2Vng=="],
 
     "ico-endec": ["ico-endec@0.1.6", "", {}, "sha512-ZdLU38ZoED3g1j3iEyzcQj+wAkY2xfWNkymszfJPoxucIUhK7NayQ+/C4Kv0nDFMIsbtbEHldv3V8PU494/ueQ=="],
 
