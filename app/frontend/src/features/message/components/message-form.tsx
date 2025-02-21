@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Paperclip, SendHorizontal } from "lucide-react";
 import { useUser } from "@/features/auth/hooks";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
+import { Paperclip, SendHorizontal } from "lucide-react";
 import { z } from "zod";
 import { usePostMessage } from "../hooks";
 import { createMessage } from "../utils";
