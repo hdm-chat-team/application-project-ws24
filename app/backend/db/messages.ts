@@ -4,7 +4,7 @@ import {
 	createSelectSchema,
 	createUpdateSchema,
 } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 import db from "#db";
 import {
 	messageRecipientTable,
@@ -13,7 +13,12 @@ import {
 } from "./messages.sql";
 import type { DB, Transaction } from "./types";
 
-const insertMessageSchema = createInsertSchema(messageTable);
+const insertMessageSchema = createInsertSchema(messageTable).extend({
+	hasFile: z.preprocess(
+		(val) => val === "true" || val === true,
+		z.boolean().default(false),
+	),
+});
 const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
