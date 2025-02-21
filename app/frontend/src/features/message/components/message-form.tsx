@@ -11,7 +11,7 @@ import { createMessage } from "../utils";
 import { AttachmentPreview } from "./attachment-preview";
 
 const messageFormSchema = z.object({
-	body: z.string().trim().nonempty(),
+	body: z.string().trim().nonempty(), // normal messages needs a body
 	files: z.instanceof(FileList).nullable(),
 });
 

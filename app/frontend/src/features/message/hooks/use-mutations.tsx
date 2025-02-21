@@ -18,9 +18,9 @@ export function usePostMessage(chatId: string) {
 			message,
 			files,
 		}: { message: LocalMessage; files: File[] }) => {
-			// * send message
 			const formData = {
 				...message,
+				// * set false/true in hasFile
 				hasFile: String(files.length > 0),
 			};
 
