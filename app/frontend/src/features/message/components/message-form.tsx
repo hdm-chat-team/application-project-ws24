@@ -57,10 +57,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 									className="hidden"
 									type="file"
 									accept="image/*,video/*,audio/*,.pdf"
-									onChange={(event) => {
-										field.handleChange(event.target.files);
-										console.log({ files: event.target.files });
-									}}
+									onChange={(event) => field.handleChange(event.target.files)}
 								/>
 							</label>
 						</Button>
