@@ -15,6 +15,7 @@ import type { DB, Transaction } from "./types";
 
 const insertMessageSchema = createInsertSchema(messageTable).extend({
 	hasFile: z.preprocess(
+		// * convert string to boolean
 		(val) => val === "true" || val === true,
 		z.boolean().default(false),
 	),
