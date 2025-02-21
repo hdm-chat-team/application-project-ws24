@@ -22,6 +22,7 @@ export function createMessage(
 	chatId: string,
 	authorId: string,
 	body: string,
+	hasFile = false,
 ): LocalMessage {
 	return {
 		id: createId(),
@@ -32,5 +33,6 @@ export function createMessage(
 		authorId,
 		chatId,
 		receivedAt: formatBerlinTime(),
+		hasFile
 	};
 }
