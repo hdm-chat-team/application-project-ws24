@@ -17,7 +17,7 @@ import { z } from "zod";
 export const Route = createFileRoute("/(auth)/signin")({
 	ssr: true,
 	validateSearch: z.object({
-		from: z.string().url().nullish(),
+		from: z.string().url().optional(),
 	}),
 	beforeLoad: async ({ context: { queryClient } }) => {
 		if (await queryClient.ensureQueryData(authQueryOptions))
