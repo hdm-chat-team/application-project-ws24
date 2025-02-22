@@ -15,11 +15,11 @@ import {
 	contactsQueryFn,
 	searchUsersQueryOptions,
 } from "@/features/contacts/queries";
-import { useDebounce } from "@/hooks/use-debounce";
 import { useQuery } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useState } from "react";
+import { useDebounceValue } from "usehooks-ts";
 
 export const Route = createFileRoute("/_app/new/")({
 	component: RouteComponent,
@@ -30,9 +30,9 @@ function RouteComponent() {
 	const navigate = useNavigate();
 
 	const selfChat = useLiveQuery(selfChatQueryFn, []);
-	const contactIds = useLiveQuery(contactsQueryFn, []);
+	const contacts = useLiveQuery(contactsQueryFn, []);
 	const [searchTerm, setSearchTerm] = useState("");
-	const search = useDebounce(searchTerm, 500);
+	const [search] = useDebounceValue(searchTerm, 500);
 
 	const { data } = useQuery(searchUsersQueryOptions({ search }));
 	const postContact = usePostContact().mutate;
@@ -52,9 +52,7 @@ function RouteComponent() {
 				/>
 				<SidebarMenu>
 					<SidebarMenuItem>
-						<SidebarMenuButton asChild>
-							<Link to="/new/group/members">New Group</Link>
-						</SidebarMenuButton>
+						<SidebarMenuButton asChild>New Group</SidebarMenuButton>
 					</SidebarMenuItem>
 				</SidebarMenu>
 				{data && (
@@ -89,11 +87,13 @@ function RouteComponent() {
 						</SidebarMenuItem>
 					</SidebarMenu>
 				)}
-				{contactIds && (
+				{contacts && (
 					<SidebarMenu id="contacts">
-						{contactIds.map((contact) => (
-							<SidebarMenuItem key={contact}>
-								<SidebarMenuButton>{contact}</SidebarMenuButton>
+						{contacts.map((contact) => (
+							<SidebarMenuItem key={contact.id}>
+								<SidebarMenuButton>
+									{contact.profile.displayName}
+								</SidebarMenuButton>
 							</SidebarMenuItem>
 						))}
 					</SidebarMenu>

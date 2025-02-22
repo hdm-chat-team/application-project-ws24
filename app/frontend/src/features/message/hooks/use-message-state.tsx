@@ -1,9 +1,10 @@
 import { useChat } from "@/features/chat/context";
 import { messageStateByIdQueryFn } from "@/features/message/queries";
-import { useIntersectionObserver, useSocket } from "@/hooks";
+import { useSocket } from "@/hooks";
 import type { Message } from "@server/db/messages";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useEffect } from "react";
+import { useIntersectionObserver } from "usehooks-ts";
 import { usePostMessage } from "./use-mutations";
 
 type UseMessageStateProps = Pick<Message, "id" | "authorId">;
