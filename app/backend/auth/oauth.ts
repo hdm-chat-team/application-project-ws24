@@ -42,3 +42,21 @@ export type GitHubUser = {
 	/** The location of the user set in GitHub */
 	location: string | null;
 };
+
+/**
+ * Represents a GitHub email address as returned by the GitHub OAuth API
+ * @see https://docs.github.com/en/rest/users/emails#list-email-addresses-for-the-authenticated-user
+ */
+export type GitHubEmail = {
+	/** The email address of the user */
+	email: string;
+
+	/** Whether this is the user's primary email address */
+	primary: boolean;
+
+	/** Whether this email address has been verified */
+	verified: boolean;
+
+	/** The visibility setting of the email address (public or private) */
+	visibility: "public" | null;
+};

@@ -8,7 +8,7 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
 import type { Env, ProtectedEnv } from "#api/app.env";
-import { validateSessionToken } from "#auth/session";
+import { invalidateSession, validateSessionToken } from "#auth/session";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
 
@@ -46,12 +46,27 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
 
 	if (!session) {
 		deleteCookie(c, SESSION_COOKIE_NAME);
-	} else if (fresh) {
+		return next();
+	}
+
+	// Verify device ID if header is present
+	const deviceIdCookie = getCookie(c, "device_id");
+	if (deviceIdCookie && deviceIdCookie !== session.deviceId) {
+		console.warn("⚠️ Device ID mismatch. Invalidating session.");
+		await invalidateSession(session.token);
+		deleteCookie(c, SESSION_COOKIE_NAME);
+		deleteCookie(c, "device_id");
+		c.set("user", null);
+		c.set("session", null);
+		c.set("profile", null);
+		return next();
+	}
+
+	if (fresh)
 		setCookie(c, SESSION_COOKIE_NAME, session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
-	}
 
 	c.set("user", user);
 	c.set("profile", profile);
@@ -60,27 +75,26 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
 });
 
 /**
- * Route protection middleware.
+ * Protected route authentication middleware.
  *
  * @description
- * makes sure that a valid session and user are present in the context, making them not be null.
+ * Ensures that a valid session, user, profile and deviceId are present in the context.
+ * This middleware should be used after the authMiddleware to protect routes that require authentication.
  *
- * @throws {HTTPException} 401 error if user or session is missing
+ * @returns 401 Unauthorized response if any of the required context variables are missing.
  *
  * @example
- * router.get("/protected", protectedRoute, async (c) => {
- *   const user = c.get("user");
- *   const session = c.get("session");
- *   // Handle protected route...
+ * router.get("/profile", requireAuth, async (c) => {
+ *   const user = c.get("user"); // truthy
+ *   const session = c.get("session"); // truthy
+ *   return c.json({ user, session });
  * });
  */
 export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
-		const { session, user, profile } = c.var;
-
-		return !(session && user && profile)
-			? c.json({ message: "Unauthorized" }, 401)
-			: next();
+		const { ...valuesToVerify } = c.var;
+		const isAuthenticated = Object.values(valuesToVerify).every(Boolean);
+		return !isAuthenticated ? c.json(401) : next();
 	},
 );
 

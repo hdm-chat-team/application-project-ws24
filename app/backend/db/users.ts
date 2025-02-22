@@ -6,10 +6,8 @@ import {
 	createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import type { GitHubUser } from "#auth/oauth";
 import db from "#db";
 import { chatMembershipTable } from "./chats.sql";
-import type { DB, Transaction } from "./types";
 import { userContactTable, userProfileTable, userTable } from "./users.sql";
 
 const insertUserSchema = createInsertSchema(userTable, {
@@ -46,66 +44,46 @@ const insertUserContactSchema = createInsertSchema(userContactTable).pick({
 const selectUserContactSchema = createSelectSchema(userContactTable);
 type UserContact = z.infer<typeof selectUserContactSchema>;
 
-const insertUser = db
+const userWithProfileSchema = selectUserSchema.extend({
+	profile: selectUserProfileSchema,
+});
+type UserWithProfile = z.infer<typeof userWithProfileSchema>;
+
+const upsertUser = db
 	.insert(userTable)
 	.values({
 		githubId: sql.placeholder("githubId"),
 		username: sql.placeholder("username"),
 		email: sql.placeholder("email"),
 	})
+	.onConflictDoUpdate({
+		target: userTable.githubId,
+		set: {
+			username: sql.placeholder("username").getSQL(),
+			email: sql.placeholder("email").getSQL(),
+		},
+	})
 	.returning({ id: userTable.id })
-	.prepare("insert_user");
+	.prepare("upsert_user");
 
-const userWithProfileSchema = selectUserSchema.extend({
-	profile: selectUserProfileSchema,
-});
-type UserWithProfile = z.infer<typeof userWithProfileSchema>;
-
-async function insertUserWithProfile(
-	githubUser: GitHubUser,
-	trx: Transaction | DB = db,
-) {
-	const {
-		id,
-		login: username,
-		name: displayName,
-		email,
-		avatar_url: avatarUrl,
-		html_url: htmlUrl,
-	} = githubUser;
-	const githubId = id.toString();
-	return trx.transaction(async (innerTrx) => {
-		const [user] = await innerTrx
-			.insert(userTable)
-			.values({
-				githubId,
-				username,
-				email: email ?? "",
-			})
-			.onConflictDoUpdate({
-				target: userTable.githubId,
-				set: { username, email: email ?? "" },
-			})
-			.returning();
-
-		if (!user) throw new Error("Failed to insert or update user");
-
-		await innerTrx
-			.insert(userProfileTable)
-			.values({
-				userId: user.id,
-				displayName,
-				avatarUrl,
-				htmlUrl,
-			})
-			.onConflictDoUpdate({
-				target: userProfileTable.userId,
-				set: { displayName, avatarUrl, htmlUrl },
-			});
-
-		return user;
-	});
-}
+const upsertUserProfile = db
+	.insert(userProfileTable)
+	.values({
+		userId: sql.placeholder("userId"),
+		displayName: sql.placeholder("displayName"),
+		avatarUrl: sql.placeholder("avatarUrl"),
+		htmlUrl: sql.placeholder("htmlUrl"),
+	})
+	.onConflictDoUpdate({
+		target: userProfileTable.userId,
+		set: {
+			displayName: sql.placeholder("displayName").getSQL(),
+			avatarUrl: sql.placeholder("avatarUrl").getSQL(),
+			htmlUrl: sql.placeholder("htmlUrl").getSQL(),
+		},
+	})
+	.returning()
+	.prepare("upsert_user_profile");
 
 const selectUserByUsernameOrEmail = db.query.userTable
 	.findMany({
@@ -127,6 +105,8 @@ const selectUserDataByUsername = db.query.userTable
 
 const selectUserById = db.query.userTable
 	.findFirst({
+		columns: { githubId: false },
+		with: { profile: true },
 		where: eq(userTable.id, sql.placeholder("id")),
 	})
 	.prepare("select_user_by_id");
@@ -164,7 +144,6 @@ const insertUserContact = db
 		contactId: sql.placeholder("contactId"),
 	})
 	.onConflictDoNothing()
-	.returning()
 	.prepare("insert_user_contact");
 
 const selectUserContactsByUserId = db.query.userTable
@@ -194,19 +173,16 @@ const deleteUserContact = db
 
 export {
 	deleteUserContact,
-	insertUser,
 	insertUserContact,
 	insertUserContactSchema,
 	insertUserProfileSchema,
 	// * User schemas
 	insertUserSchema,
-	// * User functions
-	insertUserWithProfile,
-	// * User queries
-	selectUserByUsernameOrEmail,
 	selectChatsByMemberUserId,
 	selectUserByEmail,
 	selectUserById,
+	// * User queries
+	selectUserByUsernameOrEmail,
 	selectUserContactsByUserId,
 	selectUserContactSchema,
 	selectUserDataByUsername,
@@ -214,6 +190,8 @@ export {
 	selectUserSchema,
 	updateUserProfile,
 	updateUserProfileSchema,
+	upsertUser,
+	upsertUserProfile,
 	userWithProfileSchema,
 };
 export type { User, UserContact, UserProfile, UserWithProfile };

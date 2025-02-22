@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { sessionTable } from "#db/sessions.sql";
 import { chatMembershipTable } from "./chats.sql";
+import { deviceTable } from "./devices.sql";
 import { messageTable } from "./messages.sql";
 import { cuid, id } from "./utils";
 
@@ -30,6 +31,7 @@ export const userTable = pgTable(
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	profile: one(userProfileTable),
+	devices: many(deviceTable),
 	sessions: many(sessionTable),
 	contacts: many(userContactTable, { relationName: "contactor" }),
 	contactOf: many(userContactTable, { relationName: "contact" }),

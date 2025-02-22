@@ -70,5 +70,4 @@ export type WSEventData = z.infer<typeof wsEventDataSchema>;
 export const userSearchQuerySchema = z.object({
 	search: z.string().nonempty(),
 });
-
 export type UserSearchQuery = z.infer<typeof userSearchQuerySchema>;

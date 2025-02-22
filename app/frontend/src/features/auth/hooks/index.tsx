@@ -16,7 +16,6 @@ import { authQueryOptions } from "../queries";
 export function useUser() {
 	const { data, ...rest } = useQuery(authQueryOptions);
 	if (!data) throw redirect({ to: "/signin", search: { from: location.href } });
-	const { user, profile } = data;
 
-	return { user, profile, ...rest };
+	return { ...data, ...rest };
 }
