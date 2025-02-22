@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_app/")({
 function ChatListSidebar() {
 	const chats = useLiveQuery(chatsQueryFn, []);
 	const { chat: currentChat, setChatId } = useChat();
-	
+
 	/* 
 	 Done: create proper chat list item component with avatar, name, last message, etc.
 	 TODO: add sorting by last message time
