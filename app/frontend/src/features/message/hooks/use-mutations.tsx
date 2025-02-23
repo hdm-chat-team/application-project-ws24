@@ -17,11 +17,13 @@ export function usePostMessage(chatId: string) {
 		mutationFn: async ({
 			message,
 			files,
-		}: { message: LocalMessage; files: File[] }) => {
+		}: {
+			message: LocalMessage;
+			files: File[];
+		}) => {
 			const formData = {
 				...message,
-				// * set false/true in hasFile
-				hasFile: String(files.length > 0),
+				body: message.body ?? "",
 			};
 
 			const result = await api.chat.$post({ form: formData });
@@ -72,7 +74,10 @@ export function useUpdateMessage() {
 		mutationFn: async ({
 			messageId,
 			state,
-		}: { messageId: Message["id"]; state: Message["state"] }) => {
+		}: {
+			messageId: Message["id"];
+			state: Message["state"];
+		}) => {
 			await db.messages.update(messageId, { state });
 		},
 	});
