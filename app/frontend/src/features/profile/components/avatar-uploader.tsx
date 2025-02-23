@@ -17,6 +17,7 @@ export function AvatarUploader({ className }: { className?: string }) {
 			>
 				<Avatar className="h-full w-full border border-gray-200 dark:border-gray-800">
 					<AvatarImage
+						//shows the avatar image with the fileUrl helper function
 						src={profile.avatarUrl ? fileUrl(profile.avatarUrl) : undefined}
 						className="size-full rounded-full object-cover"
 					/>
