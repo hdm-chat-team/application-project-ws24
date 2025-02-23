@@ -143,7 +143,7 @@ async function fetchGithubUser(accessToken: string): Promise<GitHubUser> {
 
 async function fetchPrimaryGithubEmail(
 	accessToken: string,
-): Promise<GitHubEmail | undefined> {
+): Promise<string | undefined> {
 	const result = await fetch(OAUTH_EMAIL_URL, {
 		headers: {
 			Authorization: `Bearer ${accessToken}`,
@@ -151,5 +151,5 @@ async function fetchPrimaryGithubEmail(
 		},
 	}).then((res) => res.json() as Promise<GitHubEmail[]>);
 
-	return result.find((email) => email.primary);
+	return result.find((email) => email.primary)?.email;
 }
