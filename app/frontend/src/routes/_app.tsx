@@ -1,9 +1,11 @@
 import {
 	Sidebar,
+	SidebarFooter,
 	SidebarInset,
 	SidebarProvider,
 } from "@/components/ui/sidebar";
 import { SocketProvider } from "@/context";
+import { SignoutButton } from "@/features/auth/components";
 import { authQueryOptions } from "@/features/auth/queries";
 import { Chat } from "@/features/chat/components";
 import { ChatProvider } from "@/features/chat/context";
@@ -21,6 +23,9 @@ export const Route = createFileRoute("/_app")({
 					<Sidebar>
 						{/* Sidebar content defined by routes */}
 						<Outlet />
+						<SidebarFooter>
+							<SignoutButton />
+						</SidebarFooter>
 					</Sidebar>
 					<SidebarInset className="flex flex-col">
 						<main className="flex w-full flex-1 overflow-hidden">
