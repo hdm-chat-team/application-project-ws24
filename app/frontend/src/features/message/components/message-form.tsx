@@ -26,7 +26,7 @@ export function MessageForm({ chatId }: { chatId: string }) {
 		onSubmit: ({ value }) => {
 			postMessage({
 				message: createMessage(chatId, user.id, value.body),
-				files: Array.from(value.files ?? []),
+				files: [],
 			});
 			form.reset();
 		},
