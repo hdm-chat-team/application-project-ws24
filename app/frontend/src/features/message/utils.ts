@@ -19,18 +19,18 @@ export function formatBerlinTime() {
 }
 
 export function createMessage(
-		chatId: string,
-		authorId: string,
-		body: string,
-	): LocalMessage {
-		return {
-			id: createId(),
-			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
-			state: "pending",
-			body: body || null,
-			authorId,
-			chatId,
-			receivedAt: formatBerlinTime(),
-		};
-	}
+	chatId: string,
+	authorId: string,
+	body: string,
+): LocalMessage {
+	return {
+		id: createId(),
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		state: "pending",
+		body: body || null,
+		authorId,
+		chatId,
+		receivedAt: formatBerlinTime(),
+	};
+}
