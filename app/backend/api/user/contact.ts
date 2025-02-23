@@ -2,9 +2,11 @@ import { cuidParamSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
 import { createRouter } from "#api/factory";
 import {
+	type UserWithProfile,
 	deleteUserContact,
 	insertUserContact,
 	insertUserContactSchema,
+	selectUserById,
 	selectUserContactsByUserId,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
@@ -22,20 +24,25 @@ export const contactsRouter = createRouter()
 	.post(
 		"/",
 		protectedRoute,
-		zValidator("json", insertUserContactSchema),
+		zValidator("json", insertUserContactSchema.pick({ contactId: true })),
 		async (c) => {
 			const { id: contactorId } = c.get("user");
 			const { contactId } = c.req.valid("json");
 
-			const [insertedContact] = await insertUserContact.execute({
+			const contact = await selectUserById.execute({
+				id: contactId,
+			});
+			if (!contact) return c.json({ message: "contact not found" }, 404);
+
+			await insertUserContact.execute({
 				contactorId,
-				contactId,
+				contactId: contact.id,
 			});
 
 			return c.json(
 				{
 					message: "contact created",
-					data: { contact: insertedContact },
+					data: { contact: contact as UserWithProfile },
 				},
 				201,
 			);

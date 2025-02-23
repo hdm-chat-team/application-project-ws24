@@ -1,11 +1,9 @@
-import { useUser } from "@/features/auth/hooks";
 import api from "@/lib/api";
 import db from "@/lib/db";
 import { useMutation } from "@tanstack/react-query";
 
-export function usePostContact() {
-	const { user } = useUser();
-	return useMutation({
+export const usePostContact = () =>
+	useMutation({
 		mutationKey: ["POST", api.user.contacts.$url().pathname],
 		mutationFn: async (contactId: string) => {
 			const result = await api.user.contacts.$post({
@@ -17,17 +15,7 @@ export function usePostContact() {
 			if (!result.ok) throw new Error("Failed to create contact");
 			return (await result.json()).data;
 		},
-		onMutate: (contactId) => {
-			db.userContacts.add({
-				contactorId: user.id,
-				contactId,
-			});
-		},
-		onError: (_error, contactId) => {
-			db.userContacts.delete({
-				contactorId: user.id,
-				contactId,
-			});
+		onSuccess: async ({ contact }) => {
+			await db.users.put({ ...contact, relation: "contact" });
 		},
 	});
-}
