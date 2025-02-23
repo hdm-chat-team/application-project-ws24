@@ -81,13 +81,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					break;
 			}
 		},
-		[
-			queryClient,
-			saveMessage,
-			saveMessagesByChat,
-			updateMessage,
-			sendMessage,
-		],
+		[queryClient, saveMessage, saveMessagesByChat, updateMessage, sendMessage],
 	);
 
 	return { handleOpen, handleMessage };
