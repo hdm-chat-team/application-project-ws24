@@ -3,7 +3,6 @@ import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
 import { db } from "@/lib/db";
-import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
@@ -68,26 +67,5 @@ export function useUpdateMessage() {
 		}: { messageId: Message["id"]; state: Message["state"] }) => {
 			await db.messages.update(messageId, { state });
 		},
-	});
-}
-
-export function useSaveAttachment() {
-	return useMutation({
-		mutationKey: ["db", "save", "attachment"],
-		mutationFn: async (attachment: Attachment) => {
-			await db.attachments.add(attachment);
-		},
-		onMutate: async ({ url }) => {
-			const blob = await fetch(url)
-				.then((res) => res.blob())
-				.catch((err) => {
-					console.error("Failed to fetch attachment", err);
-				});
-
-			if (!blob) return;
-
-			return blob;
-		},
-		onSuccess: (_, { url }, blob) => db.attachments.update(url, { blob }),
 	});
 }
