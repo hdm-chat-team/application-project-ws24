@@ -1,12 +1,14 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useUser } from "@/features/auth/hooks";
 import { useChat } from "@/features/chat/context";
 import { usePostMessage } from "@/features/message/hooks";
 import { createMessage } from "@/features/message/utils";
+import { CaptionInput } from "@/features/uploadthing/components/caption-input";
+import { FilePicker } from "@/features/uploadthing/components/file-picker";
+import { FilePreview } from "@/features/uploadthing/components/file-preview";
 import { createFileRoute } from "@tanstack/react-router";
 import { useNavigate } from "@tanstack/react-router";
-import { ArrowLeft, FileText, ImageIcon, Video } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -46,6 +48,25 @@ function AttachmentPage() {
 				return;
 			}
 
+			const fileSizeMB = selectedFile.size / (1024 * 1024);
+			let maxSize: number;
+
+			if (selectedFile.type.startsWith("video/")) {
+				maxSize = 16;
+			} else if (selectedFile.type.startsWith("image/")) {
+				maxSize = 4;
+			} else if (selectedFile.type === "application/pdf") {
+				maxSize = 4;
+			} else {
+				toast.error("Unsupported file type");
+				return;
+			}
+
+			if (fileSizeMB > maxSize) {
+				toast.error(`File too large! Maximum size is ${maxSize}MB`);
+				return;
+			}
+
 			const validatedData = attachmentFormSchema.parse({
 				body: caption,
 				file: selectedFile,
@@ -80,120 +101,15 @@ function AttachmentPage() {
 			<div className="flex h-[calc(100vh-4rem)] items-center justify-center">
 				<div className="w-full max-w-md p-4">
 					{!selectedFile ? (
-						<div className="space-y-8">
-							<h2 className="text-center text-xl">Pick a file</h2>
-							{/* Pick a file */}
-							<div className="grid grid-cols-2 gap-4">
-								<Button
-									onClick={() => document.getElementById("imageInput")?.click()}
-									className="flex h-32 flex-col items-center gap-2 border-2 border-red-500 bg-transparent hover:bg-red-500/10"
-								>
-									<ImageIcon size={32} />
-									<span>Image</span>
-								</Button>
-
-								<Button
-									onClick={() => document.getElementById("videoInput")?.click()}
-									className="flex h-32 flex-col items-center gap-2 border-2 border-red-500 bg-transparent hover:bg-red-500/10"
-								>
-									<Video size={32} />
-									<span>Video</span>
-								</Button>
-
-								<Button
-									onClick={() => document.getElementById("pdfInput")?.click()}
-									className="col-span-2 flex h-32 flex-col items-center gap-2 border-2 border-red-500 bg-transparent hover:bg-red-500/10"
-								>
-									<FileText size={32} />
-									<span>Document</span>
-								</Button>
-							</div>
-
-							{/* Hidden Inputs for File Selection */}
-							<div className="hidden">
-								<input
-									id="imageInput"
-									type="file"
-									accept="image/*"
-									onChange={(e) =>
-										e.target.files?.[0] && handleFileSelect(e.target.files[0])
-									}
-								/>
-								<input
-									id="videoInput"
-									type="file"
-									accept="video/*"
-									onChange={(e) =>
-										e.target.files?.[0] && handleFileSelect(e.target.files[0])
-									}
-								/>
-								<input
-									id="pdfInput"
-									type="file"
-									accept=".pdf"
-									onChange={(e) =>
-										e.target.files?.[0] && handleFileSelect(e.target.files[0])
-									}
-								/>
-							</div>
-						</div>
+						<FilePicker onFileSelect={handleFileSelect} />
 					) : (
 						<div className="space-y-4">
-							{/* File Preview */}
-							<div className="overflow-hidden rounded-lg border">
-								{selectedFile.type.startsWith("image/") && (
-									<img
-										src={fileUrl}
-										alt="Preview"
-										className="max-h-[400px] w-full object-contain"
-									/>
-								)}
-
-								{selectedFile.type.startsWith("video/") && (
-									<video
-										src={fileUrl}
-										controls
-										className="max-h-[400px] w-full object-contain"
-									>
-										<track kind="captions" />
-									</video>
-								)}
-
-								{selectedFile.type === "application/pdf" && (
-									<div className="relative aspect-[3/4] max-h-[400px] w-full overflow-hidden">
-										<embed
-											src={fileUrl}
-											type="application/pdf"
-											className="h-full w-full"
-										/>
-										<div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-background/90 p-4">
-											<div className="flex items-center gap-2">
-												<FileText size={20} />
-												<span className="font-medium">{selectedFile.name}</span>
-											</div>
-										</div>
-									</div>
-								)}
-							</div>
-
-							{/* Caption Input */}
-							<div className="flex gap-2">
-								<Input
-									value={caption}
-									onChange={(e) => setCaption(e.target.value)}
-									placeholder="Add a caption..."
-									className="flex-1"
-									onKeyDown={(e) => {
-										if (e.key === "Enter" && !e.shiftKey) {
-											e.preventDefault();
-											handleSubmit();
-										}
-									}}
-								/>
-								<Button onClick={handleSubmit} className="rounded-full">
-									<ArrowLeft className="rotate-[135deg]" size={20} />
-								</Button>
-							</div>
+							<FilePreview file={selectedFile} url={fileUrl} />
+							<CaptionInput
+								value={caption}
+								onChange={setCaption}
+								onSubmit={handleSubmit}
+							/>
 						</div>
 					)}
 				</div>
