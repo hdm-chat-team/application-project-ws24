@@ -24,7 +24,7 @@ function ChatListSidebar() {
 
 	/* 
 	 Done: create proper chat list item component with avatar, name, last message, etc.
-	 TODO: add sorting by last message time
+	 Done: add sorting by last message time
 	 TODO: add unread message count badge
 	 TODO: add sorting chips (all, unread)
 	 TODO: add searchbar
@@ -33,31 +33,39 @@ function ChatListSidebar() {
 		<>
 			<SidebarHeader className="flex justify-center">Chats</SidebarHeader>
 			<SidebarSeparator className="mx-0" />
+			ello
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>
-						{chats?.map(({ id, name, updatedAt }) => (
-							<SidebarMenuItem key={id}>
-								<div className="flex ">
-									<SidebarMenuButton
-										value={id}
-										onClick={(event) => setChatId(event.currentTarget.value)}
-										isActive={id === currentChat?.id}
-										className="rounded-md border border-slate-200 py-6"
-									>
-										<ChatListItem
-											name={name || ""}
-											id="1"
-											lastMessage="Hello their"
-											onClick={() => console.log("hello")}
-											avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmStm5d-komRukWTSOYWnVAhDo5i2PbrBhIA&s"
-											lastMessageTime={updatedAt}
-											// allRead={false}
-										/>
-									</SidebarMenuButton>
-								</div>
-							</SidebarMenuItem>
-						))}
+						{chats
+							?.sort((a, b) => {
+								return (
+									new Date(b.updatedAt).getTime() -
+									new Date(a.updatedAt).getTime()
+								);
+							})
+							.map(({ id, name, updatedAt }) => (
+								<SidebarMenuItem key={id}>
+									<div className="flex ">
+										<SidebarMenuButton
+											value={id}
+											onClick={(event) => setChatId(event.currentTarget.value)}
+											isActive={id === currentChat?.id}
+											className="rounded-md border border-slate-200 py-6"
+										>
+											<ChatListItem
+												name={name || ""}
+												id="1"
+												lastMessage="Hello their"
+												onClick={() => console.log("hello")}
+												avatar="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmStm5d-komRukWTSOYWnVAhDo5i2PbrBhIA&s"
+												lastMessageTime={updatedAt}
+												// allRead={false}
+											/>
+										</SidebarMenuButton>
+									</div>
+								</SidebarMenuItem>
+							))}
 					</SidebarMenu>
 				</SidebarGroup>
 			</SidebarContent>

@@ -1,5 +1,5 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import { CircleUserRound } from "lucide-react";
+
 interface ChatListItemProps {
 	id: string;
 	avatar: string;
