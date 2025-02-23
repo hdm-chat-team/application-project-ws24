@@ -1,14 +1,14 @@
-import { CircleUserRound } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { CircleUserRound } from "lucide-react";
 interface ChatListItemProps {
 	id: string;
 	avatar: string;
 	name: string;
 	lastMessage?: string;
-	isActive?: boolean; 
+	isActive?: boolean;
 	onClick: (id: string) => void;
-	allRead?: boolean; 
-	lastMessageTime?: string; 
+	allRead?: boolean;
+	lastMessageTime?: string;
 }
 
 const ChatListItem: React.FC<ChatListItemProps> = ({
@@ -21,7 +21,6 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 	allRead = true,
 	lastMessageTime = "",
 }) => {
-	
 	const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
 		if (event.key === "Enter" || event.key === " ") {
 			onClick(id);
@@ -30,35 +29,32 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 
 	return (
 		<div
-			className={` cursor-pointer flex items-center justify-between w-full  ${
+			className={` flex w-full cursor-pointer items-center justify-between ${
 				isActive ? "bg-blue-100" : ""
 			}`}
 			onClick={() => onClick(id)}
 			onKeyPress={handleKeyPress}
 		>
-			
-			<div className="flex items-center my-5 mr-2">
+			<div className="my-5 mr-2 flex items-center">
 				<Avatar>
 					<AvatarImage src={avatar} />
 				</Avatar>
 
-				<div className="flex flex-col ml-3">
+				<div className="ml-3 flex flex-col">
 					<span className="font-semibold text-gray-800 capitalize">{name}</span>
-					<span className="text-sm text-gray-500 truncate" title={lastMessage}>
+					<span className="truncate text-gray-500 text-sm" title={lastMessage}>
 						{lastMessage}
 					</span>
 				</div>
 			</div>
 
-	
 			<div className="flex items-center space-x-2">
 				{lastMessageTime && (
-					<span className="text-xs text-gray-400">
+					<span className="text-gray-400 text-xs">
 						{(() => {
 							const messageDate = new Date(lastMessageTime);
 							const today = new Date();
 
-					
 							if (
 								messageDate.getDate() === today.getDate() &&
 								messageDate.getMonth() === today.getMonth() &&
@@ -70,7 +66,6 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 								});
 							}
 
-							
 							return messageDate
 								.toLocaleDateString("en-US", {
 									day: "numeric",
@@ -82,7 +77,7 @@ const ChatListItem: React.FC<ChatListItemProps> = ({
 				)}
 				{!allRead && (
 					<span
-						className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center text-white text-xs font-semibold"
+						className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500 font-semibold text-white text-xs"
 						title="Unread messages"
 					>
 						{""}

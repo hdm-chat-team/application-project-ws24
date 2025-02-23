@@ -43,7 +43,7 @@ function ChatListSidebar() {
 										value={id}
 										onClick={(event) => setChatId(event.currentTarget.value)}
 										isActive={id === currentChat?.id}
-										className="border border-slate-200 rounded-md py-6"
+										className="rounded-md border border-slate-200 py-6"
 									>
 										<ChatListItem
 											name={name || ""}
