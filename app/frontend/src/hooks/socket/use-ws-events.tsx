@@ -4,7 +4,6 @@ import {
 	syncChatsQueryOptions,
 } from "@/features/chat/queries";
 import {
-	useSaveAttachment,
 	useSaveMessage,
 	useSaveMessageBatch,
 	useUpdateMessage,
@@ -18,7 +17,6 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const queryClient = useQueryClient();
 
 	const saveMessage = useSaveMessage().mutate;
-	const saveAttachment = useSaveAttachment().mutate;
 	const saveMessagesByChat = useSaveMessageBatch().mutate;
 	const updateMessage = useUpdateMessage().mutate;
 	const saveChats = useSaveChats().mutate;
@@ -59,11 +57,11 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					if (!chatSynched) queryClient.refetchQueries(syncChatsQueryOptions);
 					break;
 				}
-				case "message_attachment": {
+				/* case "message_attachment": {
 					const attachment = data.payload;
 					saveAttachment(attachment);
 					break;
-				}
+				} */
 				case "message_delivered": {
 					updateMessage({
 						messageId: data.payload,
@@ -86,7 +84,6 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 		[
 			queryClient,
 			saveMessage,
-			saveAttachment,
 			saveMessagesByChat,
 			updateMessage,
 			sendMessage,
