@@ -1,8 +1,8 @@
 import type { LocalMessage } from "@/features/message/utils";
+import type { LocalFile } from "@/features/uploadthing/types";
 import type { Chat } from "@server/db/chats";
 import Dexie from "dexie";
 import type { EntityTable } from "dexie";
-import type { LocalFile } from "@/features/uploadthing/types";
 
 export type LocalDatabase = Dexie & {
 	messages: EntityTable<LocalMessage, "id">;
