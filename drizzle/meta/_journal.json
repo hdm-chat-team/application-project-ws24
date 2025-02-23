@@ -22,20 +22,6 @@
       "when": 1736814637664,
       "tag": "0002_adorable_mongoose",
       "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1740143332786,
-      "tag": "0003_rare_rocket_raccoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1740149704372,
-      "tag": "0004_remarkable_starjammers",
-      "breakpoints": true
     }
   ]
 }
