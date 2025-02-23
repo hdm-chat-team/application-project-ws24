@@ -6,7 +6,6 @@ export const localFileSchema = z.object({
 	originalName: z.string(),
 	type: z.string(),
 	createdAt: z.date(),
-	blob: z.instanceof(Blob),
 });
 
 export type LocalFile = z.infer<typeof localFileSchema>;
