@@ -3,6 +3,7 @@ import { useUser } from "@/features/auth/hooks";
 import { cn } from "@/lib/utils";
 import { Upload } from "lucide-react";
 import { useUploadUserAvatar } from "../hooks";
+import { fileUrl } from "@/features/uploadthing/utils";
 
 export function AvatarUploader({ className }: { className?: string }) {
 	const { profile } = useUser();
@@ -16,7 +17,7 @@ export function AvatarUploader({ className }: { className?: string }) {
 			>
 				<Avatar className="h-full w-full border border-gray-200 dark:border-gray-800">
 					<AvatarImage
-						src={profile.avatarUrl ?? undefined}
+						src={profile.avatarUrl ? fileUrl(profile.avatarUrl) : undefined}
 						className="size-full rounded-full object-cover"
 					/>
 				</Avatar>
