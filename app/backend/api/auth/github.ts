@@ -7,7 +7,11 @@ import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { type GitHubEmail, type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import { upsertSelfChat, upsertSelfChatWithMembership } from "#db/chats";
+import {
+	insertChatMembership,
+	insertSelfChat,
+	selectUserSelfChat,
+} from "#db/chats";
 import { upsertDevice, upsertDeviceSync } from "#db/devices";
 import { upsertUser, upsertUserProfile } from "#db/users";
 import env, { DEV } from "#env";
@@ -52,29 +56,34 @@ export const githubRouter = createRouter()
 		zValidator("cookie", githubOauthCallbackCookieSchema),
 		zValidator("query", githubOauthCallbackQuerySchema),
 		async (c) => {
-			// Validate state
+			// * Validation
+
+			// Oauth state
 			const { state } = c.req.valid("query");
 			const storedState = c.req.valid("cookie").github_oauth_state;
 			if (state !== storedState)
 				return c.json({ message: "Invalid state" }, 400);
 
-			// Validate device id
+			// device id cookie
 			const deviceId = c.req.valid("cookie").device_id;
-			console.log("device", deviceId);
 			if (!deviceId) return c.json({ message: "Invalid device id" }, 400);
 
-			// Validate code and get access token
+			// code
 			const { code } = c.req.valid("query");
+
+			// * Access token
 			const tokens = await github.validateAuthorizationCode(code);
 			const accessToken = tokens.accessToken();
 			if (!accessToken)
 				return c.json({ message: "Invalid Oauth Request" }, 403);
 
-			// Fetch Github user and email
+			// * Fetch Github user and email
 			const githubUser = await fetchGithubUser(accessToken);
 			const githubEmail = await fetchPrimaryGithubEmail(accessToken);
 			if (!(githubUser && githubEmail))
 				return c.json({ message: "Failed to fetch user" }, 500);
+
+			// * Database operations
 
 			// Upsert user and profile
 			const [upsertedUser] = await upsertUser.execute({
@@ -101,14 +110,21 @@ export const githubRouter = createRouter()
 				deviceId: upsertedDevice.id,
 			});
 
-			// Upsert self chat and membership
-			const [{ id: upsertedChatId }] = await upsertSelfChat.execute();
+			// Insert self chat and membership when needed
+			const hasChat = await selectUserSelfChat
+				.execute({ userId: upsertedUser.id })
+				.then((result) => !!result);
 
-			await upsertSelfChatWithMembership.execute({
-				chatId: upsertedChatId,
-				userId: upsertedUser.id,
-				role: "owner",
-			});
+			if (!hasChat) {
+				const [{ id: insertedChatId }] = await insertSelfChat.execute();
+				await insertChatMembership.execute({
+					chatId: insertedChatId,
+					userId: upsertedUser.id,
+					role: "owner",
+				});
+			}
+
+			// * Finish
 
 			// Clear cookies
 			deleteCookie(c, "github_oauth_state");
@@ -121,7 +137,7 @@ export const githubRouter = createRouter()
 		},
 	);
 
-// * utility functions
+// * Utility functions 
 async function createAndSetSessionCookie(
 	c: HonoContext<Env>,
 	userId: string,

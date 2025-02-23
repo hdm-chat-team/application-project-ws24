@@ -50,19 +50,12 @@ const selectChatWithMembersByUserId = db.query.chatTable
 	})
 	.prepare("select_chat_with_members_by_user_id");
 
-const upsertSelfChat = db
+const insertSelfChat = db
 	.insert(chatTable)
 	.values({
 		type: "self",
 		createdAt: sql`now()`,
 		updatedAt: sql`now()`,
-	})
-	.onConflictDoUpdate({
-		target: chatTable.id,
-		targetWhere: sql`chats.type = 'self'`,
-		set: {
-			updatedAt: sql`now()`,
-		},
 	})
 	.returning({ id: chatTable.id })
 	.prepare("upsert_self_chat");
