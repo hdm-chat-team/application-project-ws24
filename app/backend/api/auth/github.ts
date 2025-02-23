@@ -137,7 +137,7 @@ export const githubRouter = createRouter()
 		},
 	);
 
-// * Utility functions 
+// * Utility functions
 async function createAndSetSessionCookie(
 	c: HonoContext<Env>,
 	userId: string,

@@ -42,7 +42,7 @@ export const profileRouter = createRouter()
 				});
 
 			await utapi.deleteFiles([fileKey]);
-			
+
 			const [updatedProfile] = await updateUserProfile.execute({
 				id,
 				avatarUrl: null,
