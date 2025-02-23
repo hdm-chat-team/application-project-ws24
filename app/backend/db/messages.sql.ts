@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-	boolean,
 	index,
 	pgEnum,
 	pgTable,
@@ -32,8 +31,7 @@ export const messageTable = pgTable(
 			.notNull()
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
-		body: text().notNull(),
-		hasFile: boolean().notNull().default(false),
+		body: text(),
 	},
 	(table) => [
 		{
