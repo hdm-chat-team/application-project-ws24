@@ -33,3 +33,14 @@ export const upsertDeviceSync = db
 		set: { lastSyncedAt: sql`now()` },
 	})
 	.prepare("upsert_device_sync");
+
+export const selectLastSyncedAtByUserDevice = db.query.deviceSyncTable
+	.findFirst({
+		columns: { lastSyncedAt: true },
+		where: (deviceSyncTable, { eq, and }) =>
+			and(
+				eq(deviceSyncTable.userId, sql.placeholder("userId")),
+				eq(deviceSyncTable.deviceId, sql.placeholder("deviceId")),
+			),
+	})
+	.prepare("select_last_synced_by_user_device");

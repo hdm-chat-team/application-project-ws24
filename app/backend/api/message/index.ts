@@ -40,7 +40,7 @@ export const messageRouter = createRouter().post(
 
 		for (const recipientId of insertedRecipientIds)
 			publish(recipientId, {
-				type: "message_incoming",
+				type: "message:incoming",
 				payload: insertedMessage,
 			});
 

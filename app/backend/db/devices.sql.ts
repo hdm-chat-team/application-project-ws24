@@ -28,7 +28,7 @@ export const deviceSyncTable = pgTable(
 		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
-		lastSyncedAt: timestamp({ mode: "string" }).defaultNow(),
+		lastSyncedAt: timestamp({ mode: "string" }).notNull().defaultNow(),
 	},
 	(table) => [primaryKey({ columns: [table.deviceId, table.userId] })],
 );

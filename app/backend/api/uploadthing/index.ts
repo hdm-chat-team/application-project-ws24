@@ -80,7 +80,7 @@ export const uploadRouter = {
 
 				for (const recipientId of recipientIds)
 					publish(recipientId, {
-						type: "message_attachment",
+						type: "message:attachment",
 						payload: attachment,
 					});
 

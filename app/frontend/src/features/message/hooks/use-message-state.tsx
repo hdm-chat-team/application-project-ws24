@@ -24,7 +24,7 @@ export function useMessageState({ id, authorId }: UseMessageStateProps) {
 	useEffect(() => {
 		if (isIntersecting && messageState === "delivered" && !isSending) {
 			sendMessage({
-				type: "message_read",
+				type: "message:read",
 				payload: { id, authorId },
 			});
 		}

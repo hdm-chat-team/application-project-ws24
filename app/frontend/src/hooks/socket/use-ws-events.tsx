@@ -1,4 +1,4 @@
-import { useSaveChats } from "@/features/chat/hooks";
+import { useSaveChat } from "@/features/chat/hooks";
 import {
 	chatByIdQueryOptions,
 	syncChatsQueryOptions,
@@ -6,7 +6,6 @@ import {
 import {
 	useSaveAttachment,
 	useSaveMessage,
-	useSaveMessageBatch,
 	useUpdateMessage,
 } from "@/features/message/hooks";
 import { localeTime } from "@/features/message/utils";
@@ -19,14 +18,12 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 
 	const saveMessage = useSaveMessage().mutate;
 	const saveAttachment = useSaveAttachment().mutate;
-	const saveMessagesByChat = useSaveMessageBatch().mutate;
 	const updateMessage = useUpdateMessage().mutate;
-	const saveChats = useSaveChats().mutate;
+	const saveChat = useSaveChat().mutate;
 
 	const handleOpen = useCallback(async () => {
-		const chats = await queryClient.fetchQuery(syncChatsQueryOptions);
-		saveChats(chats);
-	}, [queryClient, saveChats]);
+		console.log("connected");
+	}, []);
 
 	const handleMessage = useCallback(
 		(event: MessageEvent) => {
@@ -34,22 +31,32 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 			console.log("receiving", data);
 
 			switch (data.type) {
-				case "message_sync": {
-					const localMessages = data.payload.map((message) => ({
-						...message,
-						receivedAt: localeTime(),
-					}));
-					saveMessagesByChat(localMessages);
+				case "sync:chats": {
+					saveChat({
+						...data.payload,
+						syncState: "synced",
+					});
 					break;
 				}
-				case "message_incoming": {
+				case "sync:messages": {
+					saveMessage({
+						...data.payload,
+						receivedAt: localeTime(),
+					});
+					sendMessage({
+						type: "message:received",
+						payload: { id: data.payload.id, authorId: data.payload.authorId },
+					});
+					break;
+				}
+				case "message:incoming": {
 					const localMessage = {
 						...data.payload,
 						receivedAt: localeTime(),
 					};
 					saveMessage(localMessage);
 					sendMessage({
-						type: "message_received",
+						type: "message:received",
 						payload: { id: localMessage.id, authorId: localMessage.authorId },
 					});
 
@@ -59,19 +66,19 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					if (!chatSynched) queryClient.refetchQueries(syncChatsQueryOptions);
 					break;
 				}
-				case "message_attachment": {
+				case "message:attachment": {
 					const attachment = data.payload;
 					saveAttachment(attachment);
 					break;
 				}
-				case "message_delivered": {
+				case "message:delivered": {
 					updateMessage({
 						id: data.payload,
 						state: "delivered",
 					});
 					break;
 				}
-				case "message_completed": {
+				case "message:completed": {
 					updateMessage({
 						id: data.payload,
 						state: "read",
@@ -87,9 +94,9 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 			queryClient,
 			saveMessage,
 			saveAttachment,
-			saveMessagesByChat,
 			updateMessage,
 			sendMessage,
+			saveChat,
 		],
 	);
 

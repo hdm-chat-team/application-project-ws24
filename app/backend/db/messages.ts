@@ -1,5 +1,5 @@
 import { cuidSchema } from "@application-project-ws24/cuid";
-import { and, asc, eq, inArray, not, or, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -35,27 +35,13 @@ const insertMessage = db
 	.returning()
 	.prepare("insert_message");
 
-const selectUnDeliveredMessagesByUserId = db.query.messageTable
+const selectMessagesByUserDeviceLastSyncedAt = db.query.messageTable
 	.findMany({
-		where: not(eq(messageTable.authorId, sql.placeholder("userId"))),
-		with: {
-			recipients: {
-				columns: { state: true },
-				where: and(
-					eq(messageRecipientTable.recipientId, sql.placeholder("userId")),
-					eq(messageRecipientTable.state, "sent"),
-				),
-			},
-		},
-		orderBy: [asc(messageTable.chatId)],
+		where: (messageTable, { gte }) =>
+			gte(messageTable.createdAt, sql.placeholder("lastSyncedAt")),
+		orderBy: (messageTable, { desc }) => desc(messageTable.createdAt),
 	})
 	.prepare("select_un_delivered_messages");
-
-async function selectMessagesToSync(userId: string) {
-	return await selectUnDeliveredMessagesByUserId
-		.execute({ userId })
-		.then((rows) => rows.map(({ recipients, ...message }) => message));
-}
 
 const deleteMessage = db
 	.delete(messageTable)
@@ -162,9 +148,9 @@ export {
 	insertMessageSchema,
 	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
-	selectMessageSchema,
 	// * Message functions
-	selectMessagesToSync,
+	selectMessagesByUserDeviceLastSyncedAt,
+	selectMessageSchema,
 	updateMessageRecipientsStates,
 	updateMessageSchema,
 	updateMessageStatus,

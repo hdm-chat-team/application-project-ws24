@@ -37,6 +37,21 @@ type GroupChatWithMemberships = z.infer<
 	typeof insertGroupChatWithMembershipsSchema
 >;
 
+export const selectChatsByUserDeviceLastSyncedAt = db.query.chatTable
+	.findMany({
+		with: {
+			members: {
+				columns: { userId: true },
+				where: (chatMembershipTable, { eq }) =>
+					eq(chatMembershipTable.userId, sql.placeholder("userId")),
+			},
+		},
+		where: (chatTable, { gte }) =>
+			gte(chatTable.updatedAt, sql.placeholder("lastSyncedAt")),
+		orderBy: (chatTable, { desc }) => desc(chatTable.updatedAt),
+	})
+	.prepare("select_chats_by_last_synced_at");
+
 const selectChatWithMembersByUserId = db.query.chatTable
 	.findFirst({
 		columns: { id: true },
@@ -162,7 +177,7 @@ const deleteChatMembership = db
 export {
 	// * Chat queries
 	selectUserSelfChat,
-	upsertSelfChat,
+	insertSelfChat,
 	upsertSelfChatWithMembership,
 	insertDirectChat,
 	insertGroupChat,
