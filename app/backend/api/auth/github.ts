@@ -7,12 +7,8 @@ import type { Env } from "#api/app.env";
 import { createRouter } from "#api/factory";
 import { type GitHubEmail, type GitHubUser, github } from "#auth/oauth";
 import { createSession, generateSessionToken } from "#auth/session";
-import {
-	insertChatMembership,
-	insertSelfChat,
-	selectUserSelfChat,
-} from "#db/chats";
-import { upsertDevice } from "#db/devices";
+import { upsertSelfChat, upsertSelfChatWithMembership } from "#db/chats";
+import { upsertDevice, upsertDeviceSync } from "#db/devices";
 import { upsertUser, upsertUserProfile } from "#db/users";
 import env, { DEV } from "#env";
 import cookieConfig from "#lib/cookie";
@@ -81,44 +77,44 @@ export const githubRouter = createRouter()
 				return c.json({ message: "Failed to fetch user" }, 500);
 
 			// Upsert user and profile
-			const [insertedUser] = await upsertUser.execute({
+			const [upsertedUser] = await upsertUser.execute({
 				githubId: githubUser.id.toString(),
 				username: githubUser.login,
 				email: githubEmail,
 			});
 
 			await upsertUserProfile.execute({
-				userId: insertedUser.id,
+				userId: upsertedUser.id,
 				displayName: githubUser.name ?? githubUser.login,
 				avatarUrl: githubUser.avatar_url,
 				htmlUrl: githubUser.html_url,
 			});
 
-			// Insert device if not exists
-			const [device] = await upsertDevice.execute({
-				userId: insertedUser.id,
+			// Upsert device and device sync
+			const [upsertedDevice] = await upsertDevice.execute({
+				userId: upsertedUser.id,
 				deviceId,
 			});
 
-			// Create self chat if not exists
-			const hasChat = await selectUserSelfChat
-				.execute({ userId: insertedUser.id })
-				.then((result) => !!result);
+			await upsertDeviceSync.execute({
+				userId: upsertedUser.id,
+				deviceId: upsertedDevice.id,
+			});
 
-			if (!hasChat) {
-				const [{ id: insertedChatId }] = await insertSelfChat.execute();
-				await insertChatMembership.execute({
-					chatId: insertedChatId,
-					userId: insertedUser.id,
-					role: "owner",
-				});
-			}
+			// Upsert self chat and membership
+			const [{ id: upsertedChatId }] = await upsertSelfChat.execute();
+
+			await upsertSelfChatWithMembership.execute({
+				chatId: upsertedChatId,
+				userId: upsertedUser.id,
+				role: "owner",
+			});
 
 			// Clear cookies
 			deleteCookie(c, "github_oauth_state");
 
 			// Set device id and session cookie
-			await createAndSetSessionCookie(c, insertedUser.id, device.id);
+			await createAndSetSessionCookie(c, upsertedUser.id, upsertedDevice.id);
 
 			// Redirect to app
 			return c.redirect(REDIRECT_URL);
