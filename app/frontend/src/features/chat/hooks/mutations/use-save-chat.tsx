@@ -1,12 +1,12 @@
+import type { LocalChat } from "@/features/chat/utils";
 import { db } from "@/lib/db";
-import type { Chat } from "@server/db/chats";
 import { useMutation } from "@tanstack/react-query";
 
-export function useSaveChats() {
+export function useSaveChat() {
 	return useMutation({
 		mutationKey: ["db/save-chat-batch"],
-		mutationFn: async (chats: Chat[]) => {
-			await db.chats.bulkPut(chats);
+		mutationFn: async (chats: LocalChat) => {
+			await db.chats.put(chats);
 		},
 	});
 }
