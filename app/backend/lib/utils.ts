@@ -1,6 +1,9 @@
 import type { Server, ServerWebSocket, ServerWebSocketSendStatus } from "bun";
 import type { WSContext } from "hono/ws";
-import { type WSEventData, wsEventDataSchema } from "#shared/types";
+import {
+	type ServerToClientWsEventData,
+	serverToClientWsEventData,
+} from "#shared/types";
 
 let serverInstance: Server;
 
@@ -26,11 +29,11 @@ export function getServer() {
  */
 export function publish(
 	topic: string,
-	data: WSEventData,
+	data: ServerToClientWsEventData,
 	compress?: boolean,
 	socket: ServerWebSocket | Server = getServer(),
 ): ServerWebSocketSendStatus {
-	wsEventDataSchema.parse(data);
+	serverToClientWsEventData.parse(data);
 	return socket.publish(topic, JSON.stringify(data), compress);
 }
 
@@ -43,9 +46,9 @@ export function publish(
  */
 export function send(
 	socket: ServerWebSocket | WSContext,
-	data: WSEventData,
+	data: ServerToClientWsEventData,
 	compress?: boolean,
 ) {
-	wsEventDataSchema.parse(data);
+	serverToClientWsEventData.parse(data);
 	return socket.send(JSON.stringify(data), compress);
 }

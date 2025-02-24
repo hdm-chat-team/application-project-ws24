@@ -26,31 +26,37 @@ const messageAttachmentSchema = z.object({
 	type: z.string().nonempty(),
 });
 
-export const wsEventDataSchema = z.discriminatedUnion("type", [
+export const serverToClientWsEventData = z.discriminatedUnion("type", [
 	z
 		.object({
-			type: z.literal("sync:messages"),
-			payload: messageSchema,
-		})
-		.describe("The client receives unsynced messages from the server."),
-	z
-		.object({
-			type: z.literal("sync:chats"),
+			type: z.literal("chat"),
 			payload: chatWithMembersSchema,
 		})
-		.describe("The client receives unsynced chats from the server."),
+		.describe("The client receives a chat from the server."),
 	z
 		.object({
-			type: z.literal("message:incoming"),
+			type: z.literal("message"),
 			payload: messageSchema,
 		})
-		.describe("The client receives a new message from the server."),
+		.describe("The client receives a message from the server."),
+	z
+		.object({
+			type: z.literal("message:state"),
+			payload: messageSchema.pick({ id: true, state: true }),
+		})
+		.describe("The client receives a message state update from the server."),
 	z
 		.object({
 			type: z.literal("message:attachment"),
 			payload: messageAttachmentSchema,
 		})
 		.describe("The client receives a new message attachment from the server."),
+]);
+export type ServerToClientWsEventData = z.infer<
+	typeof serverToClientWsEventData
+>;
+
+export const clientToServerWsEventDataSchema = z.discriminatedUnion("type", [
 	z
 		.object({
 			type: z.literal("message:received"),
@@ -59,28 +65,14 @@ export const wsEventDataSchema = z.discriminatedUnion("type", [
 		.describe("The client receives message from the server."),
 	z
 		.object({
-			type: z.literal("message:delivered"),
-			payload: cuidSchema,
-		})
-		.describe(
-			"The client sends a message delivery confirmation to the server.",
-		),
-	z
-		.object({
 			type: z.literal("message:read"),
 			payload: messageSchema.pick({ id: true, authorId: true }),
 		})
 		.describe("The client sends a message read confirmation to the server."),
-	z
-		.object({
-			type: z.literal("message:completed"),
-			payload: cuidSchema,
-		})
-		.describe(
-			"The client receives a message completion(read by all recipients) confirmation from the server.",
-		),
 ]);
-export type WSEventData = z.infer<typeof wsEventDataSchema>;
+export type ClientToServerWsEventData = z.infer<
+	typeof clientToServerWsEventDataSchema
+>;
 
 export const userSearchQuerySchema = z.object({
 	search: z.string().nonempty(),

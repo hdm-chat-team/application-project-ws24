@@ -1,9 +1,11 @@
 import type { ServerWebSocket } from "bun";
+import { eq } from "drizzle-orm";
 import { createBunWebSocket } from "hono/bun";
 import { createRouter } from "#api/factory";
 import db from "#db";
 import { selectChatsByUserDeviceLastSyncedAt } from "#db/chats";
 import { selectLastSyncedAtByUserDevice } from "#db/devices";
+import { deviceSyncTable } from "#db/devices.sql";
 import {
 	countRecipientsByMessageState,
 	selectMessageRecipientIdsByMessageId,
@@ -15,7 +17,7 @@ import type { Session } from "#db/sessions";
 import type { User } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
 import { publish, send } from "#lib/utils";
-import { wsEventDataSchema } from "#shared/types";
+import { clientToServerWsEventDataSchema } from "#shared/types";
 
 const { upgradeWebSocket } = createBunWebSocket();
 
@@ -53,7 +55,7 @@ export const socketRouter = createRouter().get(
 
 				for (const chat of chats)
 					send(ws, {
-						type: "sync:chats",
+						type: "chat",
 						payload: chat,
 					});
 
@@ -63,10 +65,18 @@ export const socketRouter = createRouter().get(
 				});
 
 				for (const message of messages)
-					send(ws, { type: "sync:messages", payload: message });
+					send(ws, { type: "message", payload: message });
+
+				// update last synced at
+				await db
+					.update(deviceSyncTable)
+					.set({ lastSyncedAt: new Date().toISOString() })
+					.where(eq(deviceSyncTable.deviceId, session.deviceId));
 			},
 			onMessage: async (event) => {
-				const data = wsEventDataSchema.parse(JSON.parse(event.data));
+				const data = clientToServerWsEventDataSchema.parse(
+					JSON.parse(event.data),
+				);
 
 				switch (data.type) {
 					case "message:received": {
@@ -96,8 +106,8 @@ export const socketRouter = createRouter().get(
 								await updateMessageStatus(messageId, "delivered", trx);
 
 								publish(authorId, {
-									type: "message:delivered",
-									payload: messageId,
+									type: "message:state",
+									payload: { id: messageId, state: "delivered" },
 								});
 							}
 						});
@@ -131,8 +141,8 @@ export const socketRouter = createRouter().get(
 								await updateMessageStatus(messageId, "read", trx);
 
 								publish(authorId, {
-									type: "message:completed",
-									payload: messageId,
+									type: "message:state",
+									payload: { id: messageId, state: "read" },
 								});
 							}
 						});

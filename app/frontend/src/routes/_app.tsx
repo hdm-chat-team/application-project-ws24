@@ -9,7 +9,11 @@ import { SignoutButton } from "@/features/auth/components";
 import { authQueryOptions } from "@/features/auth/queries";
 import { Chat } from "@/features/chat/components";
 import { ChatProvider } from "@/features/chat/context";
+import handleMessage from "@/features/realtime/event-handler";
+import WebSocketService from "@/features/realtime/ws-service";
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+
+const ws = new WebSocketService(handleMessage);
 
 export const Route = createFileRoute("/_app")({
 	beforeLoad: async ({ context: { queryClient } }) => {
@@ -17,7 +21,7 @@ export const Route = createFileRoute("/_app")({
 			throw redirect({ to: "/signin", search: { from: location.href } });
 	},
 	component: () => (
-		<SocketProvider>
+		<SocketProvider ws={ws}>
 			<SidebarProvider className="absolute top-0 left-0 h-full min-h-full">
 				<ChatProvider>
 					<Sidebar>
