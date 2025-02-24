@@ -9,6 +9,7 @@ import {
 	useUpdateMessage,
 } from "@/features/message/hooks";
 import { formatBerlinTime } from "@/features/message/utils";
+import { saveFile } from "@/features/uploadthing/mutations";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
@@ -57,11 +58,11 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					if (!chatSynched) queryClient.refetchQueries(syncChatsQueryOptions);
 					break;
 				}
-				/* case "message_attachment": {
-					const attachment = data.payload;
-					saveAttachment(attachment);
+				case "message_attachment": {
+					const { messageId, type } = data.payload;
+					saveFile(new File([], messageId, { type }), messageId);
 					break;
-				} */
+				}
 				case "message_delivered": {
 					updateMessage({
 						messageId: data.payload,
