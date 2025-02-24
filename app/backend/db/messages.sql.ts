@@ -34,7 +34,7 @@ export const messageTable = pgTable(
 		createdAt: timestamp({ mode: "string" }).notNull(),
 		updatedAt: timestamp({ mode: "string" }).notNull(),
 	},
-	(table) => [index().on(table.chatId, table.chatId)],
+	(table) => [index().on(table.authorId), index().on(table.createdAt)],
 );
 
 export const messageTableRelations = relations(
