@@ -11,7 +11,7 @@ export const messageFormSchema = z.object({
 export type LocalMessage = Message & {
 	receivedAt: string;
 	attachmentId?: string;
-}
+};
 
 export function localeTime() {
 	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
