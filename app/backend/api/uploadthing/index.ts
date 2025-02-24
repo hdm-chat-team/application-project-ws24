@@ -33,14 +33,14 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides, profile };
 		})
-		.onUploadComplete(async ({ file: { ufsUrl }, metadata: { profile } }) => {
+		.onUploadComplete(async ({ file: { customId }, metadata: { profile } }) => {
 			const [{ avatarUrl }] = await updateUserProfile.execute({
 				...profile,
-				avatarUrl: ufsUrl,
+				avatarUrl: customId,
 			});
 			if (!avatarUrl) throw uploadthingDBError("Failed to update avatar");
 
-			return { avatarUrl };
+			return { avatarUrl: customId };
 		}),
 	attachment: routeBuilder({
 		image: { maxFileSize: "4MB", maxFileCount: 1 },
@@ -60,12 +60,16 @@ export const uploadRouter = {
 			return { [UTFiles]: fileOverrides, messageId };
 		})
 		.onUploadComplete(
-			async ({ file: { ufsUrl, type }, metadata: { messageId } }) => {
-				const [attachment] = await insertAttachment.execute({
-					url: ufsUrl,
-					type,
-					messageId,
-				});
+			async ({ file: { customId, type }, metadata: { messageId } }) => {
+				const [attachment] = await insertAttachment
+					.execute({
+						url: customId,
+						type,
+						messageId,
+					})
+					.catch(() => {
+						throw uploadthingDBError("Failed to insert attachment");
+					});
 
 				if (!attachment)
 					throw uploadthingDBError("Failed to insert attachment");

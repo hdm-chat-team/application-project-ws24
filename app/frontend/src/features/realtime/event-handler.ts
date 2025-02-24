@@ -4,6 +4,7 @@ import type {
 	ServerToClientWsEventData,
 } from "@shared/types";
 import { localeTime } from "../message/utils";
+import { saveFile } from "../uploadthing/mutations";
 
 export default async function handleMessage(
 	data: ServerToClientWsEventData,
@@ -28,8 +29,18 @@ export default async function handleMessage(
 			break;
 		}
 		case "message:attachment": {
-			const attachment = data.payload;
-			await db.messageAttachments.put(attachment);
+			const { messageId, type } = data.payload;
+			const message = await db.messages.get(messageId);
+			if (!message?.attachmentId) return;
+
+			const existingFile = await db.files.get(message.attachmentId);
+			if (existingFile?.blob) return;
+
+			const response = await fetch(`/api/files/${message.attachmentId}`);
+			const blob = await response.blob();
+			const file = new File([blob], message.attachmentId, { type });
+
+			await saveFile(file, message.attachmentId);
 			break;
 		}
 		case "message:state": {

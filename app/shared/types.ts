@@ -21,7 +21,6 @@ const messageSchema = z.object({
 });
 
 const messageAttachmentSchema = z.object({
-	url: z.string().url().nonempty(),
 	messageId: cuidSchema,
 	type: z.string().nonempty(),
 });
