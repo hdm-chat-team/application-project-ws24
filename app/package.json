@@ -27,7 +27,7 @@
 		"@hono/zod-validator": "^0.4.2",
 		"arctic": "^3.2.1",
 		"drizzle-orm": "^0.39.3",
-		"drizzle-zod": "^0.6.1",
+		"drizzle-zod": "^0.7.0",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
 		"uploadthing": "^7.4.4",
