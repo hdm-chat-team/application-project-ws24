@@ -1,52 +1,62 @@
 import { relations } from "drizzle-orm";
-import { sessionTable } from "./sessions.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
-
-import { index, pgTable, varchar } from "drizzle-orm/pg-core";
-import { chatMemberTable } from "./chats.sql";
+import {
+	index,
+	pgTable,
+	primaryKey,
+	timestamp,
+	uniqueIndex,
+	varchar,
+} from "drizzle-orm/pg-core";
+import { sessionTable } from "#db/sessions.sql";
+import { chatMembershipTable } from "./chats.sql";
+import { deviceTable } from "./devices.sql";
 import { messageTable } from "./messages.sql";
+import { cuid, id } from "./utils";
 
 export const userTable = pgTable(
 	"users",
 	{
 		id,
-		...timestamps,
+		createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+		updatedAt: timestamp({ mode: "string" })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date().toISOString()),
 		githubId: varchar({ length: 20 }).notNull().unique(),
 		username: varchar({ length: 39 }).notNull().unique(),
 		email: varchar({ length: 255 }).notNull().unique(),
 	},
-	(table) => [
-		{
-			idIndex: index().on(table.id),
-		},
-	],
+	(table) => [uniqueIndex().on(table.email, table.username)],
 );
 
 export const userTableRelations = relations(userTable, ({ one, many }) => ({
 	profile: one(userProfileTable),
+	devices: many(deviceTable),
 	sessions: many(sessionTable),
-	chats: many(chatMemberTable),
+	contacts: many(userContactTable, { relationName: "contactor" }),
+	contactOf: many(userContactTable, { relationName: "contact" }),
+	chats: many(chatMembershipTable),
 	messages: many(messageTable),
 }));
 
 export const userProfileTable = pgTable(
-	"user_profiles",
+	"users_profiles",
 	{
 		id,
-		...timestamps,
-		userId: varchar(ID_SIZE_CONFIG)
+		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" })
 			.unique(),
 		displayName: varchar({ length: 255 }),
 		avatarUrl: varchar({ length: 255 }),
 		htmlUrl: varchar({ length: 255 }),
+		createdAt: timestamp({ mode: "string" }).notNull().defaultNow(),
+		updatedAt: timestamp({ mode: "string" })
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date().toISOString()),
 	},
-	(table) => [
-		{
-			userIdIndex: index().on(table.userId),
-		},
-	],
+	(table) => [index().on(table.displayName)],
 );
 
 export const userProfileTableRelations = relations(
@@ -54,6 +64,35 @@ export const userProfileTableRelations = relations(
 	({ one }) => ({
 		owner: one(userTable, {
 			fields: [userProfileTable.userId],
+			references: [userTable.id],
+		}),
+	}),
+);
+
+export const userContactTable = pgTable(
+	"users_contacts",
+	{
+		contactorId: cuid()
+			.notNull()
+			.references(() => userTable.id, { onDelete: "cascade" }),
+		contactId: cuid()
+			.notNull()
+			.references(() => userTable.id, { onDelete: "cascade" }),
+	},
+	(table) => [primaryKey({ columns: [table.contactorId, table.contactId] })],
+);
+
+export const userContactTableRelations = relations(
+	userContactTable,
+	({ one }) => ({
+		contactor: one(userTable, {
+			relationName: "contactor",
+			fields: [userContactTable.contactorId],
+			references: [userTable.id],
+		}),
+		contact: one(userTable, {
+			relationName: "contact",
+			fields: [userContactTable.contactId],
 			references: [userTable.id],
 		}),
 	}),

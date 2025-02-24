@@ -1,10 +1,10 @@
-import type { Chat } from "@server/db/chats";
 import { useLiveQuery } from "dexie-react-hooks";
 import { createContext, useContext, useState } from "react";
 import { chatByIdQueryFn } from "../queries";
+import type { LocalChat } from "../utils";
 
 type ChatContextType = {
-	chat: Chat | undefined;
+	chat: LocalChat | undefined;
 	setChatId: (id: string) => void;
 };
 

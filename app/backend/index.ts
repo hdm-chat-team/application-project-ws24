@@ -1,5 +1,5 @@
 import { createBunWebSocket } from "hono/bun";
-import app from "#api/app";
+import { app } from "#api/app";
 import env from "#env";
 import { setServer } from "#lib/utils";
 

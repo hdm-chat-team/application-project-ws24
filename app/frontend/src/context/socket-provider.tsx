@@ -1,39 +1,49 @@
-import { useWebSocketConnection, useWebSocketEvents } from "@/hooks";
-import { type WSEventData, wsEventDataSchema } from "@shared/types";
-import { type ReactNode, createContext, useCallback, useEffect } from "react";
-
-type SocketContextType = {
-	readyState: number;
-	sendMessage: (data: WSEventData) => void;
-};
+import type WebSocketService from "@/features/realtime/ws-service";
+import type { ClientToServerWsEventData } from "@shared/types";
+import { createContext, useCallback, useContext, useEffect } from "react";
 
 export const SocketContext = createContext<SocketContextType | undefined>(
 	undefined,
 );
 
-export function SocketProvider({ children }: { children: ReactNode }) {
-	const sendWSMessage = useCallback((data: WSEventData) => {
-		wsEventDataSchema.parse(data);
-		console.log("sending", data);
-		sendRawMessage(JSON.stringify(data));
+export function SocketProvider({ children, ws }: SocketProviderProps) {
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ws is stable
+	const emit = useCallback((data: ClientToServerWsEventData) => {
+		ws.sendMessage(data);
 	}, []);
 
-	const { handleOpen, handleMessage } = useWebSocketEvents(sendWSMessage);
-	const {
-		connect,
-		disconnect,
-		sendMessage: sendRawMessage,
-		readyState,
-	} = useWebSocketConnection(handleOpen, handleMessage);
-
+	// biome-ignore lint/correctness/useExhaustiveDependencies: ws is stable
 	useEffect(() => {
-		connect();
-		return () => disconnect();
-	}, [connect, disconnect]);
+		ws.connect();
+		return () => ws.disconnect();
+	}, []);
 
 	return (
-		<SocketContext.Provider value={{ readyState, sendMessage: sendWSMessage }}>
+		<SocketContext.Provider
+			value={{
+				readyState: ws.readyState,
+				sendMessage: emit,
+			}}
+		>
 			{children}
 		</SocketContext.Provider>
 	);
 }
+
+export function useSocket() {
+	const context = useContext(SocketContext);
+
+	if (context === undefined)
+		throw new Error("useSocket must be used within a SocketProvider");
+
+	return context;
+}
+
+type SocketContextType = {
+	readyState: number;
+	sendMessage: (data: ClientToServerWsEventData) => void;
+};
+
+type SocketProviderProps = React.PropsWithChildren & {
+	ws: WebSocketService;
+};

@@ -1,6 +1,16 @@
 import { cuidSchema } from "@application-project-ws24/cuid";
 import { z } from "zod";
 
+const chatWithMembersSchema = z.object({
+	id: cuidSchema,
+	name: z.string().nullable(),
+	avatarUrl: z.string().url().nullable(),
+	type: z.enum(["self", "direct", "group"]),
+	members: z.array(cuidSchema),
+	createdAt: z.string().nonempty(),
+	updatedAt: z.string().nonempty(),
+});
+
 const messageSchema = z.object({
 	id: cuidSchema,
 	authorId: cuidSchema,
@@ -8,57 +18,63 @@ const messageSchema = z.object({
 	createdAt: z.string().nonempty(),
 	updatedAt: z.string().nonempty(),
 	state: z.enum(["pending", "sent", "delivered", "read"]),
-	body: z.string().nonempty(),
+	body: z.string().nullable(),
 });
 
 const messageAttachmentSchema = z.object({
-	url: z.string().url().nonempty(),
 	messageId: cuidSchema,
 	type: z.string().nonempty(),
 });
 
-const wsEventDataTypeSchema = z.enum([
-	"message_sync",
-	"message_incoming",
-	"message_attachment",
-	"message_received",
-	"message_delivered",
-	"message_read",
-	"message_completed",
+export const serverToClientWsEventData = z.discriminatedUnion("type", [
+	z
+		.object({
+			type: z.literal("chat"),
+			payload: chatWithMembersSchema,
+		})
+		.describe("The client receives a chat from the server."),
+	z
+		.object({
+			type: z.literal("message"),
+			payload: messageSchema,
+		})
+		.describe("The client receives a message from the server."),
+	z
+		.object({
+			type: z.literal("message:state"),
+			payload: messageSchema.pick({ id: true, state: true }),
+		})
+		.describe("The client receives a message state update from the server."),
+	z
+		.object({
+			type: z.literal("message:attachment"),
+			payload: messageAttachmentSchema,
+		})
+		.describe("The client receives a new message attachment from the server."),
 ]);
-type WSEventDataType = z.infer<typeof wsEventDataTypeSchema>;
+export type ServerToClientWsEventData = z.infer<
+	typeof serverToClientWsEventData
+>;
 
-const wsEventDataSchema = z.discriminatedUnion("type", [
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_sync),
-		payload: z.array(messageSchema),
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_incoming),
-		payload: messageSchema,
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_attachment),
-		payload: messageAttachmentSchema,
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_received),
-		payload: messageSchema.pick({ id: true, authorId: true }),
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_delivered),
-		payload: cuidSchema,
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_read),
-		payload: messageSchema.pick({ id: true, authorId: true }),
-	}),
-	z.object({
-		type: z.literal(wsEventDataTypeSchema.enum.message_completed),
-		payload: cuidSchema,
-	}),
+export const clientToServerWsEventDataSchema = z.discriminatedUnion("type", [
+	z
+		.object({
+			type: z.literal("message:received"),
+			payload: messageSchema.pick({ id: true, authorId: true }),
+		})
+		.describe("The client receives message from the server."),
+	z
+		.object({
+			type: z.literal("message:read"),
+			payload: messageSchema.pick({ id: true, authorId: true }),
+		})
+		.describe("The client sends a message read confirmation to the server."),
 ]);
-type WSEventData = z.infer<typeof wsEventDataSchema>;
+export type ClientToServerWsEventData = z.infer<
+	typeof clientToServerWsEventDataSchema
+>;
 
-export { /* messageSchema, */ wsEventDataTypeSchema, wsEventDataSchema };
-export type { WSEventDataType, WSEventData };
+export const userSearchQuerySchema = z.object({
+	search: z.string().nonempty(),
+});
+export type UserSearchQuery = z.infer<typeof userSearchQuerySchema>;

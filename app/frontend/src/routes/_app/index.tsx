@@ -2,11 +2,9 @@ import ChatListItem from "@/components/sidebar/chat-list-item";
 import {
 	SidebarContent,
 	SidebarGroup,
-	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useState } from "react";
 
@@ -71,8 +69,6 @@ function ChatListSidebar() {
 
 	return (
 		<>
-			<SidebarHeader className="flex justify-center">Chats</SidebarHeader>
-			<SidebarSeparator className="mx-0" />
 
 			<div className="my-4 px-2 py-2">
 				<div className="flex items-center rounded-full border bg-white px-3 py-2">

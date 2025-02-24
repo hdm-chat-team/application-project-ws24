@@ -1,32 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Paperclip, SendHorizontal } from "lucide-react";
-
 import { useUser } from "@/features/auth/hooks";
+import { useChat } from "@/features/chat/context";
+import { usePostDirectChat } from "@/features/chat/hooks/mutations/use-post-chat";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
+import { Link } from "@tanstack/react-router";
+import { Paperclip, SendHorizontal } from "lucide-react";
 import { usePostMessage } from "../hooks";
-import { createMessage } from "../utils";
+import { createMessage, messageFormSchema } from "../utils";
 
-const messageFormSchema = z.object({
-	body: z.string().trim().nonempty(),
-	files: z.instanceof(FileList).nullable(),
-});
-
-export function MessageForm({ chatId }: { chatId: string }) {
+export function MessageForm() {
 	const { user } = useUser();
-
-	const postMessage = usePostMessage(chatId).mutate;
+	const { chat } = useChat();
+	const postMessage = usePostMessage();
+	const postChat = usePostDirectChat();
 
 	const form = useForm({
 		defaultValues: {
-			body: "", // ? persist draft in local-storage/indexedDB ?
-			files: null,
+			body: "", // ? persist draft in local-storage/indexedDB?
 		},
-		onSubmit: ({ value }) => {
-			postMessage({
-				message: createMessage(chatId, user.id, value.body),
-				files: Array.from(value.files ?? []),
+		onSubmit: async ({ value }) => {
+			if (!chat) throw new Error("No chat selected");
+
+			// Post the chat if it is not synced
+			if (chat?.syncState !== "synced") await postChat.mutateAsync(chat);
+
+			postMessage.mutate({
+				message: createMessage(chat.id, user.id, value.body),
 			});
 			form.reset();
 		},
@@ -36,9 +36,14 @@ export function MessageForm({ chatId }: { chatId: string }) {
 	});
 
 	return (
-		<div className="space-y-2">
+		<div className="flex w-full gap-2">
+			<Button variant="secondary" size="icon" type="button">
+				<Link to="/attachment">
+					<Paperclip size="5" />
+				</Link>
+			</Button>
 			<form
-				className="flex gap-2"
+				className="flex flex-1 gap-2"
 				autoComplete="off"
 				onSubmit={(event) => {
 					event.preventDefault();
@@ -46,26 +51,6 @@ export function MessageForm({ chatId }: { chatId: string }) {
 					form.handleSubmit();
 				}}
 			>
-				<form.Field name="files">
-					{(field) => (
-						<Button variant="secondary" size="icon" asChild>
-							<label htmlFor={field.name}>
-								<Paperclip size="5" />
-								<input
-									id={field.name}
-									name={field.name}
-									className="hidden"
-									type="file"
-									accept="image/*,video/*,audio/*,.pdf"
-									onChange={(event) => {
-										field.handleChange(event.target.files);
-										console.log({ files: event.target.files });
-									}}
-								/>
-							</label>
-						</Button>
-					)}
-				</form.Field>
 				<form.Field name="body">
 					{(field) => (
 						<Input

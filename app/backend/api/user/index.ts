@@ -1,54 +1,48 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
-import { utapi } from "#api/uploadthing/index";
 import {
-	deleteUserProfileImageSchema,
-	selectUserChats,
+	type UserWithProfile,
+	selectChatsByMemberUserId,
+	selectUserByUsernameOrEmail,
 	selectUserDataByUsername,
 	selectUserSchema,
-	updateUserProfile,
-	updateUserProfileSchema,
 } from "#db/users";
 import { protectedRoute } from "#lib/middleware";
+import { userSearchQuerySchema } from "#shared/types";
+import { contactsRouter } from "./contact";
+import { profileRouter } from "./profile";
 
 export const userRouter = createRouter()
-	.put(
-		"/profile",
-		protectedRoute,
-		zValidator("form", updateUserProfileSchema),
-		async (c) => {
-			const { id } = c.get("profile");
-			const formData = c.req.valid("form");
+	.route("/contacts", contactsRouter)
+	.route("/profile", profileRouter)
+	.get("/", (c) => {
+		const { user, profile } = c.var;
+		const signedIn = !!(user && profile);
 
-			const [updatedProfile] = await updateUserProfile.execute({
-				id,
-				...formData,
-			});
-
-			return c.json({
-				message: "profile updated!",
-				data: updatedProfile,
-			});
-		},
-	)
+		return c.json(
+			{
+				message: `signed ${signedIn ? "in" : "out"}`,
+				data: { user, profile },
+			},
+			signedIn ? 200 : 404,
+		);
+	})
 	.get("/chats", protectedRoute, async (c) => {
 		const { id } = c.get("user");
 
-		const chats = await selectUserChats
-			.execute({ id })
-			.then((rows) => rows.map((row) => row.chat));
+		const chats = await selectChatsByMemberUserId
+			.execute({ userId: id })
+			.then((rows) => rows.map(({ members, ...chat }) => chat));
 
 		return c.json({ data: chats });
 	})
 	.get(
 		"/username/:username",
-		protectedRoute,
 		zValidator("param", selectUserSchema.pick({ username: true })),
 		async (c) => {
 			const { username } = c.req.valid("param");
 
-			// ? Are there any fields we should NOT be returning?
 			const result = await selectUserDataByUsername.execute({
 				username,
 			});
@@ -57,35 +51,20 @@ export const userRouter = createRouter()
 
 			const { profile, ...user } = result;
 			if (!profile)
-				throw new HTTPException(404, { message: "profile not found" });
+				throw new HTTPException(404, { message: "user profile not found" });
 
 			return c.json({ data: { user, profile } });
 		},
 	)
-	.delete(
-		"/avatar",
-		protectedRoute,
-		zValidator("json", deleteUserProfileImageSchema),
-		async (c) => {
-			const { avatarUrl } = c.req.valid("json");
-			const { id } = c.get("profile");
-			const fileKey = avatarUrl.split("/").pop();
+	.get("/search", zValidator("query", userSearchQuerySchema), async (c) => {
+		const { search } = c.req.valid("query");
 
-			if (!fileKey)
-				throw new HTTPException(400, {
-					message: "Invalid avatar URL",
-				});
+		const result = await selectUserByUsernameOrEmail.execute({
+			search,
+		});
 
-			await utapi.deleteFiles([fileKey]).catch(() => {
-				throw new HTTPException(500, {
-					message: "Failed to delete avatar",
-				});
-			});
-			const [updatedProfile] = await updateUserProfile.execute({
-				id,
-				avatarUrl: null,
-			});
-
-			return c.json({ success: true, data: updatedProfile });
-		},
-	);
+		return c.json({
+			data: result as UserWithProfile[],
+			// ? TS can't infer the type properly even if manually checked before, so we just cast it
+		});
+	});

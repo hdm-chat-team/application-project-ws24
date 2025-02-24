@@ -33,14 +33,14 @@ export const uploadRouter = {
 
 			return { [UTFiles]: fileOverrides, profile };
 		})
-		.onUploadComplete(async ({ file: { url }, metadata: { profile } }) => {
+		.onUploadComplete(async ({ file: { customId }, metadata: { profile } }) => {
 			const [{ avatarUrl }] = await updateUserProfile.execute({
 				...profile,
-				avatarUrl: url,
+				avatarUrl: customId,
 			});
 			if (!avatarUrl) throw uploadthingDBError("Failed to update avatar");
 
-			return { avatarUrl };
+			return { avatarUrl: customId };
 		}),
 	attachment: routeBuilder({
 		image: { maxFileSize: "4MB", maxFileCount: 1 },
@@ -60,10 +60,10 @@ export const uploadRouter = {
 			return { [UTFiles]: fileOverrides, messageId };
 		})
 		.onUploadComplete(
-			async ({ file: { url, type }, metadata: { messageId } }) => {
+			async ({ file: { customId, type }, metadata: { messageId } }) => {
 				const [attachment] = await insertAttachment
 					.execute({
-						url,
+						url: customId,
 						type,
 						messageId,
 					})
@@ -71,16 +71,19 @@ export const uploadRouter = {
 						throw uploadthingDBError("Failed to insert attachment");
 					});
 
+				if (!attachment)
+					throw uploadthingDBError("Failed to insert attachment");
+
 				const recipientIds = await selectMessageRecipientIdsByMessageId
 					.execute({ messageId })
-					.catch(() => {
-						throw uploadthingDBError("Failed to select recipient IDs");
-					})
 					.then((rows) => rows.map(({ recipientId }) => recipientId));
+
+				if (!recipientIds.length)
+					throw uploadthingDBError("No recipient IDs found");
 
 				for (const recipientId of recipientIds)
 					publish(recipientId, {
-						type: "message_attachment",
+						type: "message:attachment",
 						payload: attachment,
 					});
 

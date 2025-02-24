@@ -1,5 +1,6 @@
 import { authQueryOptions } from "@/features/auth/queries";
 import { useUploadThing } from "@/features/uploadthing/hooks";
+import { saveFile } from "@/features/uploadthing/mutations";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useUploadUserAvatar() {
@@ -9,8 +10,14 @@ export function useUploadUserAvatar() {
 	);
 	return useMutation({
 		mutationKey: ["api/uploadthing/avatar"],
-		mutationFn: async (files: File[]) => {
-			const result = await startUpload(files);
+		mutationFn: async ([file]: File[]) => {
+			const [result] = (await startUpload([file])) ?? [];
+
+			if (!result?.customId) {
+				throw new Error("Upload failed");
+			}
+
+			await saveFile(file, result.customId);
 			return result;
 		},
 		onMutate: async ([variables]) => {

@@ -5,6 +5,3 @@ export const messagesByChatIdQueryFn = async (id: string) =>
 
 export const messageStateByIdQueryFn = (id: string) =>
 	db.messages.get(id).then((message) => message?.state);
-
-export const attachmentsByMessageIdQueryFn = (id: string) =>
-	db.attachments.where({ messageId: id }).toArray();

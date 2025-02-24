@@ -1,4 +1,3 @@
-import { ThemeProvider } from "@/context";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
@@ -17,15 +16,12 @@ const TanStackRouterDevtools = import.meta.env.PROD
 export const Route = createRootRouteWithContext<{
 	queryClient: QueryClient;
 }>()({
-	// TODO: Wrap all routes in root layout
 	component: () => (
 		<>
-			<ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-				<Outlet />
-				<Toaster closeButton richColors />
-			</ThemeProvider>
+			<Outlet />
+			<Toaster closeButton richColors />
+			{/* Devtools */}
 			<Suspense>
-				{/* Devtools */}
 				<TanStackRouterDevtools />
 				<ReactQueryDevtools />
 			</Suspense>

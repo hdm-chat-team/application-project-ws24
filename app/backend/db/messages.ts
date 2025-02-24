@@ -1,4 +1,5 @@
-import { and, asc, eq, inArray, not, or, sql } from "drizzle-orm";
+import { cuidSchema } from "@application-project-ws24/cuid";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import {
 	createInsertSchema,
 	createSelectSchema,
@@ -13,42 +14,35 @@ import {
 } from "./messages.sql";
 import type { DB, Transaction } from "./types";
 
-const insertMessageSchema = createInsertSchema(messageTable);
+const insertMessageSchema = createInsertSchema(messageTable, {
+	id: cuidSchema,
+});
+
 const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
 
-const insertMessage = async (
-	message: z.infer<typeof insertMessageSchema>,
-	trx: Transaction | DB = db,
-) =>
-	await trx
-		.insert(messageTable)
-		.values(message)
-		.returning()
-		.then((rows) => rows[0]);
+const insertMessage = db
+	.insert(messageTable)
+	.values({
+		id: sql.placeholder("id"),
+		authorId: sql.placeholder("authorId"),
+		chatId: sql.placeholder("chatId"),
+		body: sql.placeholder("body"),
+		createdAt: sql.placeholder("createdAt"),
+		updatedAt: sql.placeholder("updatedAt"),
+		state: "sent",
+	})
+	.returning()
+	.prepare("insert_message");
 
-const selectUnDeliveredMessagesByUserId = db.query.messageTable
+const selectMessagesByUserDeviceLastSyncedAt = db.query.messageTable
 	.findMany({
-		where: not(eq(messageTable.authorId, sql.placeholder("userId"))),
-		with: {
-			recipients: {
-				columns: { state: true },
-				where: and(
-					eq(messageRecipientTable.recipientId, sql.placeholder("userId")),
-					eq(messageRecipientTable.state, "sent"),
-				),
-			},
-		},
-		orderBy: [asc(messageTable.chatId)],
+		where: (messageTable, { gte }) =>
+			gte(messageTable.createdAt, sql.placeholder("lastSyncedAt")),
+		orderBy: (messageTable, { desc }) => desc(messageTable.createdAt),
 	})
 	.prepare("select_un_delivered_messages");
-
-async function selectMessagesToSync(userId: string) {
-	return await selectUnDeliveredMessagesByUserId
-		.execute({ userId })
-		.then((rows) => rows.map(({ recipients, ...message }) => message));
-}
 
 const deleteMessage = db
 	.delete(messageTable)
@@ -80,7 +74,9 @@ async function insertMessageRecipients(
 			recipientIds.map((recipientId) => ({
 				messageId,
 				recipientId,
-				state: "pending" as const,
+				state: "pending" as Message["state"],
+				createdAt: sql`now()`,
+				updatedAt: sql`now()`,
 			})),
 		)
 		.returning({ recipientIds: messageRecipientTable.recipientId })
@@ -129,20 +125,6 @@ async function updateMessageRecipientsStates(
 		.then((rows) => rows.map((row) => row.recipientIds));
 }
 
-async function pruneMessages(trx: Transaction | DB = db) {
-	await trx
-		.delete(messageTable)
-		.where(
-			or(
-				and(
-					eq(messageTable.state, "delivered"),
-					sql`created_at < NOW() - INTERVAL '30 days'`,
-				),
-				eq(messageTable.state, "read"),
-			),
-		);
-}
-
 export {
 	countRecipientsByMessageState,
 	// * Message queries
@@ -151,11 +133,10 @@ export {
 	insertMessageRecipients,
 	// * Message schemas
 	insertMessageSchema,
-	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
-	selectMessageSchema,
 	// * Message functions
-	selectMessagesToSync,
+	selectMessagesByUserDeviceLastSyncedAt,
+	selectMessageSchema,
 	updateMessageRecipientsStates,
 	updateMessageSchema,
 	updateMessageStatus,
