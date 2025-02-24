@@ -100,19 +100,22 @@ export function useUpdateMessage() {
 
 export function useSaveAttachment() {
 	return useMutation({
-		mutationKey: ["db", "save", "file-from-url"],
+		mutationKey: ["db", "save", "attachment"],
 		mutationFn: async ({
 			messageId,
 			type,
 		}: { messageId: string; type: string }) => {
-			const existingFile = await db.files.get(messageId);
+			const message = await db.messages.get(messageId);
+			if (!message?.attachmentId) return;
+
+			const existingFile = await db.files.get(message.attachmentId);
 			if (existingFile?.blob) return;
 
-			const response = await fetch(`/api/files/${messageId}`);
+			const response = await fetch(`/api/files/${message.attachmentId}`);
 			const blob = await response.blob();
-			const file = new File([blob], messageId, { type });
+			const file = new File([blob], message.attachmentId, { type });
 
-			await saveFile(file, messageId);
+			await saveFile(file, message.attachmentId);
 		},
 	});
 }
