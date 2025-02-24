@@ -86,19 +86,19 @@ function AttachmentPage() {
 	};
 
 	return (
-		<div className="fixed inset-0 bg-black/90">
-			{/* Header */}
-			<header className="border-b">
-				<div className="p-4">
-					<Button onClick={() => navigate({ to: "/" })} variant="ghost">
-						<ArrowLeft size={20} />
-						Back to chat
-					</Button>
-				</div>
-			</header>
+		<div className="fixed inset-0 flex items-center justify-center bg-black/90">
+			<div className="relative max-h-[90vh] w-full max-w-md rounded-lg bg-background p-4">
+				{/* Header */}
+				<header className="border-b">
+					<div className="sticky top-0 z-10 mb-4 bg-background">
+						<Button onClick={() => navigate({ to: "/" })} variant="ghost">
+							<ArrowLeft size={20} />
+							Back to chat
+						</Button>
+					</div>
+				</header>
 
-			{/* File Upload */}
-			<div className="flex h-[calc(100vh-4rem)] items-center justify-center">
+				{/* File Upload */}
 				<div className="w-full max-w-md p-4">
 					{!selectedFile ? (
 						<FilePicker onFileSelect={handleFileSelect} />
