@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useState } from "react";
 
+import Chip from "@/components/chips/chips";
 import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
 import { createFileRoute } from "@tanstack/react-router";
@@ -48,13 +49,10 @@ function ChatListSidebar() {
 	const filteredChats = searchedChats.filter((chat) => {
 		switch (filter) {
 			case "unread":
-				// Beispiel: hat unreadCount > 0
 				return chat.unreadCount && chat.unreadCount > 0;
 			case "favorite":
-				// Beispiel: isFavorite === true
 				return chat.isFavorite === true;
 			case "group":
-				// Beispiel: isGroup === true
 				return chat.isGroup === true;
 			default:
 				return true;
@@ -64,6 +62,12 @@ function ChatListSidebar() {
 	filteredChats.sort((a, b) => {
 		return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
 	});
+	const filters = [
+		{ label: "All", value: "all" },
+		{ label: "Unread", value: "unread" },
+		{ label: "Favorite", value: "favorite" },
+		{ label: "Group", value: "group" },
+	];
 
 	return (
 		<>
@@ -84,26 +88,16 @@ function ChatListSidebar() {
 			</div>
 
 			<div className="flex flex-wrap gap-2 px-2 pb-2">
-				<Chip
-					label="All"
-					active={filter === "all"}
-					onClick={() => setFilter("all")}
-				/>
-				<Chip
-					label="Unread"
-					active={filter === "unread"}
-					onClick={() => setFilter("unread")}
-				/>
-				<Chip
-					label="Favorite"
-					active={filter === "favorite"}
-					onClick={() => setFilter("favorite")}
-				/>
-				<Chip
-					label="Group"
-					active={filter === "group"}
-					onClick={() => setFilter("group")}
-				/>
+				{filters.map(({ label, value }) => (
+					<Chip
+						key={value}
+						label={label}
+						active={filter === value}
+						onClick={() =>
+							setFilter(value as "all" | "unread" | "favorite" | "group")
+						}
+					/>
+				))}
 			</div>
 
 			<SidebarContent>
@@ -138,25 +132,3 @@ function ChatListSidebar() {
 }
 
 export default ChatListSidebar;
-
-type ChipProps = {
-	label: string;
-	active: boolean;
-	onClick: () => void;
-};
-
-function Chip({ label, active, onClick }: ChipProps) {
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={`${
-				active
-					? "border border-green-300 bg-green-100 text-green-800"
-					: "bg-white text-gray-800 hover:bg-slate-100"
-			} rounded-full px-2 py-1 text-sm`}
-		>
-			{label}
-		</button>
-	);
-}
