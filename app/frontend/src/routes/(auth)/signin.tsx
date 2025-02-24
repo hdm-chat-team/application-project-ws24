@@ -30,7 +30,7 @@ function SignIn() {
 	const { from } = Route.useSearch();
 	return (
 		<div className="flex min-h-screen items-center justify-center">
-			<Card className="relative flex px-5">
+			<Card className="relative flex bg-[#3e4746] px-5 text-white">
 				<div className="flex-col items-center gap-2 py-4">
 					<img
 						src={Logo}
@@ -51,21 +51,21 @@ function SignIn() {
 							className="mt-7 mb-5 flex flex-col gap-2"
 						>
 							<div className="flex gap-2">
-								<h3 className="w-2/5">E-Mail</h3>
-								<Input type="email" />
+								<h3 className="w-2/5 text-white">E-Mail</h3>
+								<Input type="email" className="border-white text-white" />
 							</div>
 							<div className="flex gap-2">
-								<h3 className="w-2/5">Password</h3>
-								<Input type="password" />
+								<h3 className="w-2/5 text-white">Password</h3>
+								<Input type="password" className="border-white text-white" />
 							</div>
 							<div className="flex w-full justify-end">
 								<Button className="w-fit rounded-3xl">Sign In</Button>
 							</div>
 						</form>
 					</CardContent>
-					<Separator />
+					<Separator className="bg-white" />
 					<CardFooter className="flex w-full flex-col">
-						<h1>or sign in with</h1>
+						<h1 className="text-white">or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
 							<GithubSignInButton from={from} />
 						</div>

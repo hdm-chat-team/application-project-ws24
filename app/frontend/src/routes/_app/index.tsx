@@ -1,19 +1,15 @@
-import { Button } from "@/components/ui/button";
 import {
 	SidebarContent,
 	SidebarGroup,
-	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { MessageSquarePlusIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_app/")({
 	component: () => <ChatListSidebar />,
@@ -32,15 +28,6 @@ function ChatListSidebar() {
 	*/
 	return (
 		<>
-			<SidebarHeader className="flex flex-row items-center justify-between">
-				Chats
-				<Button variant="ghost" size="icon" asChild>
-					<Link to="/new">
-						<MessageSquarePlusIcon />
-					</Link>
-				</Button>
-			</SidebarHeader>
-			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>

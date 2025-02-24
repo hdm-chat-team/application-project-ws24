@@ -1,4 +1,3 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Message, MessageForm } from "@/features/message/components";
 import { messagesByChatIdQueryFn } from "@/features/message/queries";
@@ -44,7 +43,7 @@ function MessagesScrollArea({
 	);
 
 	return (
-		<ScrollArea>
+		<>
 			<ol className={className}>
 				{messages?.map((message) => (
 					<li key={message.id}>
@@ -52,6 +51,6 @@ function MessagesScrollArea({
 					</li>
 				))}
 			</ol>
-		</ScrollArea>
+		</>
 	);
 }

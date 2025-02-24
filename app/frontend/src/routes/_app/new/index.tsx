@@ -1,6 +1,5 @@
 import {
 	SidebarContent,
-	SidebarHeader,
 	SidebarInput,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -46,9 +45,6 @@ function RouteComponent() {
 
 	return (
 		<>
-			<SidebarHeader className="flex flex-row items-center justify-between">
-				New Chat
-			</SidebarHeader>
 			<SidebarSeparator className="mx-0" />
 			<SidebarContent className="my-2 space-y-1">
 				<SidebarInput
