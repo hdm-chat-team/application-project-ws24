@@ -20,7 +20,7 @@ const textMessageSchema = insertMessageSchema.extend({
 });
 
 const attachmentMessageSchema = insertMessageSchema.extend({
-	body: z.string().or(z.null()),
+	body: z.string().nullable(),
 });
 
 const updateMessageSchema = createUpdateSchema(messageTable);
