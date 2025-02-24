@@ -1,8 +1,8 @@
 import api from "@/lib/api";
 import {
 	type ClientToServerWsEventData,
-	clientToServerWsEventDataSchema,
 	type ServerToClientWsEventData,
+	clientToServerWsEventDataSchema,
 	serverToClientWsEventData,
 } from "@shared/types";
 
