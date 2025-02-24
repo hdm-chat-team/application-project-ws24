@@ -13,7 +13,12 @@ import { Chat } from "@/features/chat/components";
 import { ChatProvider } from "@/features/chat/context";
 import handleMessage from "@/features/realtime/event-handler";
 import WebSocketService from "@/features/realtime/ws-service";
-import { Link, Outlet, createFileRoute, redirect } from "@tanstack/react-router";
+import {
+	Link,
+	Outlet,
+	createFileRoute,
+	redirect,
+} from "@tanstack/react-router";
 import { MessageSquarePlusIcon } from "lucide-react";
 
 const ws = new WebSocketService(handleMessage);

@@ -13,7 +13,7 @@ import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Search, SearchCheckIcon } from "lucide-react";
+import { Search } from "lucide-react";
 
 type Chat = {
 	id: string;
@@ -69,7 +69,6 @@ function ChatListSidebar() {
 
 	return (
 		<>
-
 			<div className="my-4 px-2 py-2">
 				<div className="flex items-center rounded-full border bg-white px-3 py-2">
 					<Search className="mx-2" />
