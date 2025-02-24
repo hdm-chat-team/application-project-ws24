@@ -1,5 +1,5 @@
 {
-  "id": "fd433069-a9e7-4c4f-8260-1a395e0bdec5",
+  "id": "7c73c212-23eb-4941-95c8-e378a7ff7d3d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -70,49 +70,16 @@
           "type": "chat_membership_role",
           "typeSchema": "public",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'member'"
+          "notNull": true
         },
         "joined_at": {
           "name": "joined_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         }
       },
-      "indexes": {
-        "chats_memberships_user_id_index": {
-          "name": "chats_memberships_user_id_index",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "chats_memberships_chat_id_index": {
-          "name": "chats_memberships_chat_id_index",
-          "columns": [
-            {
-              "expression": "chat_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "chats_memberships_user_id_users_id_fk": {
           "name": "chats_memberships_user_id_users_id_fk",
@@ -165,21 +132,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
         "name": {
           "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "avatar_url": {
+          "name": "avatar_url",
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
@@ -190,26 +150,142 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
         }
       },
-      "indexes": {
-        "chats_id_index": {
-          "name": "chats_id_index",
-          "columns": [
-            {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.devices_sync": {
+      "name": "devices_sync",
+      "schema": "",
+      "columns": {
+        "device_id": {
+          "name": "device_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_synced_at": {
+          "name": "last_synced_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "devices_sync_device_id_devices_id_fk": {
+          "name": "devices_sync_device_id_devices_id_fk",
+          "tableFrom": "devices_sync",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "device_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "devices_sync_user_id_users_id_fk": {
+          "name": "devices_sync_user_id_users_id_fk",
+          "tableFrom": "devices_sync",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "devices_sync_device_id_user_id_pk": {
+          "name": "devices_sync_device_id_user_id_pk",
+          "columns": [
+            "device_id",
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.devices": {
+      "name": "devices",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(15)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "added_at": {
+          "name": "added_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "last_signed_in_at": {
+          "name": "last_signed_in_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "devices_user_id_users_id_fk": {
+          "name": "devices_user_id_users_id_fk",
+          "tableFrom": "devices",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -243,8 +319,7 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
+          "notNull": true
         },
         "updated_at": {
           "name": "updated_at",
@@ -322,19 +397,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
         "chat_id": {
           "name": "chat_id",
           "type": "varchar(15)",
@@ -358,30 +420,27 @@
           "name": "body",
           "type": "text",
           "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
           "notNull": true
         }
       },
       "indexes": {
-        "messages_id_index": {
-          "name": "messages_id_index",
+        "messages_author_id_index": {
+          "name": "messages_author_id_index",
           "columns": [
             {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "messages_chat_id_index": {
-          "name": "messages_chat_id_index",
-          "columns": [
-            {
-              "expression": "chat_id",
+              "expression": "author_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -392,11 +451,11 @@
           "method": "btree",
           "with": {}
         },
-        "messages_author_id_index": {
-          "name": "messages_author_id_index",
+        "messages_created_at_index": {
+          "name": "messages_created_at_index",
           "columns": [
             {
-              "expression": "author_id",
+              "expression": "created_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -458,6 +517,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "device_id": {
+          "name": "device_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
         "expires_at": {
           "name": "expires_at",
           "type": "timestamp with time zone",
@@ -466,21 +531,6 @@
         }
       },
       "indexes": {
-        "users_sessions_token_index": {
-          "name": "users_sessions_token_index",
-          "columns": [
-            {
-              "expression": "token",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "users_sessions_user_id_index": {
           "name": "users_sessions_user_id_index",
           "columns": [
@@ -510,9 +560,82 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "users_sessions_device_id_devices_id_fk": {
+          "name": "users_sessions_device_id_devices_id_fk",
+          "tableFrom": "users_sessions",
+          "tableTo": "devices",
+          "columnsFrom": [
+            "device_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users_contacts": {
+      "name": "users_contacts",
+      "schema": "",
+      "columns": {
+        "contactor_id": {
+          "name": "contactor_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contact_id": {
+          "name": "contact_id",
+          "type": "varchar(15)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "users_contacts_contactor_id_users_id_fk": {
+          "name": "users_contacts_contactor_id_users_id_fk",
+          "tableFrom": "users_contacts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "contactor_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "users_contacts_contact_id_users_id_fk": {
+          "name": "users_contacts_contact_id_users_id_fk",
+          "tableFrom": "users_contacts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "contact_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "users_contacts_contactor_id_contact_id_pk": {
+          "name": "users_contacts_contactor_id_contact_id_pk",
+          "columns": [
+            "contactor_id",
+            "contact_id"
+          ]
+        }
+      },
       "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
@@ -526,19 +649,6 @@
           "name": "id",
           "type": "varchar(15)",
           "primaryKey": true,
-          "notNull": true
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
           "notNull": true
         },
         "user_id": {
@@ -564,39 +674,23 @@
           "type": "varchar(255)",
           "primaryKey": false,
           "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "users_profiles_id_index": {
-          "name": "users_profiles_id_index",
-          "columns": [
-            {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "users_profiles_user_id_index": {
-          "name": "users_profiles_user_id_index",
-          "columns": [
-            {
-              "expression": "user_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "users_profiles_display_name_index": {
           "name": "users_profiles_display_name_index",
           "columns": [
@@ -663,7 +757,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "github_id": {
           "name": "github_id",
@@ -685,41 +780,17 @@
         }
       },
       "indexes": {
-        "users_id_index": {
-          "name": "users_id_index",
-          "columns": [
-            {
-              "expression": "id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "users_username_index": {
-          "name": "users_username_index",
-          "columns": [
-            {
-              "expression": "username",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "users_email_index": {
-          "name": "users_email_index",
+        "users_email_username_index": {
+          "name": "users_email_username_index",
           "columns": [
             {
               "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "username",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
