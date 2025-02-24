@@ -8,6 +8,29 @@ import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
 export function usePostMessage(chatId: string) {
+	return useMutation({
+		mutationKey: ["POST", api.message.$url().pathname, chatId],
+		mutationFn: async ({ message }: { message: Message }) => {
+			const result = await api.message.$post({
+				form: {
+					...message,
+					body: message.body || undefined,
+				},
+			});
+
+			if (!result.ok) throw new Error("Failed to send message");
+		},
+		onMutate: ({ message }) =>
+			db.messages.add({
+				...message,
+				state: "sent",
+				receivedAt: localeTime(),
+			}),
+		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
+	});
+}
+
+export function usePostAttachment(chatId: string) {
 	const { startUpload } = useUploadThing(
 		(routeRegistry) => routeRegistry.attachment,
 	);

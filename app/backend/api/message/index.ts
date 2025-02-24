@@ -1,5 +1,4 @@
 import { zValidator } from "@hono/zod-validator";
-import { HTTPException } from "hono/http-exception";
 import { createRouter } from "#api/factory";
 import { selectChatWithMembersByUserId } from "#db/chats";
 import {
@@ -10,28 +9,24 @@ import {
 import { protectedRoute } from "#lib/middleware";
 import { publish } from "#lib/utils";
 
-export const messageRouter = createRouter().post(
-	"/",
-	zValidator("form", insertMessageSchema),
-	protectedRoute,
-	async (c) => {
+export const messageRouter = createRouter()
+	.use(protectedRoute)
+	.post("/", zValidator("form", insertMessageSchema), async (c) => {
 		const message = c.req.valid("form");
 
-		if (message.authorId !== c.get("user").id)
-			throw new HTTPException(403, { message: "Not authorized" });
+		if (message.authorId !== c.var.user.id)
+			return c.json({ message: "Not authorized", data: null }, 403);
 
 		const chat = await selectChatWithMembersByUserId.execute({
 			userId: message.authorId,
 			chatId: message.chatId,
 		});
 
-		if (!chat) throw new HTTPException(404, { message: "Chat not found" });
+		if (!chat) return c.json({ message: "Chat not found", data: null }, 404);
 		if (!chat.members.some((member) => member.userId === message.authorId))
-			throw new HTTPException(403, { message: "Not a chat member" });
+			return c.json({ message: "Not a Chat member", data: null }, 403);
 
-		const insertedMessage = await insertMessage
-			.execute(message)
-			.then((rows) => rows[0]);
+		const [insertedMessage] = await insertMessage.execute(message);
 
 		const insertedRecipientIds = await insertMessageRecipients(
 			insertedMessage.id,
@@ -40,10 +35,9 @@ export const messageRouter = createRouter().post(
 
 		for (const recipientId of insertedRecipientIds)
 			publish(recipientId, {
-				type: "message:incoming",
+				type: "message",
 				payload: insertedMessage,
 			});
 
 		return c.json({ message: "Message sent", data: insertedMessage.id }, 201);
-	},
-);
+	});

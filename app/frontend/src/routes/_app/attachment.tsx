@@ -1,22 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { useUser } from "@/features/auth/hooks";
 import { useChat } from "@/features/chat/context";
-import { usePostMessage } from "@/features/message/hooks";
+import { usePostAttachment } from "@/features/message/hooks";
 import { createMessage } from "@/features/message/utils";
 import { CaptionInput } from "@/features/uploadthing/components/caption-input";
 import { FilePicker } from "@/features/uploadthing/components/file-picker";
 import { FilePreview } from "@/features/uploadthing/components/file-preview";
-import { createFileRoute } from "@tanstack/react-router";
-import { useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 export const Route = createFileRoute("/_app/attachment")({
-	validateSearch: z.object({
-		chatId: z.string().min(1),
-	}),
 	component: AttachmentPage,
 });
 
@@ -26,11 +22,11 @@ const attachmentFormSchema = z.object({
 });
 
 function AttachmentPage() {
-	const { chatId } = Route.useSearch();
 	const navigate = useNavigate();
-	const { setChatId } = useChat();
+	const { chat, setChatId } = useChat();
 	const { user } = useUser();
-	const postMessage = usePostMessage(chatId).mutate;
+
+	const postMessage = usePostAttachment(chat?.id ?? "").mutate;
 
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [caption, setCaption] = useState("");
@@ -72,13 +68,13 @@ function AttachmentPage() {
 				file: selectedFile,
 			});
 
-			await postMessage({
-				message: createMessage(chatId, user.id, validatedData.body),
+			postMessage({
+				message: createMessage(chat?.id ?? "", user.id, validatedData.body),
 				files: [validatedData.file],
 			});
 
 			toast.success("File uploaded successfully");
-			setChatId(chatId);
+			setChatId(chat?.id ?? "");
 			navigate({ to: "/" });
 		} catch (error) {
 			toast.error("Failed to upload file");

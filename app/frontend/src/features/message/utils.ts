@@ -1,6 +1,11 @@
 import { createId } from "@application-project-ws24/cuid";
 import { Temporal } from "@js-temporal/polyfill";
 import type { Message } from "@server/db/messages";
+import { z } from "zod";
+
+export const messageFormSchema = z.object({
+	body: z.string().trim().nonempty(),
+});
 
 // * extends server message with receivedAt
 export type LocalMessage = Message & {
