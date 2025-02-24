@@ -7,18 +7,12 @@ export const chatByIdQueryFn = (chatId: string) => db.chats.get(chatId);
 export const selfChatQueryFn = () =>
 	db.chats.where("type").equals("self").first();
 
-export const directChatPartnerQueryFn = (chatId: string, userId: string) =>
-	db.chatMemberships
-		.where("chatId")
-		.equals(chatId)
-		.filter((member) => member.userId !== userId)
-		.first()
-		.then((member) =>
-			member
-				? db.userProfiles.where("userId").equals(member.userId).first()
-				: undefined,
-		)
-		.then((profile) => profile?.displayName);
+export const directChatByMemberIdQueryFn = (memberId: string) =>
+	db.chats
+		.where("type")
+		.equals("direct")
+		.and((chat) => chat.members?.includes(memberId))
+		.first();
 
 export const chatByIdQueryOptions = (chatId: string) =>
 	queryOptions({

@@ -1,109 +1,124 @@
-import { cuidParamSchema } from "@application-project-ws24/cuid";
+import { cuidParamSchema, cuidSchema } from "@application-project-ws24/cuid";
 import { zValidator } from "@hono/zod-validator";
-import { HTTPException } from "hono/http-exception";
-import type { DatabaseError } from "pg";
+import { z } from "zod";
 import { createRouter } from "#api/factory";
-import db from "#db";
-import { insertChat, selectChatMembership, updateChat } from "#db/chats";
-import { chatMemberTable } from "#db/chats.sql";
+import { db } from "#db";
+import {
+	type ChatMembership,
+	insertChatSchema,
+	insertGroupChat,
+	insertGroupChatWithMembershipsSchema,
+	selectChatOwnerOrAdminMembership,
+	updateChat,
+	updateChatSchema,
+} from "#db/chats";
+import { chatMembershipTable } from "#db/chats.sql";
 import { protectedRoute } from "#lib/middleware";
-import { createChatSchema, updateChatNameFormSchema } from "./validators";
-
-import { chatMemberRouter } from "./member";
+import { publish } from "#lib/utils";
+import { chatMembershipRouter } from "./member";
 
 export const chatRouter = createRouter()
-	.route("/membership", chatMemberRouter)
+	// ! All routes protected
+	.use(protectedRoute)
+	.route("/membership", chatMembershipRouter)
 	.post(
-		"/",
-		protectedRoute,
-		zValidator("form", createChatSchema),
+		"/direct",
+		zValidator(
+			"json",
+			insertChatSchema.extend({
+				members: z
+					.array(cuidSchema)
+					.length(2, "direct chat must have 2 members"),
+			}),
+		),
 		async (c) => {
-			const { members, ...chat } = c.req.valid("form");
+			const userId = c.get("user").id;
 
-			const [insertedChat] = await insertChat
-				.execute(chat)
-				.catch((error: DatabaseError) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				});
+			const chat = c.req.valid("json");
+
+			const memberships: Array<ChatMembership> = chat.members.map(
+				(memberId) => ({
+					chatId: chat.id,
+					userId: memberId,
+					role: "member",
+					joinedAt: new Date().toISOString(),
+				}),
+			);
+
+			const [insertedChat] = await insertGroupChat.execute(chat);
+			const members = await db
+				.insert(chatMembershipTable)
+				.values(memberships)
+				.returning({ userId: chatMembershipTable.userId })
+				.then((rows) => rows.map((member) => member.userId));
+
+			publish(userId, {
+				type: "chat",
+				payload: { ...insertedChat, members },
+			});
+
+			return c.json(
+				{
+					message: "direct chat created",
+					data: { chat: insertedChat, members },
+				},
+				201,
+			);
+		},
+	)
+	.post(
+		"/group",
+		zValidator("json", insertGroupChatWithMembershipsSchema),
+		async (c) => {
+			const { memberships, chat } = c.req.valid("json");
+
+			const [insertedChat] = await insertGroupChat.execute(chat);
 
 			const insertedMemberships = await db
-				.insert(chatMemberTable)
-				.values(members.map((userId) => ({ chatId: insertedChat.id, userId })))
-				.returning()
-				.catch((error: DatabaseError) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				});
+				.insert(chatMembershipTable)
+				.values(memberships)
+				.returning({ userId: chatMembershipTable.userId })
+				.then((rows) => rows.map((row) => row.userId));
 
-			/* 
-			TODO: publish chat creation event to members
-			for (const recipientId of insertedMemberships.map((m) => m.userId))
+			for (const recipientId of insertedMemberships)
 				publish(recipientId, {
-					type: "chat_incoming",
-					payload: {updatedChat, memberships: insertedMemberships},
+					type: "chat",
+					payload: { ...insertedChat, members: insertedMemberships },
 				});
-			*/
 
-			return c.json({
-				data: { chat: insertedChat, memberships: insertedMemberships },
-			});
+			return c.json(
+				{
+					message: "group chat created",
+					data: { chat: insertedChat, members: insertedMemberships },
+				},
+				201,
+			);
 		},
 	)
 	.put(
-		"/",
-		protectedRoute,
-		zValidator("form", updateChatNameFormSchema),
+		"/:id",
+		zValidator("param", cuidParamSchema),
+		zValidator("form", updateChatSchema.pick({ name: true })),
 		async (c) => {
-			const user = c.get("user");
-			const { id, name } = c.req.valid("form");
+			const userId = c.get("user").id;
 
-			const isMember = await selectChatMembership
-				.execute({ chatId: id, userId: user.id })
-				.catch((error: DatabaseError) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				})
-				.then((result) => !!result);
+			const { id: chatId } = c.req.valid("param");
+			const { name } = c.req.valid("form");
 
-			if (!isMember)
-				throw new HTTPException(403, {
-					message: "Not a chat member",
-					cause: "permissions",
-				});
+			const permittedUser = await selectChatOwnerOrAdminMembership.execute({
+				chatId,
+				userId,
+			});
 
-			const [updatedChat] = await updateChat
-				.execute({ id, name })
-				.catch((error: DatabaseError) => {
-					throw new HTTPException(500, {
-						message: error.message,
-						cause: error.cause,
-					});
-				});
+			if (!permittedUser)
+				return c.json({ message: "Not permitted", data: null }, 403);
 
-			/* 
-			TODO: publish chat update event to members
-			for (const recipientId of updatedChatMemberIds)
-				publish(recipientId, {
-					type: "chat_updated",
-					payload: updatedChat,
-				});
-			*/
-			return c.json({ data: updatedChat });
+			const [updatedChat] = await updateChat.execute({ id: chatId, name });
+
+			return c.json({ message: "updated", data: updatedChat }, 200);
 		},
 	)
-	.delete(
-		"/:id",
-		protectedRoute,
-		zValidator("param", cuidParamSchema),
-		async (c) => {
-			// ? Do we need this?
-			return c.text(`${c.req.valid("param").id} deleted`);
-		},
-	);
+	.delete("/:id", zValidator("param", cuidParamSchema), async (c) => {
+		// ? Do we need this?
+		return c.text(`Chat: ${c.req.valid("param").id} deleted`);
+	});

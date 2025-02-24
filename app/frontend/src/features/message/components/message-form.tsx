@@ -1,23 +1,32 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/features/auth/hooks";
+import { useChat } from "@/features/chat/context";
+import { usePostDirectChat } from "@/features/chat/hooks/mutations/use-post-chat";
 import { useForm } from "@tanstack/react-form";
 import { Link } from "@tanstack/react-router";
 import { Paperclip, SendHorizontal } from "lucide-react";
 import { usePostMessage } from "../hooks";
 import { createMessage, messageFormSchema } from "../utils";
 
-export function MessageForm({ chatId }: { chatId: string }) {
+export function MessageForm() {
 	const { user } = useUser();
-	const postMessage = usePostMessage(chatId);
+	const { chat } = useChat();
+	const postMessage = usePostMessage();
+	const postChat = usePostDirectChat();
 
 	const form = useForm({
 		defaultValues: {
 			body: "", // ? persist draft in local-storage/indexedDB?
 		},
-		onSubmit: ({ value }) => {
+		onSubmit: async ({ value }) => {
+			if (!chat) throw new Error("No chat selected");
+
+			// Post the chat if it is not synced
+			if (chat?.syncState !== "synced") await postChat.mutateAsync(chat);
+
 			postMessage.mutate({
-				message: createMessage(chatId, user.id, value.body),
+				message: createMessage(chat.id, user.id, value.body),
 			});
 			form.reset();
 		},

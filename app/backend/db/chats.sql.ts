@@ -15,6 +15,7 @@ export const chatTypeEnum = pgEnum("chat_type", ["self", "direct", "group"]);
 export const chatTable = pgTable("chats", {
 	id,
 	name: varchar({ length: 255 }),
+	avatarUrl: varchar({ length: 255 }),
 	type: chatTypeEnum().notNull(),
 	createdAt: timestamp({ mode: "string" }).notNull(),
 	updatedAt: timestamp({ mode: "string" }).notNull(),

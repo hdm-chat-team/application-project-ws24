@@ -1,3 +1,4 @@
+import { useChat } from "@/features/chat/context";
 import { type LocalMessage, localeTime } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { api } from "@/lib/api";
@@ -7,9 +8,10 @@ import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
-export function usePostMessage(chatId: string) {
+export function usePostMessage() {
+	const { chat } = useChat();
 	return useMutation({
-		mutationKey: ["POST", api.message.$url().pathname, chatId],
+		mutationKey: ["POST", api.message.$url().pathname, chat?.id],
 		mutationFn: async ({ message }: { message: Message }) => {
 			const result = await api.message.$post({
 				form: {

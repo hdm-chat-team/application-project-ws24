@@ -6,17 +6,15 @@ type SyncState = "pending" | "synced" | "error";
 
 export type LocalChat = Chat & {
 	syncState: SyncState;
-	members: User["id"][];
+	members: Array<User["id"]>;
 };
 
 export const createChat = (
-	options: Pick<LocalChat, "name" | "type" | "members">,
+	options: Pick<LocalChat, "name" | "type" | "members" | "avatarUrl">,
 ): LocalChat => ({
 	id: createId(),
 	createdAt: new Date().toISOString(),
 	updatedAt: new Date().toISOString(),
 	syncState: "pending",
-	name: options.name,
-	type: options.type,
-	members: options.members,
+	...options,
 });

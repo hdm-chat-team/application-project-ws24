@@ -5,7 +5,7 @@ import type { UserSearchQuery } from "@shared/types";
 import { queryOptions } from "@tanstack/react-query";
 
 export const contactsQueryFn = () =>
-	db.users.where("relation").equals("contact").toArray();
+	db.users.where("relation").equals("contact").sortBy("profile.displayName");
 
 export const searchUsersQueryOptions = (query: UserSearchQuery) =>
 	queryOptions<UserWithProfile[]>({
