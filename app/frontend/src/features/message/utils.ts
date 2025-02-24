@@ -4,9 +4,9 @@ import type { Message } from "@server/db/messages";
 
 // * extends server message with receivedAt
 export interface LocalMessage extends Message {
-		receivedAt: string;
-		attachmentId?: string;
-	}
+	receivedAt: string;
+	attachmentId?: string;
+}
 
 export function formatBerlinTime() {
 	return Temporal.Now.zonedDateTimeISO("Europe/Berlin").toLocaleString(
