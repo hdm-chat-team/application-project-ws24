@@ -12,7 +12,7 @@ type UseMessageStateProps = Pick<Message, "id" | "authorId">;
 export function useMessageState({ id, authorId }: UseMessageStateProps) {
 	const { chat } = useChat();
 	if (!chat?.id) throw new Error("Chat not found");
-	const isSending = usePostMessage(chat.id).isPending;
+	const isSending = usePostMessage().isPending;
 	const { sendMessage } = useSocket();
 	const messageState = useLiveQuery(() => messageStateByIdQueryFn(id), [id]);
 
