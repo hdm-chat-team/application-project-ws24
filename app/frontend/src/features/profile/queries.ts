@@ -3,7 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 export const userProfileQueryOptions = (username: string) =>
 	queryOptions({
-		queryKey: [api.user.username[":username"].$url().pathname, username],
+		queryKey: ["GET", api.user.username[":username"].$url().pathname, username],
 		queryFn: async () => {
 			const response = await api.user.username[":username"].$get({
 				param: { username },

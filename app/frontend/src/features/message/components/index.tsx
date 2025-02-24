@@ -12,7 +12,7 @@ type MessageBubbleProps = {
 };
 
 export function Message({
-	value: { id, body, authorId, state, receivedAt },
+	value: { id, body, authorId, state, receivedAt, attachmentId: fileId },
 }: MessageBubbleProps) {
 	const ref = useMessageState({ id, authorId });
 	const { user } = useUser();
@@ -29,7 +29,7 @@ export function Message({
 					isSent ? "bg-primary text-primary-foreground" : "bg-muted",
 				)}
 			>
-				<MessageAttachments messageId={id} />
+				{fileId && <MessageAttachments customId={fileId} />}
 				<p className="mt-2 break-words text-sm">{body}</p>
 				<div className="mt-1 flex items-center justify-end gap-1">
 					<span className="text-muted-foreground text-xs">{receivedAt}</span>

@@ -2,6 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import env from "#env";
 import * as messageAttachmentSchema from "./attachments.sql";
 import * as chatSchema from "./chats.sql";
+import * as deviceSchema from "./devices.sql";
 import * as messageSchema from "./messages.sql";
 import * as sessionSchema from "./sessions.sql";
 import * as userSchema from "./users.sql";
@@ -9,6 +10,7 @@ import * as userSchema from "./users.sql";
 const schema = {
 	...userSchema,
 	...sessionSchema,
+	...deviceSchema,
 	...chatSchema,
 	...messageSchema,
 	...messageAttachmentSchema,

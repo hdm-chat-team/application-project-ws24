@@ -13,6 +13,7 @@ const insertSession = db
 	.values({
 		token: sql.placeholder("token"),
 		userId: sql.placeholder("userId"),
+		deviceId: sql.placeholder("deviceId"),
 	})
 	.returning()
 	.prepare("insert_session");

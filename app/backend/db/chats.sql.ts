@@ -1,43 +1,62 @@
 import { relations } from "drizzle-orm";
-import { index, pgTable, primaryKey, varchar } from "drizzle-orm/pg-core";
+import {
+	pgEnum,
+	pgTable,
+	primaryKey,
+	timestamp,
+	varchar,
+} from "drizzle-orm/pg-core";
+import { messageTable } from "./messages.sql";
 import { userTable } from "./users.sql";
-import { ID_SIZE_CONFIG, id, timestamps } from "./utils";
+import { cuid, id } from "./utils";
+
+export const chatTypeEnum = pgEnum("chat_type", ["self", "direct", "group"]);
 
 export const chatTable = pgTable("chats", {
 	id,
-	...timestamps,
 	name: varchar({ length: 255 }),
+	avatarUrl: varchar({ length: 255 }),
+	type: chatTypeEnum().notNull(),
+	createdAt: timestamp({ mode: "string" }).notNull(),
+	updatedAt: timestamp({ mode: "string" }).notNull(),
 });
 
-export const chatRelations = relations(chatTable, ({ many }) => ({
-	members: many(chatMemberTable),
+export const chatTableRelations = relations(chatTable, ({ many }) => ({
+	members: many(chatMembershipTable),
+	messages: many(messageTable),
 }));
 
-export const chatMemberTable = pgTable(
-	"chat_members",
+export const chatMembershipRoleEnum = pgEnum("chat_membership_role", [
+	"owner",
+	"admin",
+	"member",
+]);
+
+export const chatMembershipTable = pgTable(
+	"chats_memberships",
 	{
-		chatId: varchar(ID_SIZE_CONFIG)
-			.notNull()
-			.references(() => chatTable.id, { onDelete: "cascade" }),
-		userId: varchar(ID_SIZE_CONFIG)
+		userId: cuid()
 			.notNull()
 			.references(() => userTable.id, { onDelete: "cascade" }),
+		chatId: cuid()
+			.notNull()
+			.references(() => chatTable.id, { onDelete: "cascade" }),
+		role: chatMembershipRoleEnum().notNull(),
+		joinedAt: timestamp({ mode: "string" }).notNull(),
 	},
-	(table) => [
-		{
-			pk: primaryKey({ columns: [table.chatId, table.userId] }),
-			chatMemberIdIndex: index().on(table.userId),
-		},
-	],
+	(table) => [primaryKey({ columns: [table.userId, table.chatId] })],
 );
 
-export const chatMemberRelations = relations(chatMemberTable, ({ one }) => ({
-	chat: one(chatTable, {
-		fields: [chatMemberTable.chatId],
-		references: [chatTable.id],
+export const chatMembershipTableRelations = relations(
+	chatMembershipTable,
+	({ one }) => ({
+		user: one(userTable, {
+			fields: [chatMembershipTable.userId],
+			references: [userTable.id],
+		}),
+		chat: one(chatTable, {
+			fields: [chatMembershipTable.chatId],
+			references: [chatTable.id],
+		}),
 	}),
-	user: one(userTable, {
-		fields: [chatMemberTable.userId],
-		references: [userTable.id],
-	}),
-}));
+);

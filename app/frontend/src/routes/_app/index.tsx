@@ -4,10 +4,8 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-import TopNav from "@/components/nav/top-nav";
 import { useChat } from "@/features/chat/context";
 import { chatsQueryFn } from "@/features/chat/queries";
 import { createFileRoute } from "@tanstack/react-router";
@@ -30,8 +28,6 @@ function ChatListSidebar() {
 	*/
 	return (
 		<>
-			<TopNav />
-			<SidebarSeparator className="mx-0" />
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu>

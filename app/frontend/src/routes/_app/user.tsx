@@ -1,7 +1,6 @@
 import {
 	SidebarContent,
-	SidebarHeader,
-	SidebarSeparator,
+	SidebarSeparator
 } from "@/components/ui/sidebar";
 
 import { ProfileEditForm } from "@/features/profile/components";
@@ -20,7 +19,6 @@ function UserSearchSidebar() {
 
 	return (
 		<>
-			<SidebarHeader>Users</SidebarHeader>
 			<SidebarSeparator className="my-2" />
 			<SidebarContent>
 				<ProfileEditForm />

@@ -22,7 +22,7 @@ export function Chat() {
 			<Separator />
 			<MessagesScrollArea chatId={chat.id} className="m-3 overflow-auto" />
 			<div className="border-t bg-background p-4">
-				<MessageForm chatId={chat.id} />
+				<MessageForm />
 			</div>
 		</div>
 	);

@@ -33,14 +33,14 @@ export function ChatHeader() {
 							<X
 								className="cursor-pointer text-white"
 								size="1.1rem"
-								onClick={() => setIsSearchOpen((prev) => !prev)}
+								onClick={() => setIsSearchOpen(!isSearchOpen)}
 							/>
 						</div>
 					) : (
 						<Search
 							className="ml-auto scale-100 transform cursor-pointer text-white transition-all duration-300 ease-in-out"
 							size="1.1rem"
-							onClick={() => setIsSearchOpen((prev) => !prev)}
+							onClick={() => setIsSearchOpen(!isSearchOpen)}
 						/>
 					)}
 				</div>
