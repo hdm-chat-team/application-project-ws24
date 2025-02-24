@@ -5,6 +5,7 @@ import type { Message } from "@server/db/messages";
 // * extends server message with receivedAt
 export interface LocalMessage extends Message {
 	receivedAt: string;
+	attachmentId?: string;
 }
 
 export function formatBerlinTime() {

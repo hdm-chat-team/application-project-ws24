@@ -1,9 +1,9 @@
 import type { LocalMessage } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
+import { saveFile } from "@/features/uploadthing/mutations";
 import { api } from "@/lib/api";
 import { compressToAvif } from "@/lib/compression";
 import { db } from "@/lib/db";
-import type { Attachment } from "@server/db/attachments";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
@@ -33,7 +33,7 @@ export function usePostMessage(chatId: string) {
 			const messageId = (await result.json()).data;
 
 			// * compress and upload attachments
-			if (files.length === 0) return;
+			if (files.length === 0) return { message, messageId };
 			const processedFiles = await Promise.all(
 				files.map(async (file) => {
 					if (!file.type.startsWith("image/")) return file;
@@ -41,13 +41,28 @@ export function usePostMessage(chatId: string) {
 					return compressedFile.size < file.size ? compressedFile : file;
 				}),
 			);
-			await startUpload(processedFiles, { id: messageId });
+
+			// * upload and save attachment
+			const [uploadResult] =
+				(await startUpload(processedFiles, { id: messageId })) ?? [];
+			if (!uploadResult?.customId) throw new Error("Upload failed");
+
+			await Promise.all([
+				saveFile(processedFiles[0], uploadResult.customId),
+				db.messages
+					.where("id")
+					.equals(messageId)
+					.modify((msg) => {
+						msg.attachmentId = uploadResult.customId ?? undefined;
+					}),
+			]);
+
+			return { message, messageId };
 		},
 		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
 	});
 }
-
 export function useSaveMessage() {
 	return useMutation({
 		mutationKey: ["db/save-message"],
@@ -86,20 +101,21 @@ export function useUpdateMessage() {
 export function useSaveAttachment() {
 	return useMutation({
 		mutationKey: ["db", "save", "attachment"],
-		mutationFn: async (attachment: Attachment) => {
-			await db.attachments.add(attachment);
-		},
-		onMutate: async ({ url }) => {
-			const blob = await fetch(url)
-				.then((res) => res.blob())
-				.catch((err) => {
-					console.error("Failed to fetch attachment", err);
-				});
+		mutationFn: async ({
+			messageId,
+			type,
+		}: { messageId: string; type: string }) => {
+			const message = await db.messages.get(messageId);
+			if (!message?.attachmentId) return;
 
-			if (!blob) return;
+			const existingFile = await db.files.get(message.attachmentId);
+			if (existingFile?.blob) return;
 
-			return blob;
+			const response = await fetch(`/api/files/${message.attachmentId}`);
+			const blob = await response.blob();
+			const file = new File([blob], message.attachmentId, { type });
+
+			await saveFile(file, message.attachmentId);
 		},
-		onSuccess: (_, { url }, blob) => db.attachments.update(url, { blob }),
 	});
 }
