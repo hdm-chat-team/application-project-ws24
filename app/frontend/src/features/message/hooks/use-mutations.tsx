@@ -5,6 +5,7 @@ import { compressToAvif } from "@/lib/compression";
 import { db } from "@/lib/db";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
+import { saveFile } from "@/features/uploadthing/mutations";
 
 export function usePostMessage(chatId: string) {
 	const { startUpload } = useUploadThing(
@@ -23,7 +24,7 @@ export function usePostMessage(chatId: string) {
 			const messageId = (await result.json()).data;
 
 			// * compress and upload attachments
-			if (files.length === 0) return;
+			if (files.length === 0) return { message, messageId };
 			const processedFiles = await Promise.all(
 				files.map(async (file) => {
 					if (!file.type.startsWith("image/")) return file;
@@ -31,13 +32,28 @@ export function usePostMessage(chatId: string) {
 					return compressedFile.size < file.size ? compressedFile : file;
 				}),
 			);
-			await startUpload(processedFiles, { id: messageId });
+
+			// * upload and save attachment
+			const [uploadResult] =
+				(await startUpload(processedFiles, { id: messageId })) ?? [];
+			if (!uploadResult?.customId) throw new Error("Upload failed");
+
+			await Promise.all([
+				saveFile(processedFiles[0], uploadResult.customId),
+				db.messages
+					.where("id")
+					.equals(messageId)
+					.modify((msg) => {
+						msg.attachmentId = uploadResult.customId ?? undefined;
+					}),
+			]);
+
+			return { message, messageId };
 		},
 		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
 	});
 }
-
 export function useSaveMessage() {
 	return useMutation({
 		mutationKey: ["db/save-message"],
