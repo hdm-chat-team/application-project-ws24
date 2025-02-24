@@ -1,7 +1,4 @@
-import {
-	SidebarContent,
-	SidebarSeparator
-} from "@/components/ui/sidebar";
+import { SidebarContent, SidebarSeparator } from "@/components/ui/sidebar";
 
 import { ProfileEditForm } from "@/features/profile/components";
 import { createFileRoute } from "@tanstack/react-router";
