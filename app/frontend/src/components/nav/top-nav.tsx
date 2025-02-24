@@ -10,9 +10,22 @@ import {
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { useUser } from "@/features/auth/hooks";
+import api from "@/lib/api";
 
 export default function TopNav() {
 	const { profile } = useUser();
+
+	const handleSettingsClick = () => {
+		alert("Will be implemented in the future");
+	};
+
+	const handleLogoutClick = () => {
+		const from = window.location.href;
+		window.location.href = api.auth.signout
+			.$url({ query: { from } })
+			.toString();
+	};
+
 
 	return (
 		<div className="flex items-center justify-between bg-red-600 px-4 py-3 text-white shadow-md dark:bg-[#2b0306] h-[var(--header-height)]">
@@ -40,11 +53,11 @@ export default function TopNav() {
 								Profile
 							</DropdownMenuItem>
 						</Link>
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={handleSettingsClick}>
 							<Settings className="mr-2 h-4 w-4" />
 							Settings
 						</DropdownMenuItem>
-						<DropdownMenuItem>
+						<DropdownMenuItem onClick={handleLogoutClick}>
 							<LogOut className="mr-2 h-4 w-4" />
 							Logout
 						</DropdownMenuItem>
