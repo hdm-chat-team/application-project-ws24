@@ -29,7 +29,7 @@ export function createMessage(
 		createdAt: new Date().toISOString(),
 		updatedAt: new Date().toISOString(),
 		state: "pending",
-		body,
+		body: body || null,
 		authorId,
 		chatId,
 		receivedAt: formatBerlinTime(),

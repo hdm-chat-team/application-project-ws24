@@ -17,10 +17,19 @@ export function usePostMessage(chatId: string) {
 		mutationFn: async ({
 			message,
 			files,
-		}: { message: LocalMessage; files: File[] }) => {
-			// * send message
-			const result = await api.chat.$post({ form: message });
+		}: {
+			message: LocalMessage;
+			files: File[];
+		}) => {
+			const formData = {
+				...message,
+				body: message.body ?? "",
+			};
+
+			const result = await api.chat.$post({ form: formData });
+
 			if (!result.ok) throw new Error("Failed to send message");
+
 			const messageId = (await result.json()).data;
 
 			// * compress and upload attachments
@@ -80,7 +89,10 @@ export function useUpdateMessage() {
 		mutationFn: async ({
 			messageId,
 			state,
-		}: { messageId: Message["id"]; state: Message["state"] }) => {
+		}: {
+			messageId: Message["id"];
+			state: Message["state"];
+		}) => {
 			await db.messages.update(messageId, { state });
 		},
 	});

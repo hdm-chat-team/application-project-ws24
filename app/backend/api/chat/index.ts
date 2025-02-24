@@ -1,19 +1,24 @@
 import { zValidator } from "@hono/zod-validator";
 import { HTTPException } from "hono/http-exception";
+import { z } from "zod";
 import { createRouter } from "#api/factory";
 import db from "#db";
 import { selectChatWithMembersByUserId } from "#db/chats";
 import {
+	attachmentMessageSchema,
 	insertMessage,
 	insertMessageRecipients,
-	insertMessageSchema,
+	textMessageSchema,
 } from "#db/messages";
 import { protectedRoute } from "#lib/middleware";
 import { publish } from "#lib/utils";
 
+// * A message must have a body or a attachment Message has a optional body
+const messageSchema = z.union([textMessageSchema, attachmentMessageSchema]);
+
 export const chatRouter = createRouter().post(
 	"/",
-	zValidator("form", insertMessageSchema),
+	zValidator("form", messageSchema),
 	protectedRoute,
 	async (c) => {
 		const message = c.req.valid("form");

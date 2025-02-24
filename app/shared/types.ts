@@ -8,7 +8,7 @@ const messageSchema = z.object({
 	createdAt: z.string().nonempty(),
 	updatedAt: z.string().nonempty(),
 	state: z.enum(["pending", "sent", "delivered", "read"]),
-	body: z.string().nonempty(),
+	body: z.string().nullable(),
 });
 
 const messageAttachmentSchema = z.object({
