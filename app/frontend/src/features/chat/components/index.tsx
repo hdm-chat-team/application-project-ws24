@@ -44,7 +44,7 @@ function MessagesScrollArea({
 	);
 
 	return (
-		<ScrollArea>
+		<>
 			<ol className={className}>
 				{messages?.map((message) => (
 					<li key={message.id}>
@@ -52,6 +52,6 @@ function MessagesScrollArea({
 					</li>
 				))}
 			</ol>
-		</ScrollArea>
+		</>
 	);
 }
