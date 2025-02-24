@@ -4,6 +4,7 @@ import { z } from "zod";
 const chatWithMembersSchema = z.object({
 	id: cuidSchema,
 	name: z.string().nullable(),
+	avatarUrl: z.string().url().nullable(),
 	type: z.enum(["self", "direct", "group"]),
 	members: z.array(cuidSchema),
 	createdAt: z.string().nonempty(),
