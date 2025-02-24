@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import {
 	type ClientToServerWsEventData,
+	clientToServerWsEventDataSchema,
 	type ServerToClientWsEventData,
 	serverToClientWsEventData,
 } from "@shared/types";
@@ -156,7 +157,7 @@ export default class WebSocketService {
 		}
 
 		// Validate the message using your Zod schema
-		const { error } = serverToClientWsEventData.safeParse(message);
+		const { error } = clientToServerWsEventDataSchema.safeParse(message);
 		if (error) {
 			console.error("Error validating outgoing message:", error);
 			return;
