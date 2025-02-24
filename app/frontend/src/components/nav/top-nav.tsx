@@ -1,16 +1,16 @@
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { useUser } from "@/features/auth/hooks";
+import api from "@/lib/api";
 import Logo from "@assets/hdmChat.svg";
 import { Link } from "@tanstack/react-router";
 import { LogOut, Settings, User } from "lucide-react";
 import { ModeToggle } from "../mode-toggle";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useUser } from "@/features/auth/hooks";
-import api from "@/lib/api";
 
 export default function TopNav() {
 	const { profile } = useUser();
@@ -26,9 +26,8 @@ export default function TopNav() {
 			.toString();
 	};
 
-
 	return (
-		<div className="flex items-center justify-between bg-red-600 px-4 py-3 text-white shadow-md dark:bg-[#2b0306] h-[var(--header-height)]">
+		<div className="flex h-[var(--header-height)] items-center justify-between bg-red-600 px-4 py-3 text-white shadow-md dark:bg-[#2b0306]">
 			<div className="flex items-center space-x-2">
 				<img src={Logo} alt="Logo" className="h-14 w-16 sm:h-14 sm:w-14" />
 			</div>

@@ -9,14 +9,14 @@ export function ChatHeader() {
 	const { chat } = useChat();
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-/* 
+	/* 
 	TODO: PLACEHOLDER here the Bildlink must be added
 	TODO: maybe a sidebar for all the meta data of the chat
 	<Search />
 	*/
 
 	return (
-		<header className="sticky top-0 flex h-[var(--header-height)] items-center gap-4 bg-red-600 px-4 dark:bg-[#2b0306] text-white">
+		<header className="sticky top-0 flex h-[var(--header-height)] items-center gap-4 bg-red-600 px-4 text-white dark:bg-[#2b0306]">
 			<SidebarTrigger className="-ml-1 text-white" />
 			{chat && (
 				<div className="flex w-full items-center gap-5">
@@ -28,7 +28,7 @@ export function ChatHeader() {
 						<div className="ml-auto flex items-center gap-2">
 							<Input
 								placeholder="Search Chat..."
-								className="w-64 scale-100 transform transition-all duration-300 ease-in-out bg-transparent text-white border border-white placeholder-white focus:ring-0 focus:outline-none"
+								className="w-64 scale-100 transform border border-white bg-transparent text-white placeholder-white transition-all duration-300 ease-in-out focus:outline-none focus:ring-0"
 							/>
 							<X
 								className="cursor-pointer text-white"
@@ -38,7 +38,7 @@ export function ChatHeader() {
 						</div>
 					) : (
 						<Search
-							className="ml-auto scale-100 transform cursor-pointer transition-all duration-300 ease-in-out text-white"
+							className="ml-auto scale-100 transform cursor-pointer text-white transition-all duration-300 ease-in-out"
 							size="1.1rem"
 							onClick={() => setIsSearchOpen((prev) => !prev)}
 						/>
