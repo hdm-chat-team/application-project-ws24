@@ -9,13 +9,15 @@ import {
 	useUpdateMessage,
 } from "@/features/message/hooks";
 import { formatBerlinTime } from "@/features/message/utils";
-import { saveFile } from "@/features/uploadthing/mutations";
+import { useSaveAttachment } from "@/features/message/hooks";
 import { type WSEventData, wsEventDataSchema } from "@shared/types";
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
 
 export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 	const queryClient = useQueryClient();
+
+	const { mutate: saveAttachment } = useSaveAttachment();
 
 	const saveMessage = useSaveMessage().mutate;
 	const saveMessagesByChat = useSaveMessageBatch().mutate;
@@ -46,6 +48,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 						...data.payload,
 						receivedAt: formatBerlinTime(),
 					};
+
 					saveMessage(localMessage);
 					sendMessage({
 						type: "message_received",
@@ -60,7 +63,7 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 				}
 				case "message_attachment": {
 					const { messageId, type } = data.payload;
-					saveFile(new File([], messageId, { type }), messageId);
+					saveAttachment({ messageId, type });
 					break;
 				}
 				case "message_delivered": {
@@ -82,7 +85,14 @@ export function useWebSocketEvents(sendMessage: (data: WSEventData) => void) {
 					break;
 			}
 		},
-		[queryClient, saveMessage, saveMessagesByChat, updateMessage, sendMessage],
+		[
+			queryClient,
+			saveMessage,
+			saveMessagesByChat,
+			updateMessage,
+			sendMessage,
+			saveAttachment,
+		],
 	);
 
 	return { handleOpen, handleMessage };
