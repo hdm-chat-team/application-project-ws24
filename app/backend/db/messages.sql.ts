@@ -31,7 +31,7 @@ export const messageTable = pgTable(
 			.notNull()
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
-		body: text().notNull(),
+		body: text(),
 	},
 	(table) => [
 		{

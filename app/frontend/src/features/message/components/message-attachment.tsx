@@ -37,7 +37,7 @@ export function MessageAttachments({ messageId }: { messageId: string }) {
 								className="h-auto w-full"
 								preload="metadata"
 							>
-								<track kind="captions" src="" label="Captions" />
+								<track kind="captions" label="Captions" />
 							</video>
 						</div>
 					)}
