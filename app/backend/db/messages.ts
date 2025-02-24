@@ -4,7 +4,7 @@ import {
 	createSelectSchema,
 	createUpdateSchema,
 } from "drizzle-zod";
-import type { z } from "zod";
+import { z } from "zod";
 import db from "#db";
 import {
 	messageRecipientTable,
@@ -14,12 +14,23 @@ import {
 import type { DB, Transaction } from "./types";
 
 const insertMessageSchema = createInsertSchema(messageTable);
+
+const textMessageSchema = insertMessageSchema.extend({
+	body: z.string().trim().nonempty(),
+});
+
+const attachmentMessageSchema = insertMessageSchema.extend({
+	body: z.string().nullable(),
+});
+
 const updateMessageSchema = createUpdateSchema(messageTable);
 const selectMessageSchema = createSelectSchema(messageTable);
 type Message = z.infer<typeof selectMessageSchema>;
 
 const insertMessage = async (
-	message: z.infer<typeof insertMessageSchema>,
+	message:
+		| z.infer<typeof textMessageSchema>
+		| z.infer<typeof attachmentMessageSchema>,
 	trx: Transaction | DB = db,
 ) =>
 	await trx
@@ -154,6 +165,8 @@ export {
 	pruneMessages,
 	selectMessageRecipientIdsByMessageId,
 	selectMessageSchema,
+	textMessageSchema,
+	attachmentMessageSchema,
 	// * Message functions
 	selectMessagesToSync,
 	updateMessageRecipientsStates,
