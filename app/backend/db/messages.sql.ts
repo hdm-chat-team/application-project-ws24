@@ -30,7 +30,7 @@ export const messageTable = pgTable(
 			.notNull()
 			.references(() => userTable.id),
 		state: messageStateEnum().notNull(),
-		body: text().notNull(),
+		body: text(),
 		createdAt: timestamp({ mode: "string" }).notNull(),
 		updatedAt: timestamp({ mode: "string" }).notNull(),
 	},

@@ -17,10 +17,19 @@ export function usePostMessage(chatId: string) {
 		mutationFn: async ({
 			message,
 			files,
-		}: { message: Message; files: File[] }) => {
-			// * send message
-			const result = await api.message.$post({ form: message });
+		}: {
+			message: Message;
+			files: File[];
+		}) => {
+			const formData = {
+				...message,
+				body: message.body ?? "",
+			};
+
+			const result = await api.message.$post({ form: formData });
+
 			if (!result.ok) throw new Error("Failed to send message");
+
 			const messageId = (await result.json()).data;
 
 			// * compress and upload attachments
