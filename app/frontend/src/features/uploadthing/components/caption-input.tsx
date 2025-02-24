@@ -13,12 +13,12 @@ export function CaptionInput({ value, onChange, onSubmit }: CaptionInputProps) {
 		<div className="flex gap-2">
 			<Input
 				value={value}
-				onChange={(e) => onChange(e.target.value)}
+				onChange={(event) => onChange(event.target.value)}
 				placeholder="Add a caption..."
 				className="flex-1"
-				onKeyDown={(e) => {
-					if (e.key === "Enter" && !e.shiftKey) {
-						e.preventDefault();
+				onKeyDown={(event) => {
+					if (event.key === "Enter" && !event.shiftKey) {
+						event.preventDefault();
 						onSubmit();
 					}
 				}}
