@@ -13,14 +13,15 @@
 	"scripts": {
 		"build": "bun build backend/index.ts --outdir dist --target bun --minify",
 		"check": "bun tsc",
-		"db": "bunx drizzle-kit",
-		"db:prod": "bun --env-file=.env.production drizzle-kit",
 		"dev": "NODE_ENV=development bun run --hot backend/index.ts",
 		"preview": "NODE_ENV=production bun run dist/index.js",
 		"start": "NODE_ENV=production bun run dist/index.js",
+		"db": "bun drizzle-kit",
+		"db:prod": "bun --env-file=.env.production drizzle-kit",
+		"db:reset": "bun --bun backend/db/scripts/reset.ts",
+		"db:seed": "bun --bun backend/db/scripts/seed.ts",
 		"test": "bun test --coverage",
-		"test:watch": "bun test --watch",
-		"db:seed": "bun run backend/db/scripts/seed.ts"
+		"test:watch": "bun test --watch"
 	},
 	"dependencies": {
 		"@application-project-ws24/cuid": "workspace:*",
@@ -30,14 +31,14 @@
 		"drizzle-zod": "^0.7.0",
 		"hono": "^4.6.19",
 		"pg": "^8.13.1",
-		"uploadthing": "^7.4.4",
+		"uploadthing": "^7.5.2",
 		"zod": "^3.24.1"
 	},
 	"devDependencies": {
 		"@application-project-ws24/tsconfig": "workspace:*",
 		"@types/bun": "^1.2.0",
 		"@types/pg": "^8.11.11",
-		"drizzle-kit": "^0.30.2",
+		"drizzle-kit": "^0.30.4",
 		"drizzle-seed": "^0.3.1"
 	}
 }

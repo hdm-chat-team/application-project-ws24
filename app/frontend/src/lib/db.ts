@@ -1,21 +1,22 @@
+import type { LocalChat } from "@/features/chat/utils";
+import type { LocalUser } from "@/features/contacts/types";
 import type { LocalMessage } from "@/features/message/utils";
 import type { LocalFile } from "@/features/uploadthing/types";
-import type { Chat } from "@server/db/chats";
 import Dexie from "dexie";
-import type { EntityTable } from "dexie";
 
 export type LocalDatabase = Dexie & {
-	messages: EntityTable<LocalMessage, "id">;
-	chats: EntityTable<Chat, "id">;
-	files: EntityTable<LocalFile & { blob?: Blob }, "customId">;
+	users: Dexie.Table<LocalUser, string>;
+	chats: Dexie.Table<LocalChat, string>;
+	messages: Dexie.Table<LocalMessage, string>;
+	files: Dexie.Table<LocalFile & { blob?: Blob }, string>;
 };
 
 const db = new Dexie("database") as LocalDatabase;
 
-db.version(14).stores({
-	messages:
-		"id, body, state, chatId, authorId, createdAt, updatedAt, receivedAt",
-	chats: "id, name, createdAt, updatedAt",
+db.version(18).stores({
+	users: "id, &username, &email, relation, profile.displayName",
+	chats: "id, name, type, syncState, createdAt, updatedAt",
+	messages: "id, state, chatId, authorId, createdAt, updatedAt, receivedAt",
 	files: "customId, originalName, type, createdAt",
 });
 

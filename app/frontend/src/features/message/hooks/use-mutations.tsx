@@ -1,4 +1,5 @@
-import type { LocalMessage } from "@/features/message/utils";
+import { useChat } from "@/features/chat/context";
+import { type LocalMessage, localeTime } from "@/features/message/utils";
 import { useUploadThing } from "@/features/uploadthing/hooks";
 import { saveFile } from "@/features/uploadthing/mutations";
 import { api } from "@/lib/api";
@@ -7,18 +8,42 @@ import { db } from "@/lib/db";
 import type { Message } from "@server/db/messages";
 import { useMutation } from "@tanstack/react-query";
 
-export function usePostMessage(chatId: string) {
+export function usePostMessage() {
+	const { chat } = useChat();
+	return useMutation({
+		mutationKey: ["POST", api.message.$url().pathname, chat?.id],
+		mutationFn: async ({ message }: { message: Message }) => {
+			const result = await api.message.$post({
+				form: {
+					...message,
+					body: message.body || undefined,
+				},
+			});
+
+			if (!result.ok) throw new Error("Failed to send message");
+		},
+		onMutate: ({ message }) =>
+			db.messages.add({
+				...message,
+				state: "sent",
+				receivedAt: localeTime(),
+			}),
+		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
+	});
+}
+
+export function usePostAttachment(chatId: string) {
 	const { startUpload } = useUploadThing(
 		(routeRegistry) => routeRegistry.attachment,
 	);
 
 	return useMutation({
-		mutationKey: [api.chat.$url().pathname, chatId],
+		mutationKey: ["POST", api.message.$url().pathname, chatId],
 		mutationFn: async ({
 			message,
 			files,
 		}: {
-			message: LocalMessage;
+			message: Message;
 			files: File[];
 		}) => {
 			const formData = {
@@ -26,7 +51,7 @@ export function usePostMessage(chatId: string) {
 				body: message.body ?? "",
 			};
 
-			const result = await api.chat.$post({ form: formData });
+			const result = await api.message.$post({ form: formData });
 
 			if (!result.ok) throw new Error("Failed to send message");
 
@@ -59,7 +84,12 @@ export function usePostMessage(chatId: string) {
 
 			return { message, messageId };
 		},
-		onMutate: ({ message }) => db.messages.add({ ...message, state: "sent" }),
+		onMutate: ({ message }) =>
+			db.messages.add({
+				...message,
+				state: "sent",
+				receivedAt: localeTime(),
+			}),
 		onError: (_error, { message }) => db.messages.delete(message.id), // ? still persist and add retry feature?
 	});
 }
@@ -86,14 +116,9 @@ export function useSaveMessageBatch() {
 export function useUpdateMessage() {
 	return useMutation({
 		mutationKey: ["db/update-message"],
-		mutationFn: async ({
-			messageId,
-			state,
-		}: {
-			messageId: Message["id"];
-			state: Message["state"];
-		}) => {
-			await db.messages.update(messageId, { state });
+		mutationFn: async (options: Pick<Message, "id" | "state">) => {
+			const { id, state } = options;
+			await db.messages.update(id, { state });
 		},
 	});
 }

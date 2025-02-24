@@ -34,11 +34,13 @@ export function generateSessionToken(): string {
 export async function createSession(
 	userId: string,
 	token: string,
+	deviceId: string,
 ): Promise<Session> {
 	const [session] = await insertSession
 		.execute({
 			token: hashToken(token),
 			userId,
+			deviceId,
 		})
 		.catch((error) => {
 			console.error("Failed to insert session:", error);

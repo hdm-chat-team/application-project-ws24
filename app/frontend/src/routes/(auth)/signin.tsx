@@ -67,7 +67,7 @@ function SignIn() {
 					<CardFooter className="flex w-full flex-col">
 						<h1>or sign in with</h1>
 						<div className="mt-5 flex w-full justify-center">
-							<GithubSignInButton from={from ?? ""} />
+							<GithubSignInButton from={from} />
 						</div>
 					</CardFooter>
 				</div>

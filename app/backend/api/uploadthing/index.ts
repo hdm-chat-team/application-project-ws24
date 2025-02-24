@@ -71,16 +71,19 @@ export const uploadRouter = {
 						throw uploadthingDBError("Failed to insert attachment");
 					});
 
+				if (!attachment)
+					throw uploadthingDBError("Failed to insert attachment");
+
 				const recipientIds = await selectMessageRecipientIdsByMessageId
 					.execute({ messageId })
-					.catch(() => {
-						throw uploadthingDBError("Failed to select recipient IDs");
-					})
 					.then((rows) => rows.map(({ recipientId }) => recipientId));
+
+				if (!recipientIds.length)
+					throw uploadthingDBError("No recipient IDs found");
 
 				for (const recipientId of recipientIds)
 					publish(recipientId, {
-						type: "message_attachment",
+						type: "message:attachment",
 						payload: attachment,
 					});
 

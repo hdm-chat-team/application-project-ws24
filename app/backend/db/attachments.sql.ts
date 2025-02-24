@@ -1,12 +1,12 @@
 import { relations } from "drizzle-orm";
 import { pgTable, text, varchar } from "drizzle-orm/pg-core";
 import { messageTable } from "./messages.sql";
-import { ID_SIZE_CONFIG } from "./utils";
+import { cuid } from "./utils";
 
-export const messageAttachmentTable = pgTable("message_attachments", {
+export const messageAttachmentTable = pgTable("messages_attachments", {
 	url: varchar({ length: 255 }).primaryKey(),
 	type: text().notNull(),
-	messageId: varchar(ID_SIZE_CONFIG)
+	messageId: cuid()
 		.references(() => messageTable.id, { onDelete: "cascade" })
 		.notNull(),
 });

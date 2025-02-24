@@ -16,6 +16,7 @@ const router = createRouter({
 	routeTree,
 	defaultNotFoundComponent: DefaultNotFound,
 	context: { queryClient },
+	defaultPreloadStaleTime: 0, // * Because we are using ReactQuery's caching
 });
 
 // * TypeScript type registration for router instance

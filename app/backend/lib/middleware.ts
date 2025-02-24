@@ -8,9 +8,11 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import type { HTTPResponseError } from "hono/types";
 import type { Env, ProtectedEnv } from "#api/app.env";
-import { validateSessionToken } from "#auth/session";
+import { invalidateSession, validateSessionToken } from "#auth/session";
 import env, { DEV, TEST } from "#env";
 import cookieConfig from "#lib/cookie";
+
+const SESSION_COOKIE_NAME = "auth_session";
 
 const origin = DEV
 	? [env.APP_URL, `http://localhost:${env.PORT}`, "http://localhost:5173"]
@@ -30,23 +32,41 @@ const origin = DEV
  * - session: Session object or null
  */
 const authMiddleware = createMiddleware<Env>(async (c, next) => {
-	const sessionCookieToken = getCookie(c, "auth_session") ?? null;
+	const sessionCookieToken = getCookie(c, SESSION_COOKIE_NAME) ?? null;
+
 	if (!sessionCookieToken) {
 		c.set("user", null);
 		c.set("session", null);
+		c.set("profile", null);
 		return next();
 	}
+
 	const { session, user, profile, fresh } =
 		await validateSessionToken(sessionCookieToken);
 
 	if (!session) {
-		deleteCookie(c, "auth_session");
-	} else if (fresh) {
-		setCookie(c, "auth_session", session.token, {
+		deleteCookie(c, SESSION_COOKIE_NAME);
+		return next();
+	}
+
+	// Verify device ID if header is present
+	const deviceIdCookie = getCookie(c, "device_id");
+	if (deviceIdCookie && deviceIdCookie !== session.deviceId) {
+		console.warn("⚠️ Device ID mismatch. Invalidating session.");
+		await invalidateSession(session.token);
+		deleteCookie(c, SESSION_COOKIE_NAME);
+		deleteCookie(c, "device_id");
+		c.set("user", null);
+		c.set("session", null);
+		c.set("profile", null);
+		return next();
+	}
+
+	if (fresh)
+		setCookie(c, SESSION_COOKIE_NAME, session.token, {
 			...cookieConfig,
 			expires: session.expiresAt,
 		});
-	}
 
 	c.set("user", user);
 	c.set("profile", profile);
@@ -55,36 +75,26 @@ const authMiddleware = createMiddleware<Env>(async (c, next) => {
 });
 
 /**
- * Route protection middleware.
+ * Protected route authentication middleware.
  *
  * @description
- * makes sure that a valid session and user are present in the context, making them not be null.
+ * Ensures that a valid session, user, profile and deviceId are present in the context.
+ * This middleware should be used after the authMiddleware to protect routes that require authentication.
  *
- * @throws {HTTPException} 401 error if user or session is missing
+ * @returns 401 Unauthorized response if any of the required context variables are missing.
  *
  * @example
- * router.get("/protected", protectedRoute, async (c) => {
- *   const user = c.get("user");
- *   const session = c.get("session");
- *   // Handle protected route...
+ * router.get("/profile", requireAuth, async (c) => {
+ *   const user = c.get("user"); // truthy
+ *   const session = c.get("session"); // truthy
+ *   return c.json({ user, session });
  * });
  */
 export const protectedRoute = createMiddleware<ProtectedEnv>(
 	async (c, next) => {
-		const user = c.get("user");
-		const profile = c.get("profile");
-		const session = c.get("session");
-
-		if (!session || !user || !profile)
-			throw new HTTPException(401, {
-				message: "Unauthorized",
-				cause: "Missing session or user",
-			});
-
-		c.set("user", user);
-		c.set("profile", profile);
-		c.set("session", session);
-		return next();
+		const { ...valuesToVerify } = c.var;
+		const isAuthenticated = Object.values(valuesToVerify).every(Boolean);
+		return !isAuthenticated ? c.json(401) : next();
 	},
 );
 
@@ -127,15 +137,11 @@ export const utilityMiddlewares = every(
  * @returns A `Response` object with a status code and message based on the error type.
  */
 export async function onError(error: Error | HTTPResponseError) {
-	let response: Response;
-	if (!(error instanceof HTTPException)) {
-		console.error(error);
-		response = new Response(error.message, {
-			status: 500,
-			statusText: `Internal error: ${error.cause}`,
-		});
-	} else {
-		response = error.getResponse();
-	}
-	return response;
+	console.error(error);
+	return !(error instanceof HTTPException)
+		? new Response(error.message, {
+				status: 500,
+				statusText: `Internal error: ${error.cause}`,
+			})
+		: error.getResponse();
 }
