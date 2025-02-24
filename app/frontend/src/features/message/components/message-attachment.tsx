@@ -3,11 +3,12 @@ import { db } from "@/lib/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { FileIcon } from "lucide-react";
 
-export function MessageAttachments({ messageId }: { messageId: string }) {
+export function MessageAttachments({ customId }: { customId: string }) {
 	const file = useLiveQuery(
-		() => db.files.where("customId").equals(messageId).first(),
-		[messageId],
+		() => db.files.where("customId").equals(customId).first(),
+		[customId],
 	);
+
 	if (!file) return null;
 	return (
 		<div className="space-y-2">
